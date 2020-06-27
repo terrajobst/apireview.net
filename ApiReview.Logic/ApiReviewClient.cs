@@ -19,16 +19,26 @@ namespace ApiReview.Logic
         private const string _repoList = "dotnet/runtime,dotnet/winforms";
         private const string _netFoundationChannelId = "UCiaZbznpWV1o-KLxj8zqR6A";
 
-        public static async Task<ApiReviewSummary> GetSummaryAsync(DateTimeOffset date)
+        public static async Task<ApiReviewSummary> GetSummaryAsync(string videoId)
         {
             var repos = OrgAndRepo.ParseList(_repoList).ToArray();
-            var video = await GetVideoAsync(date);
-            var items = await GetFeedbackAsync(repos, date);
+            var video = await GetVideoAsync(videoId);
+            if (video == null)
+                return null;
 
+            var date = video.StartDateTime.Date;
+            var items = await GetFeedbackAsync(repos, date);
             return CreateSummary(date, video, items);
         }
 
-        public static ApiReviewSummary CreateSummary(DateTimeOffset date, ApiReviewVideo video, IReadOnlyList<ApiReviewFeedback> items)
+        public static async Task<ApiReviewSummary> GetSummaryAsync(DateTimeOffset date)
+        {
+            var repos = OrgAndRepo.ParseList(_repoList).ToArray();
+            var items = await GetFeedbackAsync(repos, date);
+            return CreateSummary(date, null, items);
+        }
+
+        private static ApiReviewSummary CreateSummary(DateTimeOffset date, ApiReviewVideo video, IReadOnlyList<ApiReviewFeedback> items)
         {
             if (items.Count == 0)
             {
@@ -295,7 +305,38 @@ namespace System.Security.Cryptography.X509Certificates
             return Task.FromResult(result);
         }
 
-        private static async Task<ApiReviewVideo> GetVideoAsync(DateTimeOffset date)
+        public static Task<IReadOnlyList<ApiReviewVideo>> GetFakeVideosAsync()
+        {
+            var result = new[]
+            {
+                new ApiReviewVideo(
+                    "rx_098IdZU0",
+                    DateTimeOffset.Parse("2020-06-25T16:54:00Z"),
+                    DateTimeOffset.Parse("2020-06-25T19:02:22Z"),
+                    "GitHub Quick Reviews",
+                    "https://i.ytimg.com/vi/rx_098IdZU0/mqdefault.jpg"
+                ),
+                new ApiReviewVideo(
+                    "q7ODj3RJnME",
+                    DateTimeOffset.Parse("2020-06-25T16:53:18Z"),
+                    DateTimeOffset.Parse("2020-06-25T17:42:57Z"),
+                    "Desktop: .NET Community Standup - June 25th 2020 - New XAML Desktop Features",
+                    "https://i.ytimg.com/vi/q7ODj3RJnME/mqdefault.jpg"
+                )
+            };
+
+            return Task.FromResult<IReadOnlyList<ApiReviewVideo>>(result);
+        }
+
+        public static async Task<IReadOnlyList<ApiReviewVideo>> GetVideosAsync(DateTimeOffset date)
+        {
+            var publishedAfter = date.Date;
+            var publishedBefore = date.Date.AddHours(23).AddMinutes(59).AddSeconds(59);
+            var videos = await GetVideosAsync(publishedAfter, publishedBefore);
+            return videos;
+        }
+
+        public static async Task<IReadOnlyList<ApiReviewVideo>> GetVideosAsync(DateTimeOffset publishedAfter, DateTimeOffset publishedBefore)
         {
             var service = await YouTubeServiceFactory.CreateAsync();
 
@@ -305,11 +346,9 @@ namespace System.Security.Cryptography.X509Certificates
             var searchRequest = service.Search.List("snippet");
             searchRequest.ChannelId = _netFoundationChannelId;
             searchRequest.Type = "video";
-            searchRequest.Q = "review";
             searchRequest.EventType = EventTypeEnum.Completed;
-            searchRequest.PublishedAfter = date.Date;
-            searchRequest.PublishedBefore = date.Date.AddHours(23).AddMinutes(59).AddSeconds(59);
-            searchRequest.Order = OrderEnum.Date;
+            searchRequest.PublishedAfter = publishedAfter.DateTime;
+            searchRequest.PublishedBefore = publishedBefore.DateTime;
 
             while (nextPageToken != null)
             {
@@ -327,22 +366,34 @@ namespace System.Security.Cryptography.X509Certificates
                 nextPageToken = response.NextPageToken;
             }
 
-            var video = result.Where(v => v.LiveStreamingDetails != null &&
+            var videos = result.Where(v => v.LiveStreamingDetails != null &&
                                           v.LiveStreamingDetails.ActualStartTime != null &&
                                           v.LiveStreamingDetails.ActualEndTime != null)
-                              .OrderByDescending(v => v.LiveStreamingDetails.ActualStartTime.Value)
-                              .FirstOrDefault(v => v.LiveStreamingDetails.ActualEndTime.Value.Date == date);
+                               .OrderByDescending(v => v.LiveStreamingDetails.ActualStartTime.Value)
+                               .Select(CreateVideo);
+            return videos.ToArray();
+        }
 
-            if (video != null)
-            {
-                return new ApiReviewVideo(video.Id,
-                                          video.LiveStreamingDetails.ActualStartTime.Value,
-                                          video.LiveStreamingDetails.ActualEndTime.Value,
-                                          video.Snippet.Title,
-                                          video.Snippet.Thumbnails?.Default__?.Url);
-            }
+        private static ApiReviewVideo CreateVideo(Video v)
+        {
+            return new ApiReviewVideo(v.Id,
+                                      v.LiveStreamingDetails.ActualStartTime.Value,
+                                      v.LiveStreamingDetails.ActualEndTime.Value,
+                                      v.Snippet.Title,
+                                      v.Snippet.Thumbnails?.Default__?.Url);
+        }
 
-            return null;
+        public static async Task<ApiReviewVideo> GetVideoAsync(string videoId)
+        {
+            var service = await YouTubeServiceFactory.CreateAsync();
+
+            var videoRequest = service.Videos.List("snippet,liveStreamingDetails");
+            videoRequest.Id = videoId;
+            var videoResponse = await videoRequest.ExecuteAsync();
+            if (videoResponse.Items.Count == 0)
+                return null;
+
+            return CreateVideo(videoResponse.Items[0]);
         }
 
         private static async Task<IReadOnlyList<ApiReviewFeedback>> GetFeedbackAsync(OrgAndRepo[] repos, DateTimeOffset date)

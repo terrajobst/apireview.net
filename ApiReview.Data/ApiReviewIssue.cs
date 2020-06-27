@@ -19,15 +19,7 @@ namespace ApiReview.Data
 
         public DateTimeOffset CreatedAt { get; set; }
 
-        public string DetailText
-        {
-            get
-            {
-                var age = DateTimeOffset.Now - CreatedAt;
-                var ageText = TimeFormatting.Format(age);
-                return $"{IdFull} {ageText} by {Author}";
-            }
-        }
+        public string DetailText => $"{IdFull} {CreatedAt.FormatAge()} by {Author}";
 
         public string Url { get; set; }
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 using ApiReview.Data;
@@ -12,10 +13,23 @@ namespace ApiReview.Backend.Controllers
     [Route("[controller]")]
     public class NotesController : ControllerBase
     {
-        [HttpGet("{date}")]
-        public Task<ApiReviewSummary> Get(DateTimeOffset date)
+        [HttpGet("date/{date}")]
+        public Task<ApiReviewSummary> GetByDate(DateTimeOffset date)
         {
-            return ApiReviewClient.GetFakeSummaryAsync(date);
+            return ApiReviewClient.GetSummaryAsync(date);
+        }
+
+        [HttpGet("video/{videoId}")]
+        public Task<ApiReviewSummary> GetByVideo(string videoId)
+        {
+            return ApiReviewClient.GetSummaryAsync(videoId);
+        }
+
+        [HttpGet("videos/{date}")]
+        public Task<IReadOnlyList<ApiReviewVideo>> GetVideos(DateTimeOffset date)
+        {
+            //return ApiReviewClient.GetVideosAsync(date);
+            return ApiReviewClient.GetFakeVideosAsync();
         }
     }
 }

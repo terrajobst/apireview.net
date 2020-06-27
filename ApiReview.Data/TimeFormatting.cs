@@ -2,7 +2,7 @@
 
 namespace ApiReview.Data
 {
-    internal static class TimeFormatting
+    public static class TimeFormatting
     {
         public static string Format(TimeSpan elapsedTime)
         {
@@ -21,6 +21,12 @@ namespace ApiReview.Data
                 return $"{totalMinutes:N0} minutes ago";
             else
                 return $"just now";
+        }
+
+        public static string FormatAge(this DateTimeOffset dateTimeOffset)
+        {
+            var elapased = DateTimeOffset.Now.Subtract(dateTimeOffset);
+            return Format(elapased);
         }
     }
 }
