@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Google.Apis.YouTube.v3" Version="1.38.2.1565" />
+    <PackageReference Include="Markdig" Version="0.17.1" />
+    <PackageReference Include="Octokit" Version="0.34.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ApiReview.Data\ApiReview.Data.csproj" />
+  </ItemGroup>
+
+</Project>
