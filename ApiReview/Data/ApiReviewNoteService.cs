@@ -18,21 +18,21 @@ namespace ApiReview.Data
             };
         }
 
-        public Task<ApiReviewSummary> GetByDate(DateTimeOffset date)
+        public Task<ApiReviewSummary> IssuesForRange(DateTimeOffset start, DateTimeOffset end, bool video)
         {
-            var url = "notes/date/" + date.ToString("s");
+            var url = $"notes/issues-for-range?start={start:s}&end={end:s}&video={video}";
             return _client.GetFromJsonAsync<ApiReviewSummary>(url);
         }
 
-        public Task<ApiReviewSummary> GetByVideo(string videoId)
+        public Task<ApiReviewSummary> IssuesForVideo(string videoId)
         {
-            var url = "notes/video/" + videoId;
+            var url = $"notes/issues-for-video?videoId={videoId}";
             return _client.GetFromJsonAsync<ApiReviewSummary>(url);
         }
 
-        public Task<IReadOnlyList<ApiReviewVideo>> GetVideos(DateTimeOffset date)
+        public Task<IReadOnlyList<ApiReviewVideo>> GetVideos(DateTimeOffset start, DateTimeOffset end)
         {
-            var url = "notes/videos/" + date.ToString("s");
+            var url = $"notes/videos?start={start:s}&end={end:s}";
             return _client.GetFromJsonAsync<IReadOnlyList<ApiReviewVideo>>(url);
         }
     }

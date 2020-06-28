@@ -19,6 +19,14 @@ namespace ApiReview.Logic
         private const string _repoList = "dotnet/runtime,dotnet/winforms";
         private const string _netFoundationChannelId = "UCiaZbznpWV1o-KLxj8zqR6A";
 
+        public static async Task<ApiReviewSummary> GetSummaryAsync(DateTimeOffset start, DateTimeOffset end, bool includeVideo)
+        {
+            var repos = OrgAndRepo.ParseList(_repoList).ToArray();
+            var video = !includeVideo ? null : await GetVideoAsync(start, end);
+            var items = await GetFeedbackAsync(repos, start, end);
+            return CreateSummary(video, items);
+        }
+
         public static async Task<ApiReviewSummary> GetSummaryAsync(string videoId)
         {
             var repos = OrgAndRepo.ParseList(_repoList).ToArray();
@@ -26,25 +34,18 @@ namespace ApiReview.Logic
             if (video == null)
                 return null;
 
-            var date = video.StartDateTime.Date;
-            var items = await GetFeedbackAsync(repos, date);
-            return CreateSummary(date, video, items);
+            var start = video.StartDateTime;
+            var end = video.EndDateTime;
+            var items = await GetFeedbackAsync(repos, start, end);
+            return CreateSummary(video, items);
         }
 
-        public static async Task<ApiReviewSummary> GetSummaryAsync(DateTimeOffset date)
-        {
-            var repos = OrgAndRepo.ParseList(_repoList).ToArray();
-            var items = await GetFeedbackAsync(repos, date);
-            return CreateSummary(date, null, items);
-        }
-
-        private static ApiReviewSummary CreateSummary(DateTimeOffset date, ApiReviewVideo video, IReadOnlyList<ApiReviewFeedback> items)
+        private static ApiReviewSummary CreateSummary(ApiReviewVideo video, IReadOnlyList<ApiReviewFeedback> items)
         {
             if (items.Count == 0)
             {
                 return new ApiReviewSummary
                 {
-                    Date = date,
                     Video = video,
                     Items = Array.Empty<ApiReviewFeedbackWithVideo>()
                 };
@@ -100,14 +101,13 @@ namespace ApiReview.Logic
 
                 return new ApiReviewSummary
                 {
-                    Date = date,
                     Video = video,
                     Items = result
                 };
             }
         }
 
-        public static Task<ApiReviewSummary> GetFakeSummaryAsync(DateTimeOffset date)
+        public static Task<ApiReviewSummary> GetFakeSummaryAsync()
         {
             var video = new ApiReviewVideo(
                 "t-X09mGPvNM",
@@ -301,7 +301,7 @@ namespace System.Security.Cryptography.X509Certificates
                 }
             };
 
-            var result = CreateSummary(video.StartDateTime.Date, video, items);
+            var result = CreateSummary(video, items);
             return Task.FromResult(result);
         }
 
@@ -328,12 +328,10 @@ namespace System.Security.Cryptography.X509Certificates
             return Task.FromResult<IReadOnlyList<ApiReviewVideo>>(result);
         }
 
-        public static async Task<IReadOnlyList<ApiReviewVideo>> GetVideosAsync(DateTimeOffset date)
+        public static async Task<ApiReviewVideo> GetVideoAsync(DateTimeOffset publishedAfter, DateTimeOffset publishedBefore)
         {
-            var publishedAfter = date.Date;
-            var publishedBefore = date.Date.AddHours(23).AddMinutes(59).AddSeconds(59);
             var videos = await GetVideosAsync(publishedAfter, publishedBefore);
-            return videos;
+            return videos.FirstOrDefault();
         }
 
         public static async Task<IReadOnlyList<ApiReviewVideo>> GetVideosAsync(DateTimeOffset publishedAfter, DateTimeOffset publishedBefore)
@@ -349,28 +347,29 @@ namespace System.Security.Cryptography.X509Certificates
             searchRequest.EventType = EventTypeEnum.Completed;
             searchRequest.PublishedAfter = publishedAfter.DateTime;
             searchRequest.PublishedBefore = publishedBefore.DateTime;
+            searchRequest.MaxResults = 25;
 
             while (nextPageToken != null)
             {
                 searchRequest.PageToken = nextPageToken;
                 var response = await searchRequest.ExecuteAsync();
 
-                foreach (var searchResultItem in response.Items)
-                {
-                    var videoRequest = service.Videos.List("snippet,liveStreamingDetails");
-                    videoRequest.Id = searchResultItem.Id.VideoId;
-                    var videoResponse = await videoRequest.ExecuteAsync();
-                    result.AddRange(videoResponse.Items);
-                }
+                var ids = response.Items.Select(i => i.Id.VideoId);
+                var idString = string.Join(",", ids);
+
+                var videoRequest = service.Videos.List("snippet,liveStreamingDetails");
+                videoRequest.Id = idString;
+                var videoResponse = await videoRequest.ExecuteAsync();
+                result.AddRange(videoResponse.Items);
 
                 nextPageToken = response.NextPageToken;
             }
 
             var videos = result.Where(v => v.LiveStreamingDetails != null &&
-                                          v.LiveStreamingDetails.ActualStartTime != null &&
-                                          v.LiveStreamingDetails.ActualEndTime != null)
-                               .OrderByDescending(v => v.LiveStreamingDetails.ActualStartTime.Value)
-                               .Select(CreateVideo);
+                                           v.LiveStreamingDetails.ActualStartTime != null &&
+                                           v.LiveStreamingDetails.ActualEndTime != null)
+                               .Select(CreateVideo)
+                               .OrderByDescending(v => v.Duration);
             return videos.ToArray();
         }
 
@@ -396,7 +395,7 @@ namespace System.Security.Cryptography.X509Certificates
             return CreateVideo(videoResponse.Items[0]);
         }
 
-        private static async Task<IReadOnlyList<ApiReviewFeedback>> GetFeedbackAsync(OrgAndRepo[] repos, DateTimeOffset date)
+        private static async Task<IReadOnlyList<ApiReviewFeedback>> GetFeedbackAsync(OrgAndRepo[] repos, DateTimeOffset start, DateTimeOffset end)
         {
             static string GetApiStatus(Issue issue)
             {
@@ -456,9 +455,9 @@ namespace System.Security.Cryptography.X509Certificates
                 return false;
             }
 
-            static IEnumerable<EventInfo> GetApiEvents(IEnumerable<EventInfo> events, DateTimeOffset date)
+            static IEnumerable<EventInfo> GetApiEvents(IEnumerable<EventInfo> events, DateTimeOffset start, DateTimeOffset end)
             {
-                foreach (var eventGroup in events.Where(e => e.CreatedAt.Date == date && IsApiEvent(e))
+                foreach (var eventGroup in events.Where(e => start <= e.CreatedAt && e.CreatedAt <= end && IsApiEvent(e))
                                                  .GroupBy(e => e.CreatedAt.Date))
                 {
                     var latest = eventGroup.OrderBy(e => e.CreatedAt).Last();
@@ -497,7 +496,7 @@ namespace System.Security.Cryptography.X509Certificates
                 {
                     Filter = IssueFilter.All,
                     State = ItemStateFilter.All,
-                    Since = date
+                    Since = start
                 };
 
                 var issues = await github.Issue.GetAllForRepository(owner, repo, request);
@@ -513,7 +512,7 @@ namespace System.Security.Cryptography.X509Certificates
                     if (!WasEverReadyForReview(issue, events))
                         continue;
 
-                    foreach (var apiEvent in GetApiEvents(events, date))
+                    foreach (var apiEvent in GetApiEvents(events, start, end))
                     {
                         var title = GitHubIssueHelpers.FixTitle(issue.Title);
                         var feedbackDateTime = apiEvent.CreatedAt;
@@ -637,10 +636,13 @@ namespace System.Security.Cryptography.X509Certificates
 
         public static async Task CommitAsync(ApiReviewSummary summary)
         {
+            if (summary.Items.Count == 0)
+                return;
+
             var owner = "dotnet";
             var repo = "apireviews";
             var branch = "heads/master";
-            var date = summary.Date;
+            var date = summary.Items.FirstOrDefault().Feedback.FeedbackDateTime.DateTime;
             var markdown = $"# Quick Reviews {date:d}\n\n{GetMarkdown(summary)}";
             var path = $"{date.Year}/{date.Month:00}-{date.Day:00}-quick-reviews/README.md";
             var commitMessage = $"Add quick review notes for {date:d}";

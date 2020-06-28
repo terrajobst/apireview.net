@@ -17,6 +17,7 @@ namespace ApiReview.Data
         public string Id { get; }
         public DateTimeOffset StartDateTime { get; }
         public DateTimeOffset EndDateTime { get; }
+        public TimeSpan Duration => EndDateTime - StartDateTime;
         public string Title { get; }
         public string ThumbnailUrl { get; }
     }

@@ -13,23 +13,24 @@ namespace ApiReview.Backend.Controllers
     [Route("[controller]")]
     public class NotesController : ControllerBase
     {
-        [HttpGet("date/{date}")]
-        public Task<ApiReviewSummary> GetByDate(DateTimeOffset date)
+        [HttpGet("issues-for-range")]
+        public Task<ApiReviewSummary> IssuesForRange(DateTimeOffset start, DateTimeOffset end, bool video)
         {
-            return ApiReviewClient.GetSummaryAsync(date);
+            return ApiReviewClient.GetSummaryAsync(start, end, video);
+            // return ApiReviewClient.GetFakeSummaryAsync();
         }
 
-        [HttpGet("video/{videoId}")]
-        public Task<ApiReviewSummary> GetByVideo(string videoId)
+        [HttpGet("issues-for-video")]
+        public Task<ApiReviewSummary> IssuesForVideo(string videoId)
         {
             return ApiReviewClient.GetSummaryAsync(videoId);
         }
 
-        [HttpGet("videos/{date}")]
-        public Task<IReadOnlyList<ApiReviewVideo>> GetVideos(DateTimeOffset date)
+        [HttpGet("videos")]
+        public Task<IReadOnlyList<ApiReviewVideo>> GetVideos(DateTimeOffset start, DateTimeOffset end)
         {
-            //return ApiReviewClient.GetVideosAsync(date);
-            return ApiReviewClient.GetFakeVideosAsync();
+            return ApiReviewClient.GetVideosAsync(start, end);
+            // return ApiReviewClient.GetFakeVideosAsync();
         }
     }
 }

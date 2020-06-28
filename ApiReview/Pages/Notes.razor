@@ -2,20 +2,42 @@
 @inject ApiReviewNoteService NoteService
 @using ApiReview.Data;
 
-<div class="form-group">
-    <input class="form-control" type="text" placeholder="Date" @bind="DateTimeText">
+<div class="form-group row">
+    <label for="inputStartDateTime" class="col-sm-2 col-form-label">Start</label>
+    <div class="col-sm-2">
+        <input type="date" class="form-control" id="inputStartDate" @bind="Start">
+    </div>
+    <div class="col-sm-2">
+        <input type="time" class="form-control" id="inputStartTime" @bind="Start">
+    </div>
+</div>
+<div class="form-group row">
+    <label for="inputEndDateTime" class="col-sm-2 col-form-label">End</label>
+    <div class="col-sm-2">
+        <input type="date" class="form-control" id="inputEndDate" @bind="End">
+    </div>
+    <div class="col-sm-2">
+        <input type="time" class="form-control" id="inputEndTime" @bind="End">
+    </div>
+</div>
+<div class="form-group row">
+    <div class="col-sm-2"></div>
+    <div class="col-sm-10">
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="includeVideo" @bind="IncludeVideo">
+            <label class="form-check-label" for="includeVideo">
+                Include video
+            </label>
+        </div>
+    </div>
+</div>
+<div class="form-group row">
+    <div class="col-sm-10">
+        <button class="btn btn-secondary" @onclick="FindIssuesAsync">Find Issues</button>
+    </div>
 </div>
 
 <div class="d-flex flex-row flex-wrap">
-    <div class="p-2 @(_selectedVideo == null ? "yt-video-selected" : null)" @onclick="@(e => SelectVideoAsync(null))">
-        <div class="yt-video">
-            <div style="width: 320px; height: 180px; background: lightgray">
-            </div>
-            <div class="mt-2 yt-video-title">
-                None
-            </div>
-        </div>
-    </div>
     @foreach (var video in _videos)
     {
         <div class="p-2 @(_selectedVideo == video ? "yt-video-selected" : null)" @onclick="@(e => SelectVideoAsync(video))">
@@ -32,7 +54,6 @@
     }
 </div>
 
-
 @if (_loadingSummary)
 {
     <div class="ml-1 mt-4 mb-4">
@@ -43,7 +64,7 @@
 }
 else if (_summary != null)
 {
-    <div class="gh-issue-list">
+    <div class="mt-4 gh-issue-list">
         @foreach (var item in _summary.Items)
         {
             <div class="gh-issue-cell">
@@ -58,10 +79,10 @@ else if (_summary != null)
                 </span>
                 <div class="gh-details-cell">
                     <strong><a href="@item.Feedback.FeedbackUrl">@item.Feedback.FeedbackStatus</a></strong>
-                    @if (item.Feedback.VideoUrl != null)
+                    @if (item.VideoTimeCodeUrl != null)
                     {
                         <text>|</text>
-                        <strong><a href="@item.Feedback.VideoUrl">Video</a></strong>
+                        <strong><a href="@item.VideoTimeCodeUrl">Video</a></strong>
                     }
                     @item.Feedback.Issue.DetailText
                 </div>
@@ -74,18 +95,69 @@ else if (_summary != null)
 
 @code
 {
+    private DateTimeOffset _start;
+    private DateTimeOffset _end;
+
+    private DateTimeOffset Start
+    {
+        get => _start;
+        set => SetDateTime(ref _start, value);
+    }
+
+    private DateTimeOffset End
+    {
+        get => _end;
+        set => SetDateTime(ref _end, value);
+    }
+
+    private bool IncludeVideo { get; set; }
+
     private IReadOnlyList<ApiReviewVideo> _videos = Array.Empty<ApiReviewVideo>();
     private ApiReviewVideo _selectedVideo;
 
     private bool _loadingSummary;
     private ApiReviewSummary _summary;
 
-    private string DateTimeText { get; set; }
-
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        DateTimeText = DateTime.Now.Date.ToString("yyyy-MM-dd");
-        _videos = await NoteService.GetVideos(DateTimeOffset.Now.Date);
+        Start = DateTime.Now.Date.AddHours(9).AddMinutes(30);
+        End = DateTime.Now.Date.AddHours(12).AddMinutes(30);
+        IncludeVideo = true;
+    }
+
+    private void SetDateTime(ref DateTimeOffset field, DateTimeOffset value)
+    {
+        var preserveTime = value.Date != field.Date &&
+                           value.TimeOfDay == TimeSpan.Zero;
+
+        if (preserveTime)
+        {
+            field = value.Add(field.TimeOfDay);
+        }
+        else
+        {
+            field = value;
+        }
+    }
+
+    private async Task FindIssuesAsync()
+    {
+        _loadingSummary = true;
+
+        _summary = await NoteService.IssuesForRange(Start, End, IncludeVideo);
+
+        if (IncludeVideo)
+        {
+            _videos = await NoteService.GetVideos(Start, End);
+            _selectedVideo = _videos.FirstOrDefault(v => v.Id == _summary.Video?.Id);
+        }
+        else
+        {
+            _videos = Array.Empty<ApiReviewVideo>();
+            _selectedVideo = null;
+        }
+
+        _loadingSummary = false;
     }
 
     private async Task SelectVideoAsync(ApiReviewVideo video)
@@ -94,7 +166,7 @@ else if (_summary != null)
         _loadingSummary = true;
         if (video != null)
         {
-            _summary = await NoteService.GetByVideo(video.Id);
+            _summary = await NoteService.IssuesForVideo(video.Id);
             _loadingSummary = false;
         }
     }
