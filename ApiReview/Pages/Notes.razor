@@ -162,6 +162,8 @@ else if (Summary != null)
     {
         IsLoading = true;
 
+        Videos = Array.Empty<ApiReviewVideo>();
+        SelectedVideo = null;
         Summary = await NoteService.IssuesForRange(Start, End, IncludeVideo);
 
         if (IncludeVideo)
