@@ -3,25 +3,26 @@
 @using ApiReview.Data;
 
 <div class="form-group row">
-    <label for="inputStartDateTime" class="col-sm-2 col-form-label">Start</label>
     <div class="col-sm-2">
+        <label for="inputStartDate">Date</label>
         <input type="date" class="form-control" id="inputStartDate" @bind="Start">
     </div>
     <div class="col-sm-2">
-        <input type="time" class="form-control" id="inputStartTime" @bind="Start">
+        <label for="inputStartDateTime">Start Time</label>
+        <input type="time" placeholder="Start" class="form-control" id="inputStartTime" @bind="Start">
+    </div>
+    <div class="col-sm-2">
+        <label for="inputEndTime">End Time</label>
+        <input type="time" placeholder="End" class="form-control @(EndValidationMessage == null ? "" : "is-invalid")" id="inputEndTime" @bind="End">
+        @if (EndValidationMessage != null)
+        {
+            <div class="invalid-feedback">
+                @EndValidationMessage
+            </div>
+        }
     </div>
 </div>
 <div class="form-group row">
-    <label for="inputEndDateTime" class="col-sm-2 col-form-label">End</label>
-    <div class="col-sm-2">
-        <input type="date" class="form-control" id="inputEndDate" @bind="End">
-    </div>
-    <div class="col-sm-2">
-        <input type="time" class="form-control" id="inputEndTime" @bind="End">
-    </div>
-</div>
-<div class="form-group row">
-    <div class="col-sm-2"></div>
     <div class="col-sm-10">
         <div class="form-check">
             <input class="form-check-input" type="checkbox" id="includeVideo" @bind="IncludeVideo">
@@ -33,14 +34,14 @@
 </div>
 <div class="form-group row">
     <div class="col-sm-10">
-        <button class="btn btn-secondary" @onclick="FindIssuesAsync">Find Issues</button>
+        <button class="btn btn-secondary" disabled="@(EndValidationMessage != null || IsLoading)" @onclick="FindIssuesAsync">Find Issues</button>
     </div>
 </div>
 
 <div class="d-flex flex-row flex-wrap">
-    @foreach (var video in _videos)
+    @foreach (var video in Videos)
     {
-        <div class="p-2 @(_selectedVideo == video ? "yt-video-selected" : null)" @onclick="@(e => SelectVideoAsync(video))">
+        <div class="p-2 @(SelectedVideo == video ? "yt-video-selected" : null)" @onclick="@(e => SelectVideoAsync(video))">
             <div class="yt-video">
                 <div><img src="@video.ThumbnailUrl" /></div>
                 <div class="mt-2 yt-video-title">
@@ -54,18 +55,22 @@
     }
 </div>
 
-@if (_loadingSummary)
+@if (IsLoading)
 {
-    <div class="ml-1 mt-4 mb-4">
+    <div class="ml-1 mt-2 mb-4">
         <div class="spinner-border" role="status">
             <span class="sr-only">Loading issues...</span>
         </div>
     </div>
 }
-else if (_summary != null)
+else if (Summary != null && Summary.Items.Count == 0)
 {
-    <div class="mt-4 gh-issue-list">
-        @foreach (var item in _summary.Items)
+    <p class="text-muted">No issues found.</p>
+}
+else if (Summary != null)
+{
+    <div class="mt-2 gh-issue-list">
+        @foreach (var item in Summary.Items)
         {
             <div class="gh-issue-cell">
                 <input type="checkbox" checked />
@@ -90,7 +95,7 @@ else if (_summary != null)
         }
     </div>
 
-    <button class="btn btn-primary">Share Notes</button>
+    <button class="btn btn-primary mb-4">Share Notes</button>
 }
 
 @code
@@ -110,13 +115,15 @@ else if (_summary != null)
         set => SetDateTime(ref _end, value);
     }
 
+    private string EndValidationMessage { get; set; }
+
     private bool IncludeVideo { get; set; }
 
-    private IReadOnlyList<ApiReviewVideo> _videos = Array.Empty<ApiReviewVideo>();
-    private ApiReviewVideo _selectedVideo;
+    private IReadOnlyList<ApiReviewVideo> Videos { get; set; } = Array.Empty<ApiReviewVideo>();
+    private ApiReviewVideo SelectedVideo { get; set; }
 
-    private bool _loadingSummary;
-    private ApiReviewSummary _summary;
+    private bool IsLoading { get; set; }
+    private ApiReviewSummary Summary { get; set; }
 
     protected override void OnInitialized()
     {
@@ -138,36 +145,47 @@ else if (_summary != null)
         {
             field = value;
         }
+
+        _end = _start.Date.Add(_end.TimeOfDay);
+
+        if (End <= Start)
+        {
+            EndValidationMessage = "End Time must be after Start Time";
+        }
+        else
+        {
+            EndValidationMessage = null;
+        }
     }
 
     private async Task FindIssuesAsync()
     {
-        _loadingSummary = true;
+        IsLoading = true;
 
-        _summary = await NoteService.IssuesForRange(Start, End, IncludeVideo);
+        Summary = await NoteService.IssuesForRange(Start, End, IncludeVideo);
 
         if (IncludeVideo)
         {
-            _videos = await NoteService.GetVideos(Start, End);
-            _selectedVideo = _videos.FirstOrDefault(v => v.Id == _summary.Video?.Id);
+            Videos = await NoteService.GetVideos(Start, End);
+            SelectedVideo = Videos.FirstOrDefault(v => v.Id == Summary.Video?.Id);
         }
         else
         {
-            _videos = Array.Empty<ApiReviewVideo>();
-            _selectedVideo = null;
+            Videos = Array.Empty<ApiReviewVideo>();
+            SelectedVideo = null;
         }
 
-        _loadingSummary = false;
+        IsLoading = false;
     }
 
     private async Task SelectVideoAsync(ApiReviewVideo video)
     {
-        _selectedVideo = video;
-        _loadingSummary = true;
+        SelectedVideo = video;
+        IsLoading = true;
         if (video != null)
         {
-            _summary = await NoteService.IssuesForVideo(video.Id);
-            _loadingSummary = false;
+            Summary = await NoteService.IssuesForVideo(video.Id);
+            IsLoading = false;
         }
     }
 }
