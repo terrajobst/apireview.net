@@ -12,10 +12,17 @@ namespace ApiReview.Backend.Controllers
     [Route("[controller]")]
     public class IssuesController : ControllerBase
     {
+        private readonly GitHubManager _gitHubManager;
+
+        public IssuesController(GitHubManager gitHubManager)
+        {
+            _gitHubManager = gitHubManager;
+        }
+
         [HttpGet]
         public Task<IReadOnlyList<ApiReviewIssue>> Get()
         {
-            return ApiReviewClient.GetIssues();
+            return _gitHubManager.GetIssuesAsync();
         }
     }
 }

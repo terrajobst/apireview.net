@@ -2,6 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+
+using ApiReview.Logic;
+
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -26,6 +29,10 @@ namespace ApiReview.Backend
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+            services.AddSingleton<IYouTubeManager, FakeYouTubeManager>();
+            //services.AddSingleton<IYouTubeManager, YouTubeManager>();
+            services.AddSingleton<GitHubManager>();
+            services.AddSingleton<SummaryManager>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
