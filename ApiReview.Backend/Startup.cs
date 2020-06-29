@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
+using ApiReview.Data;
 using ApiReview.Logic;
 
 using Microsoft.AspNetCore.Builder;
@@ -28,7 +29,10 @@ namespace ApiReview.Backend
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
+            services.AddControllers().AddJsonOptions(o =>
+            {
+                o.JsonSerializerOptions.Converters.Add(new TimeSpanJsonConverter());
+            });
             services.AddSingleton<IYouTubeManager, FakeYouTubeManager>();
             //services.AddSingleton<IYouTubeManager, YouTubeManager>();
             services.AddSingleton<GitHubManager>();
