@@ -140,7 +140,7 @@ namespace ApiReview.Logic
                                       v.LiveStreamingDetails.ActualStartTime.Value,
                                       v.LiveStreamingDetails.ActualEndTime.Value,
                                       v.Snippet.Title,
-                                      v.Snippet.Thumbnails?.Default__?.Url);
+                                      v.Snippet.Thumbnails?.Medium?.Url);
         }
     }
 }
