@@ -12,9 +12,9 @@ namespace ApiReview.Backend.Controllers
     [Route("[controller]")]
     public class IssuesController : ControllerBase
     {
-        private readonly GitHubManager _gitHubManager;
+        private readonly IGitHubManager _gitHubManager;
 
-        public IssuesController(GitHubManager gitHubManager)
+        public IssuesController(IGitHubManager gitHubManager)
         {
             _gitHubManager = gitHubManager;
         }

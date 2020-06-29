@@ -35,7 +35,8 @@ namespace ApiReview.Backend
             });
             services.AddSingleton<IYouTubeManager, FakeYouTubeManager>();
             //services.AddSingleton<IYouTubeManager, YouTubeManager>();
-            services.AddSingleton<GitHubManager>();
+            services.AddSingleton<IGitHubManager, FakeGitHubManager>();
+            //services.AddSingleton<IGitHubManager, GitHubManager>();
             services.AddSingleton<SummaryManager>();
         }
 

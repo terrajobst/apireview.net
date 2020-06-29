@@ -10,9 +10,9 @@ namespace ApiReview.Logic
     public class SummaryManager
     {
         private readonly IYouTubeManager _youTubeManager;
-        private readonly GitHubManager _gitHubManager;
+        private readonly IGitHubManager _gitHubManager;
 
-        public SummaryManager(IYouTubeManager youTubeManager, GitHubManager gitHubManager)
+        public SummaryManager(IYouTubeManager youTubeManager, IGitHubManager gitHubManager)
         {
             _youTubeManager = youTubeManager;
             _gitHubManager = gitHubManager;

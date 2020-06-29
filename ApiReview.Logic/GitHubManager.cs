@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 using ApiReview.Data;
@@ -9,7 +10,38 @@ using Octokit;
 
 namespace ApiReview.Logic
 {
-    public sealed class GitHubManager
+    public interface IGitHubManager
+    {
+        Task<IReadOnlyList<ApiReviewFeedback>> GetFeedbackAsync(DateTimeOffset start, DateTimeOffset end);
+        Task<IReadOnlyList<ApiReviewIssue>> GetIssuesAsync();
+    }
+
+    public sealed class FakeGitHubManager : IGitHubManager
+    {
+        private IReadOnlyList<ApiReviewIssue> _issues;
+        private IReadOnlyList<ApiReviewFeedback> _feedback;
+
+        public FakeGitHubManager()
+        {
+            _issues = JsonSerializer.Deserialize<IReadOnlyList<ApiReviewIssue>>(Resources.GitHubFakeIssues);
+            _feedback = JsonSerializer.Deserialize<IReadOnlyList<ApiReviewFeedback>>(Resources.GitHubFakeFeedback);
+        }
+
+        public Task<IReadOnlyList<ApiReviewFeedback>> GetFeedbackAsync(DateTimeOffset start, DateTimeOffset end)
+        {
+            var result = _feedback.Where(f => start <= f.FeedbackDateTime && f.FeedbackDateTime <= end)
+                                  .ToArray();
+
+            return Task.FromResult<IReadOnlyList<ApiReviewFeedback>>(result);
+        }
+
+        public Task<IReadOnlyList<ApiReviewIssue>> GetIssuesAsync()
+        {
+            return Task.FromResult(_issues);
+        }
+    }
+
+    public sealed class GitHubManager : IGitHubManager
     {
         private const string _repoList = "dotnet/runtime,dotnet/winforms";
 
