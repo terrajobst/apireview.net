@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30024.149
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiReview", "ApiReview\ApiReview.csproj", "{E043138F-E698-48AB-838E-D9BE2B31BF9F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiReview.Client", "ApiReview.Client\ApiReview.Client.csproj", "{E043138F-E698-48AB-838E-D9BE2B31BF9F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiReview.Backend", "ApiReview.Backend\ApiReview.Backend.csproj", "{740659DF-CC40-40F5-A6CF-F3552BAC07E4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiReview.Server", "ApiReview.Server\ApiReview.Server.csproj", "{740659DF-CC40-40F5-A6CF-F3552BAC07E4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiReview.Logic", "ApiReview.Logic\ApiReview.Logic.csproj", "{05BE5BC3-6400-4C93-A36C-CE2B67E36FFA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiReview.Server.Logic", "ApiReview.Server.Logic\ApiReview.Server.Logic.csproj", "{05BE5BC3-6400-4C93-A36C-CE2B67E36FFA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiReview.Data", "ApiReview.Data\ApiReview.Data.csproj", "{5C340B17-7C39-41B0-9503-9A5E494478B2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiReview.Shared", "ApiReview.Shared\ApiReview.Shared.csproj", "{5C340B17-7C39-41B0-9503-9A5E494478B2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
