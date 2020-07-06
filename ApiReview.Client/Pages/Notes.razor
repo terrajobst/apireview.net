@@ -45,7 +45,7 @@
 </div>
 <div class="form-group row">
     <div class="col-sm-10">
-        <button class="btn btn-secondary" disabled="@(EndValidationMessage != null || IsLoading)" @onclick="FindIssuesAsync">Find Issues</button>
+        <button class="btn btn-secondary" disabled="@(!CanSearch)" @onclick="FindIssuesAsync">Find Issues</button>
     </div>
 </div>
 
@@ -129,6 +129,10 @@ else if (Summary != null)
     private string DateValidationMessage { get; set; }
     private string StartValidationMessage { get; set; }
     private string EndValidationMessage { get; set; }
+    private bool HasValidationErrors => DateValidationMessage != null ||
+                                        StartValidationMessage != null ||
+                                        EndValidationMessage != null;
+    private bool CanSearch => !HasValidationErrors && !IsLoading;
 
     private bool IncludeVideo { get; set; }
 
