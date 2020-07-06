@@ -25,18 +25,18 @@ namespace ApiReview.Server.Logic
             return new[]
             {
                 new ApiReviewVideo(
-                    "rx_098IdZU0",
-                    DateTimeOffset.Parse("2020-06-25T16:54:00Z"),
-                    DateTimeOffset.Parse("2020-06-25T19:02:22Z"),
-                    "GitHub Quick Reviews",
-                    "https://i.ytimg.com/vi/rx_098IdZU0/mqdefault.jpg"
-                ),
-                new ApiReviewVideo(
                     "q7ODj3RJnME",
                     DateTimeOffset.Parse("2020-06-25T16:53:18Z"),
                     DateTimeOffset.Parse("2020-06-25T17:42:57Z"),
                     "Desktop: .NET Community Standup - June 25th 2020 - New XAML Desktop Features",
                     "https://i.ytimg.com/vi/q7ODj3RJnME/mqdefault.jpg"
+                ),
+                new ApiReviewVideo(
+                    "rx_098IdZU0",
+                    DateTimeOffset.Parse("2020-06-25T16:54:00Z"),
+                    DateTimeOffset.Parse("2020-06-25T19:02:22Z"),
+                    "GitHub Quick Reviews",
+                    "https://i.ytimg.com/vi/rx_098IdZU0/mqdefault.jpg"
                 ),
                 new ApiReviewVideo(
                     "R5G4scTRRNQ",
@@ -130,7 +130,7 @@ namespace ApiReview.Server.Logic
                                            v.LiveStreamingDetails.ActualStartTime != null &&
                                            v.LiveStreamingDetails.ActualEndTime != null)
                                .Select(CreateVideo)
-                               .OrderByDescending(v => v.Duration);
+                               .OrderBy(v => v.StartDateTime);
             return videos.ToArray();
         }
 
