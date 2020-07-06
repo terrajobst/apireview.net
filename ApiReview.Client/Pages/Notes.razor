@@ -4,11 +4,23 @@
 <div class="form-group row">
     <div class="col-sm-2">
         <label for="inputStartDate">Date</label>
-        <input type="date" class="form-control" id="inputStartDate" @bind="Start">
+        <input type="date" class="form-control @(DateValidationMessage == null ? "" : "is-invalid")" id="inputStartDate" @bind="Start">
+        @if (DateValidationMessage != null)
+        {
+            <div class="invalid-feedback">
+                @DateValidationMessage
+            </div>
+        }
     </div>
     <div class="col-sm-2">
         <label for="inputStartDateTime">Start Time</label>
-        <input type="time" placeholder="Start" class="form-control" id="inputStartTime" @bind="Start">
+        <input type="time" placeholder="Start" class="form-control @(StartValidationMessage == null ? "" : "is-invalid")" id="inputStartTime" @bind="Start">
+        @if (StartValidationMessage != null)
+        {
+            <div class="invalid-feedback">
+                @StartValidationMessage
+            </div>
+        }
     </div>
     <div class="col-sm-2">
         <label for="inputEndTime">End Time</label>
@@ -114,6 +126,8 @@ else if (Summary != null)
         set => SetDateTime(ref _end, value);
     }
 
+    private string DateValidationMessage { get; set; }
+    private string StartValidationMessage { get; set; }
     private string EndValidationMessage { get; set; }
 
     private bool IncludeVideo { get; set; }
@@ -146,6 +160,25 @@ else if (Summary != null)
         }
 
         _end = _start.Date.Add(_end.TimeOfDay);
+
+        if (Start.Date > DateTimeOffset.Now.Date)
+        {
+            DateValidationMessage = "Date cannot be in the future";
+            StartValidationMessage = null;
+        }
+        else
+        {
+            DateValidationMessage = null;
+
+            if (Start > DateTimeOffset.Now)
+            {
+                StartValidationMessage = "Start cannot be in the future";
+            }
+            else
+            {
+                StartValidationMessage = null;
+            }
+        }
 
         if (End <= Start)
         {
