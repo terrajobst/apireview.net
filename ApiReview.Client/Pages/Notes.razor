@@ -140,8 +140,10 @@ else if (Summary != null)
 
     protected override void OnInitialized()
     {
-        Start = DateTime.Now.Date.AddHours(9).AddMinutes(30);
-        End = DateTime.Now.Date.AddHours(12).AddMinutes(30);
+        //Start = DateTime.Now.Date.AddHours(9).AddMinutes(30);
+        //End = DateTime.Now.Date.AddHours(12).AddMinutes(30);
+        Start = DateTime.Now.Date;
+        End = DateTime.Now.Date.AddHours(23).AddMinutes(59);
         IncludeVideo = true;
     }
 
