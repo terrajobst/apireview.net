@@ -6,7 +6,7 @@ namespace ApiReview.Shared
     {
         public ApiReviewIssue Issue { get; set; }
         public DateTimeOffset FeedbackDateTime { get; set; }
-        public int? FeedbackId { get; set; }
+        public string FeedbackId { get; set; }
         public string FeedbackUrl { get; set; }
         public string FeedbackStatus { get; set; }
         public string FeedbackMarkdown { get; set; }

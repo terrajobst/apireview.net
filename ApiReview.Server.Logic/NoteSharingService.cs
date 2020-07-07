@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -71,7 +72,8 @@ namespace ApiReview.Server.Logic
                 if (feedback.VideoUrl == null && feedback.FeedbackId != null)
                 {
                     var updatedMarkdown = $"[Video]({item.VideoTimeCodeUrl})\n\n{feedback.FeedbackMarkdown}";
-                    await github.Issue.Comment.Update(feedback.Issue.Owner, feedback.Issue.Repo, feedback.FeedbackId.Value, updatedMarkdown);
+                    var commentId = Convert.ToInt32(feedback.FeedbackId);
+                    await github.Issue.Comment.Update(feedback.Issue.Owner, feedback.Issue.Repo, commentId, updatedMarkdown);
                 }
             }
         }

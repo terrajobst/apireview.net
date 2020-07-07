@@ -179,7 +179,7 @@ namespace ApiReview.Server.Logic
                                                    .OrderBy(c => c.within)
                                                    .Select(c => c.comment)
                                                    .FirstOrDefault();
-                        var feedbackId = eventComment?.Id;
+                        var feedbackId = eventComment?.Id.ToString();
                         var feedbackUrl = eventComment?.HtmlUrl ?? issue.HtmlUrl;
                         var (videoUrl, feedbackMarkdown) = ParseFeedback(eventComment?.Body);
 
