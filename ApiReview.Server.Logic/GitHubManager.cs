@@ -180,6 +180,7 @@ namespace ApiReview.Server.Logic
                                                    .Select(c => c.comment)
                                                    .FirstOrDefault();
                         var feedbackId = eventComment?.Id.ToString();
+                        var feedbackAuthor = eventComment?.User.Login;
                         var feedbackUrl = eventComment?.HtmlUrl ?? issue.HtmlUrl;
                         var (videoUrl, feedbackMarkdown) = ParseFeedback(eventComment?.Body);
 
@@ -189,6 +190,7 @@ namespace ApiReview.Server.Logic
                         {
                             Issue = apiReviewIssue,
                             FeedbackId = feedbackId,
+                            FeedbackAuthor = feedbackAuthor,
                             FeedbackDateTime = feedbackDateTime,
                             FeedbackUrl = feedbackUrl,
                             FeedbackStatus = status,
