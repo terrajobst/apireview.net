@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 using ApiReview.Shared;
 
-namespace ApiReview.Server.Logic
+namespace ApiReview.Server.Services
 {
     public class SummaryManager
     {

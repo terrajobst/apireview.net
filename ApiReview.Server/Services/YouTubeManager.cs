@@ -9,7 +9,7 @@ using Google.Apis.YouTube.v3.Data;
 
 using static Google.Apis.YouTube.v3.SearchResource.ListRequest;
 
-namespace ApiReview.Server.Logic
+namespace ApiReview.Server.Services
 {
     public interface IYouTubeManager
     {
@@ -74,11 +74,18 @@ namespace ApiReview.Server.Logic
 
     public class YouTubeManager : IYouTubeManager
     {
+        // TODO: Extract to config
         private const string _netFoundationChannelId = "UCiaZbznpWV1o-KLxj8zqR6A";
+        private readonly YouTubeServiceFactory _youTubeServiceFactory;
+
+        public YouTubeManager(YouTubeServiceFactory youTubeServiceFactory)
+        {
+            _youTubeServiceFactory = youTubeServiceFactory;
+        }
 
         public async Task<ApiReviewVideo> GetVideoAsync(string id)
         {
-            var service = await YouTubeServiceFactory.CreateAsync();
+            var service = await _youTubeServiceFactory.CreateAsync();
 
             var videoRequest = service.Videos.List("snippet,liveStreamingDetails");
             videoRequest.Id = id;
@@ -97,7 +104,7 @@ namespace ApiReview.Server.Logic
 
         public async Task<IReadOnlyList<ApiReviewVideo>> GetVideosAsync(DateTimeOffset start, DateTimeOffset end)
         {
-            var service = await YouTubeServiceFactory.CreateAsync();
+            var service = await _youTubeServiceFactory.CreateAsync();
 
             var result = new List<Video>();
             var nextPageToken = "";

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ApiReview.Server.Logic
+namespace ApiReview.Server.Services
 {
     internal static class GitHubIssueHelpers
     {

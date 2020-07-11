@@ -13,6 +13,8 @@ namespace ApiReview.Shared
 
             if (totalYears > 1)
                 return $"{totalYears:N0} years ago";
+            else if (totalDays > 60)
+                return $"{totalDays / 30:N0} months ago";
             else if (totalDays > 1)
                 return $"{totalDays:N0} days ago";
             else if (totalHours > 1)

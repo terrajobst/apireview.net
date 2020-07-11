@@ -1,11 +1,12 @@
 ﻿@page "/notes"
-@using System.Threading; 
+@using System.Threading;
+@attribute [Authorize(Roles = "api-approver")]
 @inject ApiReviewNoteService NoteService
 
 <div class="form-group row">
     <div class="col-sm-2">
         <label for="inputStartDate">Date</label>
-        <input type="date" class="form-control @(DateValidationMessage == null ? "" : "is-invalid")" id="inputStartDate" @bind="Start">
+        <input type="date" class="form-control @(DateValidationMessage == null ? "" : "is-invalid")" id="inputStartDate" @bind="Date">
         @if (DateValidationMessage != null)
         {
             <div class="invalid-feedback">
@@ -114,16 +115,35 @@ else if (Summary != null)
     private DateTimeOffset _start;
     private DateTimeOffset _end;
 
+    private DateTimeOffset Date
+    {
+        get => _start;
+        set
+        {
+            _start = value.Date.Add(_start.TimeOfDay);
+            _end = value.Date.Add(_end.TimeOfDay);
+            UpdateValidation();
+        }
+    }
+
     private DateTimeOffset Start
     {
         get => _start;
-        set => SetDateTime(ref _start, value);
+        set
+        {
+            _start = _start.Date.Add(value.TimeOfDay);
+            UpdateValidation();
+        }
     }
 
     private DateTimeOffset End
     {
         get => _end;
-        set => SetDateTime(ref _end, value);
+        set
+        {
+            _end = _end.Date.Add(value.TimeOfDay);
+            UpdateValidation();
+        }
     }
 
     private string DateValidationMessage { get; set; }
@@ -144,29 +164,13 @@ else if (Summary != null)
 
     protected override void OnInitialized()
     {
-        //Start = DateTime.Now.Date.AddHours(9).AddMinutes(30);
-        //End = DateTime.Now.Date.AddHours(12).AddMinutes(30);
-        Start = DateTime.Now.Date;
-        End = DateTime.Now.Date.AddHours(23).AddMinutes(59);
+        _start = DateTime.Now.Date;
+        _end = _start.AddHours(23).AddMinutes(59);
         IncludeVideo = true;
     }
 
-    private void SetDateTime(ref DateTimeOffset field, DateTimeOffset value)
+    private void UpdateValidation()
     {
-        var preserveTime = value.Date != field.Date &&
-                           value.TimeOfDay == TimeSpan.Zero;
-
-        if (preserveTime)
-        {
-            field = value.Add(field.TimeOfDay);
-        }
-        else
-        {
-            field = value;
-        }
-
-        _end = _start.Date.Add(_end.TimeOfDay);
-
         if (Start.Date > DateTimeOffset.Now.Date)
         {
             DateValidationMessage = "Date cannot be in the future";
@@ -210,7 +214,7 @@ else if (Summary != null)
 
         var token = _cts.Token;
 
-        IReadOnlyList<ApiReviewVideo> videos = null;
+        IReadOnlyList<ApiReviewVideo> videos = Array.Empty<ApiReviewVideo>();
 
         if (IncludeVideo)
         {

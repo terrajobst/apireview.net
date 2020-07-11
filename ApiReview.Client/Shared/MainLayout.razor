@@ -6,7 +6,23 @@
 
 <div class="main">
     <div class="top-row px-4">
-        <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
+        <AuthorizeView>
+            <Authorized>
+                @{
+                    var avatarUrl = context.User.FindFirst("avatar_url");
+                    if (avatarUrl != null)
+                    {
+                        <img src="@avatarUrl.Value"
+                             class="mr-1"
+                             alt="@context.User.Identity.Name"
+                             style="border-radius: 50%"
+                             width="20"
+                             height="20" />
+                    }
+                }
+                <strong>@context.User.Identity.Name</strong>
+            </Authorized>
+        </AuthorizeView>
     </div>
 
     <div class="content px-4">

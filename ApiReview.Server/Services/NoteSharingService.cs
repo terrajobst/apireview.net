@@ -7,10 +7,19 @@ using ApiReview.Shared;
 
 using Octokit;
 
-namespace ApiReview.Server.Logic
+namespace ApiReview.Server.Services
 {
     public sealed class NoteSharingService
     {
+        private readonly GitHubClientFactory _clientFactory;
+        private readonly YouTubeServiceFactory _youTubeServiceFactory;
+
+        public NoteSharingService(GitHubClientFactory clientFactory, YouTubeServiceFactory youTubeServiceFactory)
+        {
+            _clientFactory = clientFactory;
+            _youTubeServiceFactory = youTubeServiceFactory;
+        }
+
         public async Task ShareNotesAsync(ApiReviewSummary summary)
         {
             await UpdateVideoDescriptionAsync(summary);
@@ -48,7 +57,7 @@ namespace ApiReview.Server.Logic
                                                 .Replace("<", "(")
                                                 .Replace(">", ")");
 
-            var service = await YouTubeServiceFactory.CreateAsync();
+            var service = await _youTubeServiceFactory.CreateAsync();
 
             var listRequest = service.Videos.List("snippet");
             listRequest.Id = summary.Video.Id;
@@ -61,9 +70,9 @@ namespace ApiReview.Server.Logic
             await updateRequest.ExecuteAsync();
         }
 
-        private static async Task UpdateCommentsAsync(ApiReviewSummary summary)
+        private async Task UpdateCommentsAsync(ApiReviewSummary summary)
         {
-            var github = GitHubClientFactory.Create();
+            var github = await _clientFactory.CreateAsync();
 
             foreach (var item in summary.Items)
             {
@@ -78,7 +87,7 @@ namespace ApiReview.Server.Logic
             }
         }
 
-        private static async Task CommitAsync(ApiReviewSummary summary)
+        private async Task CommitAsync(ApiReviewSummary summary)
         {
             if (summary.Items.Count == 0)
                 return;
@@ -91,7 +100,7 @@ namespace ApiReview.Server.Logic
             var path = $"{date.Year}/{date.Month:00}-{date.Day:00}-quick-reviews/README.md";
             var commitMessage = $"Add quick review notes for {date:d}";
 
-            var github = GitHubClientFactory.Create();
+            var github = await _clientFactory.CreateAsync();
             var masterReference = await github.Git.Reference.Get(owner, repo, branch);
             var latestCommit = await github.Git.Commit.Get(owner, repo, masterReference.Object.Sha);
 

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ApiReview.Server.Logic
+namespace ApiReview.Server.Services
 {
     internal sealed class OrgAndRepo
     {

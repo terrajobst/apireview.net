@@ -3,14 +3,16 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 
 using ApiReview.Shared;
-using ApiReview.Server.Logic;
+using ApiReview.Server.Services;
 
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ApiReview.Server.Controllers
 {
     [ApiController]
     [Route("[controller]")]
+    [Authorize(Roles = "api-approver")]
     public class NotesController : ControllerBase
     {
         private readonly SummaryManager _summaryManager;

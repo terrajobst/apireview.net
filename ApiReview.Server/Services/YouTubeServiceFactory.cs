@@ -5,18 +5,25 @@ using Google.Apis.Auth.OAuth2;
 using Google.Apis.Services;
 using Google.Apis.YouTube.v3;
 
-namespace ApiReview.Server.Logic
-{
-    internal static class YouTubeServiceFactory
-    {
-        public static async Task<YouTubeService> CreateAsync()
-        {
-            var (clientId, clientSecret) = YouTubeKeyStore.GetApiKey();
+using Microsoft.Extensions.Configuration;
 
+namespace ApiReview.Server.Services
+{
+    public sealed class YouTubeServiceFactory
+    {
+        private readonly IConfiguration _configuration;
+
+        public YouTubeServiceFactory(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
+
+        public async Task<YouTubeService> CreateAsync()
+        {
             var secrets = new ClientSecrets()
             {
-                ClientId = clientId,
-                ClientSecret = clientSecret
+                ClientId = _configuration["YouTubeClientId"],
+                ClientSecret = _configuration["YouTubeClientSecret"]
             };
 
             var credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(

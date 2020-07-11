@@ -1,6 +1,7 @@
 ﻿@page "/backlog"
 @inject IJSRuntime JSRuntime;
 @inject ApiReviewService ApiReviewService;
+@attribute [Authorize]
 
 @if (_issues == null)
 {

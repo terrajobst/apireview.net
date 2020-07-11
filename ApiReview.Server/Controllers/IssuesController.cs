@@ -2,14 +2,16 @@
 using System.Threading.Tasks;
 
 using ApiReview.Shared;
-using ApiReview.Server.Logic;
+using ApiReview.Server.Services;
 
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ApiReview.Server.Controllers
 {
     [ApiController]
     [Route("[controller]")]
+    [Authorize]
     public class IssuesController : ControllerBase
     {
         private readonly IGitHubManager _gitHubManager;

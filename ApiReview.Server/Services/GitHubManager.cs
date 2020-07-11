@@ -8,7 +8,7 @@ using ApiReview.Shared;
 
 using Octokit;
 
-namespace ApiReview.Server.Logic
+namespace ApiReview.Server.Services
 {
     public interface IGitHubManager
     {
@@ -43,7 +43,14 @@ namespace ApiReview.Server.Logic
 
     public sealed class GitHubManager : IGitHubManager
     {
+        // TODO: Extract to config
         private const string _repoList = "dotnet/designs,dotnet/runtime,dotnet/winforms";
+        private readonly GitHubClientFactory _clientFactory;
+
+        public GitHubManager(GitHubClientFactory clientFactory)
+        {
+            _clientFactory = clientFactory;
+        }
 
         public Task<IReadOnlyList<ApiReviewFeedback>> GetFeedbackAsync(DateTimeOffset start, DateTimeOffset end)
         {
@@ -51,7 +58,7 @@ namespace ApiReview.Server.Logic
             return GetFeedbackAsync(repos, start, end);
         }
 
-        private static async Task<IReadOnlyList<ApiReviewFeedback>> GetFeedbackAsync(OrgAndRepo[] repos, DateTimeOffset start, DateTimeOffset end)
+        private async Task<IReadOnlyList<ApiReviewFeedback>> GetFeedbackAsync(OrgAndRepo[] repos, DateTimeOffset start, DateTimeOffset end)
         {
             static bool IsApiIssue(Issue issue)
             {
@@ -83,7 +90,7 @@ namespace ApiReview.Server.Logic
                 return (null, body);
             }
 
-            var github = GitHubClientFactory.Create();
+            var github = await _clientFactory.CreateAsync();
             var results = new List<ApiReviewFeedback>();
 
             foreach (var (owner, repo) in repos)
@@ -150,7 +157,7 @@ namespace ApiReview.Server.Logic
         {
             var repos = OrgAndRepo.ParseList(_repoList).ToArray();
 
-            var github = GitHubClientFactory.Create();
+            var github = await _clientFactory.CreateAsync();
             var result = new List<ApiReviewIssue>();
 
             foreach (var (owner, repo) in repos)

@@ -4,11 +4,9 @@ This site allows us to browse the backlog and share notes.
 
 ## Missing
 
-* We should consider using GraphQL to speed up retreival of issues
-* Auth
 * Sharing notes
-* Extract lookup of GitHub/YouTube keys
-* Use a bot as the GitHub user
+* Deploy to Azure
+* We should consider using GraphQL to speed up retreival of issues
 
 ## GraphQL
 

@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Http;
+﻿using System.Collections.Generic;
 using System.Net.Http.Json;
-using System.Text.Json;
 using System.Threading.Tasks;
-
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 
 using ApiReview.Shared;
 
@@ -14,17 +8,12 @@ namespace ApiReview.Client.Data
 {
     internal sealed class ApiReviewService
     {
-        private readonly HttpClient _client;
-        private readonly JsonSerializerOptions _jsonOptions;
+        private readonly ApiReviewHttpClientFactory _clientFactory;
         private IReadOnlyList<ApiReviewIssue> _issues;
 
-        public ApiReviewService(IOptions<JsonOptions> options)
+        public ApiReviewService(ApiReviewHttpClientFactory clientFactory)
         {
-            _client = new HttpClient
-            {
-                BaseAddress = new Uri("https://localhost:44305")
-            };
-            _jsonOptions = options.Value.JsonSerializerOptions;
+            _clientFactory = clientFactory;
         }
 
         public async Task<IReadOnlyList<ApiReviewIssue>> GetIssuesAsync()
@@ -37,7 +26,8 @@ namespace ApiReview.Client.Data
 
         public async Task RefreshAsync()
         {
-            _issues = await _client.GetFromJsonAsync<IReadOnlyList<ApiReviewIssue>>("issues", _jsonOptions);
+            var client = await _clientFactory.CreateAsync();
+            _issues = await client.GetFromJsonAsync<IReadOnlyList<ApiReviewIssue>>("issues", _clientFactory.JsonOptions);
         }
     }
 }
