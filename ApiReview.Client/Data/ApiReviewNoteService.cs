@@ -24,9 +24,9 @@ namespace ApiReview.Client.Data
             _jsonOptions = options.Value.JsonSerializerOptions;
         }
 
-        public Task<ApiReviewSummary> IssuesForRange(DateTimeOffset start, DateTimeOffset end, bool video)
+        public Task<ApiReviewSummary> IssuesForRange(DateTimeOffset start, DateTimeOffset end)
         {
-            var url = $"notes/issues-for-range?start={start:s}&end={end:s}&video={video}";
+            var url = $"notes/issues-for-range?start={start:s}&end={end:s}";
             return _client.GetFromJsonAsync<ApiReviewSummary>(url, _jsonOptions);
         }
 

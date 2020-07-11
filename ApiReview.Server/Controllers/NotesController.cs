@@ -23,9 +23,9 @@ namespace ApiReview.Server.Controllers
         }
 
         [HttpGet("issues-for-range")]
-        public Task<ApiReviewSummary> IssuesForRange(DateTimeOffset start, DateTimeOffset end, bool video)
+        public Task<ApiReviewSummary> IssuesForRange(DateTimeOffset start, DateTimeOffset end)
         {
-            return _summaryManager.GetSummaryAsync(start, end, video);
+            return _summaryManager.GetSummaryAsync(start, end);
         }
 
         [HttpGet("issues-for-video")]

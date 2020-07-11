@@ -18,11 +18,10 @@ namespace ApiReview.Server.Logic
             _gitHubManager = gitHubManager;
         }
 
-        public async Task<ApiReviewSummary> GetSummaryAsync(DateTimeOffset start, DateTimeOffset end, bool includeVideo)
+        public async Task<ApiReviewSummary> GetSummaryAsync(DateTimeOffset start, DateTimeOffset end)
         {
-            var video = !includeVideo ? null : await _youTubeManager.GetVideoAsync(start, end);
             var items = await _gitHubManager.GetFeedbackAsync(start, end);
-            return CreateSummary(video, items);
+            return CreateSummary(null, items);
         }
 
         public async Task<ApiReviewSummary> GetSummaryAsync(string videoId)

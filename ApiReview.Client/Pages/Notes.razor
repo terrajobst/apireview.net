@@ -70,7 +70,7 @@
 {
     <div class="ml-1 mt-2 mb-4">
         <div class="spinner-border" role="status">
-            <span class="sr-only">Loading issues...</span>
+            <span class="sr-only">Loading...</span>
         </div>
     </div>
 }
@@ -199,21 +199,21 @@ else if (Summary != null)
     private async Task FindIssuesAsync()
     {
         IsLoading = true;
-
         Videos = Array.Empty<ApiReviewVideo>();
         SelectedVideo = null;
-        Summary = await NoteService.IssuesForRange(Start, End, IncludeVideo);
+        StateHasChanged();
 
         if (IncludeVideo)
         {
             Videos = await NoteService.GetVideos(Start, End);
-            SelectedVideo = Videos.FirstOrDefault(v => v.Id == Summary.Video?.Id);
+            SelectedVideo = Videos.FirstOrDefault();
+            StateHasChanged();
         }
+
+        if (SelectedVideo != null)
+            Summary = await NoteService.IssuesForVideo(SelectedVideo.Id);
         else
-        {
-            Videos = Array.Empty<ApiReviewVideo>();
-            SelectedVideo = null;
-        }
+            Summary = await NoteService.IssuesForRange(Start, End);
 
         IsLoading = false;
     }
