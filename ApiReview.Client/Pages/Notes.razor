@@ -56,9 +56,7 @@
         <div class="p-2 @(SelectedVideo == video ? "yt-video-selected" : null)" @onclick="@(e => SelectVideoAsync(video))">
             <div class="yt-video">
                 <div><img src="@video.ThumbnailUrl" /></div>
-                <div class="mt-2 yt-video-title">
-                    <a href="@video.Url">@video.Title</a>
-                </div>
+                <a class="mt-2 yt-video-title" href="@video.Url">@video.Title</a>
                 <div class="text-muted text-sm-left">
                     @video.StartDateTime.FormatAge() at @video.StartDateTime.ToString("h tt")
                 </div>
