@@ -1,4 +1,5 @@
 ﻿@page "/notes"
+@using System.Threading; 
 @inject ApiReviewNoteService NoteService
 
 <div class="form-group row">
@@ -111,6 +112,7 @@ else if (Summary != null)
 
 @code
 {
+    private CancellationTokenSource _cts;
     private DateTimeOffset _start;
     private DateTimeOffset _end;
 
@@ -203,17 +205,38 @@ else if (Summary != null)
         SelectedVideo = null;
         StateHasChanged();
 
+        if (_cts != null)
+            _cts.Cancel();
+
+        _cts = new CancellationTokenSource();
+
+        var token = _cts.Token;
+
+        IReadOnlyList<ApiReviewVideo> videos = null;
+
         if (IncludeVideo)
         {
-            Videos = await NoteService.GetVideos(Start, End);
-            SelectedVideo = Videos.FirstOrDefault();
-            StateHasChanged();
+            videos = await NoteService.GetVideos(Start, End);
+
+            if (token.IsCancellationRequested)
+                return;
         }
 
+        Videos = videos;
+        SelectedVideo = videos.FirstOrDefault();
+        StateHasChanged();
+
+        ApiReviewSummary summary;
+
         if (SelectedVideo != null)
-            Summary = await NoteService.IssuesForVideo(SelectedVideo.Id);
+            summary = await NoteService.IssuesForVideo(SelectedVideo.Id);
         else
-            Summary = await NoteService.IssuesForRange(Start, End);
+            summary = await NoteService.IssuesForRange(Start, End);
+
+        if (token.IsCancellationRequested)
+            return;
+
+        Summary = summary;
 
         IsLoading = false;
     }
