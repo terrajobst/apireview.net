@@ -43,7 +43,7 @@ namespace ApiReview.Server.Logic
 
     public sealed class GitHubManager : IGitHubManager
     {
-        private const string _repoList = "dotnet/runtime,dotnet/winforms";
+        private const string _repoList = "dotnet/designs,dotnet/runtime,dotnet/winforms";
 
         public Task<IReadOnlyList<ApiReviewFeedback>> GetFeedbackAsync(DateTimeOffset start, DateTimeOffset end)
         {
