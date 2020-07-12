@@ -53,72 +53,12 @@ namespace ApiReview.Server.Logic
 
         private static async Task<IReadOnlyList<ApiReviewFeedback>> GetFeedbackAsync(OrgAndRepo[] repos, DateTimeOffset start, DateTimeOffset end)
         {
-            static string GetApiStatus(Issue issue)
+            static bool IsApiIssue(Issue issue)
             {
                 var isReadyForReview = issue.Labels.Any(l => l.Name == "api-ready-for-review");
                 var isApproved = issue.Labels.Any(l => l.Name == "api-approved");
                 var needsWork = issue.Labels.Any(l => l.Name == "api-needs-work");
-                var isRejected = isReadyForReview && issue.State.Value == ItemState.Closed;
-
-                var isApi = isApproved || needsWork || isRejected;
-
-                if (!isApi)
-                    return null;
-
-                if (isApproved)
-                    return "Approved";
-
-                if (isRejected)
-                    return "Rejected";
-
-                return "Needs Work";
-            }
-
-            static bool WasEverReadyForReview(Issue issue, IEnumerable<EventInfo> events)
-            {
-                if (issue.Labels.Any(l => l.Name == "api-ready-for-review" ||
-                                          l.Name == "api-approved"))
-                    return true;
-
-                foreach (var eventInfo in events)
-                {
-                    if (eventInfo.Label?.Name == "api-ready-for-review" ||
-                        eventInfo.Label?.Name == "api-approved")
-                        return true;
-                }
-
-                return false;
-            }
-
-            static bool IsApiEvent(EventInfo eventInfo)
-            {
-                // We need to work around unsupported enum values:
-                // - https://github.com/octokit/octokit.net/issues/2023
-                // - https://github.com/octokit/octokit.net/issues/2025
-                //
-                // which will cause Value to throw an exception.
-
-                switch (eventInfo.Event.StringValue)
-                {
-                    case "labeled":
-                        if (eventInfo.Label.Name == "api-approved" || eventInfo.Label.Name == "api-needs-work")
-                            return true;
-                        break;
-                    case "closed":
-                        return true;
-                }
-
-                return false;
-            }
-
-            static IEnumerable<EventInfo> GetApiEvents(IEnumerable<EventInfo> events, DateTimeOffset start, DateTimeOffset end)
-            {
-                foreach (var eventGroup in events.Where(e => start <= e.CreatedAt && e.CreatedAt <= end && IsApiEvent(e))
-                                                 .GroupBy(e => e.CreatedAt.Date))
-                {
-                    var latest = eventGroup.OrderBy(e => e.CreatedAt).Last();
-                    yield return latest;
-                }
+                return isReadyForReview || isApproved || needsWork;
             }
 
             static (string VideoLink, string Markdown) ParseFeedback(string body)
@@ -159,30 +99,30 @@ namespace ApiReview.Server.Logic
 
                 foreach (var issue in issues)
                 {
-                    var status = GetApiStatus(issue);
-                    if (status == null)
+                    if (!IsApiIssue(issue))
                         continue;
 
                     var events = await github.Issue.Events.GetAllForIssue(owner, repo, issue.Number);
+                    var reviewOutcome = ApiReviewOutcome.Get(events, start, end);
 
-                    if (!WasEverReadyForReview(issue, events))
-                        continue;
-
-                    foreach (var apiEvent in GetApiEvents(events, start, end))
+                    if (reviewOutcome != null)
                     {
                         var title = GitHubIssueHelpers.FixTitle(issue.Title);
-                        var feedbackDateTime = apiEvent.CreatedAt;
+                        var feedbackDateTime = reviewOutcome.DecisionTime;
+
+                        var decision = reviewOutcome.Decision.ToString();
                         var comments = await github.Issue.Comment.GetAllForIssue(owner, repo, issue.Number);
-                        var eventComment = comments.Where(c => c.User.Login == apiEvent.Actor.Login)
-                                                   .Select(c => (comment: c, within: Math.Abs((c.CreatedAt - feedbackDateTime).TotalSeconds)))
-                                                   .Where(c => c.within <= TimeSpan.FromMinutes(15).TotalSeconds)
-                                                   .OrderBy(c => c.within)
-                                                   .Select(c => c.comment)
-                                                   .FirstOrDefault();
-                        var feedbackId = eventComment?.Id.ToString();
-                        var feedbackAuthor = eventComment?.User.Login;
-                        var feedbackUrl = eventComment?.HtmlUrl ?? issue.HtmlUrl;
-                        var (videoUrl, feedbackMarkdown) = ParseFeedback(eventComment?.Body);
+                        var comment = comments.Where(c => start <= c.CreatedAt && c.CreatedAt <= end)
+                                              .Where(c => string.Equals(c.User.Login, reviewOutcome.DecisionMaker, StringComparison.OrdinalIgnoreCase))                                              
+                                              .Select(c => (Comment: c, TimeDifference: Math.Abs((c.CreatedAt - feedbackDateTime).TotalSeconds)))
+                                              .OrderBy(c => c.TimeDifference)
+                                              .Select(c => c.Comment)
+                                              .FirstOrDefault();
+
+                        var feedbackId = comment?.Id.ToString();
+                        var feedbackAuthor = reviewOutcome.DecisionMaker;
+                        var feedbackUrl = comment?.HtmlUrl ?? issue.HtmlUrl;
+                        var (videoUrl, feedbackMarkdown) = ParseFeedback(comment?.Body);
 
                         var apiReviewIssue = CreateIssue(owner, repo, issue);
 
@@ -193,7 +133,7 @@ namespace ApiReview.Server.Logic
                             FeedbackAuthor = feedbackAuthor,
                             FeedbackDateTime = feedbackDateTime,
                             FeedbackUrl = feedbackUrl,
-                            FeedbackStatus = status,
+                            FeedbackStatus = decision,
                             FeedbackMarkdown = feedbackMarkdown,
                             VideoUrl = videoUrl
                         };
@@ -251,6 +191,76 @@ namespace ApiReview.Server.Logic
                 Id = issue.Number
             };
             return result;
+        }
+
+        private enum ApiReviewDecision
+        {
+            Approved,
+            NeedsWork,
+            Rejected
+        }
+
+        private sealed class ApiReviewOutcome
+        {
+            public ApiReviewOutcome(ApiReviewDecision decision, string decisionMaker, DateTimeOffset decisionTime)
+            {
+                Decision = decision;
+                DecisionMaker = decisionMaker;
+                DecisionTime = decisionTime;
+            }
+
+            public static ApiReviewOutcome Get(IEnumerable<EventInfo> events, DateTimeOffset start, DateTimeOffset end)
+            {
+                var readyEvent = default(EventInfo);
+                var current = default(ApiReviewOutcome);
+                var rejection = default(ApiReviewOutcome);
+
+                foreach (var e in events.Where(e => e.CreatedAt <= end)
+                                        .OrderBy(e => e.CreatedAt))
+                {
+                    switch (e.Event.StringValue)
+                    {
+                        case "labeled" when string.Equals(e.Label.Name, "api-ready-for-review", StringComparison.OrdinalIgnoreCase):
+                            current = null;
+                            readyEvent = e;
+                            break;
+                        case "labeled" when string.Equals(e.Label.Name, "api-approved", StringComparison.OrdinalIgnoreCase):
+                            current = new ApiReviewOutcome(ApiReviewDecision.Approved, e.Actor.Login, e.CreatedAt);
+                            readyEvent = null;
+                            break;
+                        case "labeled" when string.Equals(e.Label.Name, "api-needs-work", StringComparison.OrdinalIgnoreCase):
+                            if (readyEvent != null)
+                            {
+                                current = new ApiReviewOutcome(ApiReviewDecision.NeedsWork, e.Actor.Login, e.CreatedAt);
+                                readyEvent = null;
+                            }
+                            break;
+                        case "reopened":
+                            rejection = null;
+                            break;
+                        case "closed":
+                            if (readyEvent != null)
+                                rejection = new ApiReviewOutcome(ApiReviewDecision.Rejected, e.Actor.Login, e.CreatedAt);
+                            break;
+                    }
+                }
+
+                if (rejection != null)
+                    current = rejection;
+
+                if (current != null)
+                {
+                    var inInterval = start <= current.DecisionTime && current.DecisionTime <= end;
+                    if (!inInterval)
+                        return null;
+                }
+
+                return current;
+            }
+
+            public ApiReviewDecision Decision { get; }
+            public string DecisionMaker { get; }
+            public DateTimeOffset DecisionTime { get; }
         }
     }
 }
