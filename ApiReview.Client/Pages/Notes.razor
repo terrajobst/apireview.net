@@ -235,7 +235,6 @@ else if (Summary != null)
             return;
 
         Summary = summary;
-
         IsLoading = false;
     }
 
@@ -243,10 +242,20 @@ else if (Summary != null)
     {
         SelectedVideo = video;
         IsLoading = true;
-        if (video != null)
-        {
-            Summary = await NoteService.IssuesForVideo(video.Id);
-            IsLoading = false;
-        }
+        StateHasChanged();
+
+        if (_cts != null)
+            _cts.Cancel();
+
+        _cts = new CancellationTokenSource();
+
+        var token = _cts.Token;
+
+        var summary = await NoteService.IssuesForVideo(video.Id);
+        if (token.IsCancellationRequested)
+            return;
+
+        Summary = summary;
+        IsLoading = false;
     }
 }
