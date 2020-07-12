@@ -41,7 +41,7 @@ namespace ApiReview.Server.Logic
             foreach (var item in summary.Items)
             {
                 var tc = item.VideoTimeCode;
-                descriptionBuilder.WriteLine($"{tc.Hours:00}:{tc.Minutes:00}:{tc.Seconds:00} - {item.Feedback.FeedbackStatus}: {item.Feedback.Issue.Title} {item.Feedback.FeedbackUrl}");
+                descriptionBuilder.WriteLine($"{tc.Hours:00}:{tc.Minutes:00}:{tc.Seconds:00} - {item.Feedback.Decision}: {item.Feedback.Issue.Title} {item.Feedback.FeedbackUrl}");
             }
 
             var description = descriptionBuilder.ToString()
@@ -132,7 +132,7 @@ namespace ApiReview.Server.Logic
 
                 noteWriter.WriteLine($"## {feedback.Issue.Title}");
                 noteWriter.WriteLine();
-                noteWriter.Write($"**{feedback.FeedbackStatus}** | [#{feedback.Issue.Repo}/{feedback.Issue.Id}]({feedback.FeedbackUrl})");
+                noteWriter.Write($"**{feedback.Decision}** | [#{feedback.Issue.Repo}/{feedback.Issue.Id}]({feedback.FeedbackUrl})");
 
                 if (item.VideoTimeCodeUrl != null)
                     noteWriter.Write($" | [Video]({item.VideoTimeCodeUrl})");

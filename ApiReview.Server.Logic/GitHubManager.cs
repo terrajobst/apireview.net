@@ -110,7 +110,7 @@ namespace ApiReview.Server.Logic
                         var title = GitHubIssueHelpers.FixTitle(issue.Title);
                         var feedbackDateTime = reviewOutcome.DecisionTime;
 
-                        var decision = reviewOutcome.Decision.ToString();
+                        var decision = reviewOutcome.Decision;
                         var comments = await github.Issue.Comment.GetAllForIssue(owner, repo, issue.Number);
                         var comment = comments.Where(c => start <= c.CreatedAt && c.CreatedAt <= end)
                                               .Where(c => string.Equals(c.User.Login, reviewOutcome.DecisionMaker, StringComparison.OrdinalIgnoreCase))                                              
@@ -128,12 +128,12 @@ namespace ApiReview.Server.Logic
 
                         var feedback = new ApiReviewFeedback
                         {
+                            Decision = decision,
                             Issue = apiReviewIssue,
                             FeedbackId = feedbackId,
                             FeedbackAuthor = feedbackAuthor,
                             FeedbackDateTime = feedbackDateTime,
                             FeedbackUrl = feedbackUrl,
-                            FeedbackStatus = decision,
                             FeedbackMarkdown = feedbackMarkdown,
                             VideoUrl = videoUrl
                         };
@@ -191,13 +191,6 @@ namespace ApiReview.Server.Logic
                 Id = issue.Number
             };
             return result;
-        }
-
-        private enum ApiReviewDecision
-        {
-            Approved,
-            NeedsWork,
-            Rejected
         }
 
         private sealed class ApiReviewOutcome
