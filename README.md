@@ -8,6 +8,31 @@ This site allows us to browse the backlog and share notes.
 * Deploy to Azure
 * We should consider using GraphQL to speed up retreival of issues
 
+## Dashboard
+
+Consider a dashboard page like this:
+
+```text
+Repos
+[x] dotnet/designs
+[x] dotnet/runtime
+[x] dotnet/winforms
+
+Milestones
+[x] 5.0
+[ ] 6.0
+[ ] Future
+
+       | Suggestion | Ready For Review | Needs Work | Approved
+-------+------------+------------------+------------+---------
+Area 1 |            |                  |            |
+Area 2 |            |                  |            |
+```
+
+## Storing Meetings & Notes
+
+Consider adding a way to store past reviews and schedule meetings.
+
 ## GraphQL
 
 This query gets us the data from GitHub:
