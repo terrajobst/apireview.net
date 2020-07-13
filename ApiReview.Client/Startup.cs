@@ -15,12 +15,14 @@ namespace ApiReview.Client
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IWebHostEnvironment env)
         {
             Configuration = configuration;
+            Env = env;
         }
 
         public IConfiguration Configuration { get; }
+        public IWebHostEnvironment Env { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
@@ -54,18 +56,21 @@ namespace ApiReview.Client
                         options.SaveTokens = true;
                         // TODO: Extract to config
                         options.ClaimActions.MapJsonKey("avatar_url", "avatar_url");
-                        options.Events.OnCreatingTicket = async context =>
+                        if (Env.IsDevelopment())
                         {
-                            var accessToken = context.AccessToken;
-                            // TODO: Extract to config
-                            var orgName = "dotnet";
-                            var teamName = "fxdc";
-                            var userName = context.Identity.Name;
-                            var isMember = await GitHubAuthHelpers.IsMemberOfTeamAsync(accessToken, orgName, teamName, userName);
-                            // TODO: Extract to config
-                            if (isMember)
-                                context.Identity.AddClaim(new Claim(context.Identity.RoleClaimType, "api-approver"));
-                        };
+                            options.Events.OnCreatingTicket = async context =>
+                            {
+                                var accessToken = context.AccessToken;
+                                // TODO: Extract to config
+                                var orgName = "dotnet";
+                                var teamName = "fxdc";
+                                var userName = context.Identity.Name;
+                                var isMember = await GitHubAuthHelpers.IsMemberOfTeamAsync(accessToken, orgName, teamName, userName);
+                                // TODO: Extract to config
+                                if (isMember)
+                                        context.Identity.AddClaim(new Claim(context.Identity.RoleClaimType, "api-approver"));
+                            };
+                        }
                     });
         }
 
