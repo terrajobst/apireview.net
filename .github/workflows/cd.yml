@@ -1,0 +1,54 @@
+name: CD
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.100
+
+    # Publishing
+    
+    - name: Publish ApiReview.Client
+      run: |
+        cd ApiReview.Client 
+        dotnet publish -c Release -o '../artifacts/ApiReview.Client'
+        cd ..
+
+    - name: Publish ApiReview.Server
+      run: |
+        cd ApiReview.Server 
+        dotnet publish -c Release -o '../artifacts/ApiReview.Server'
+        cd ..
+        
+    # Deployment
+
+    - name: Azure Login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Deploy ApiReview.Client
+      uses: azure/webapps-deploy@v2.1
+      with: 
+        app-name: apireviews
+        package: './artifacts/ApiReview.Client'
+
+    - name: Deploy ApiReview.Server
+      uses: azure/webapps-deploy@v2.1
+      with: 
+        app-name: apireviews-api
+        package: './artifacts/ApiReview.Server'
+
+    - name: Azure Logout
+      run: |
+        az logout
