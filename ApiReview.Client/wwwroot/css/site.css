@@ -209,6 +209,14 @@ app {
         background-color: #f6f8fa;
     }
 
+.gh-issue-blocking {
+    background: #ffd9d9;
+}
+
+    .gh-issue-blocking:hover {
+        background-color: #ffd9d96b;
+    }
+
 .gh-label {
     height: 20px;
     padding: .15em 4px;
@@ -246,9 +254,5 @@ app {
 }
 
 .yt-video-selected {
-    /*
-    border: 3px solid blue;
-    margin: -3px;
-    */
     background: lightblue;
 }

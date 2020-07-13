@@ -54,7 +54,9 @@ else
             if (!IsVisible(issue))
                 continue;
 
-            <div class="gh-issue-cell">
+            var background = issue.IsBlocking ? "gh-issue-blocking" : "";
+
+            <div class="gh-issue-cell @background">
                 <a class="gh-issue-title" href="@issue.Url">@issue.Title</a>
                 <span>
                     @foreach (var label in issue.Labels)
