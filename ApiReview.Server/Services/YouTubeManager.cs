@@ -85,7 +85,7 @@ namespace ApiReview.Server.Services
 
         public async Task<ApiReviewVideo> GetVideoAsync(string id)
         {
-            var service = await _youTubeServiceFactory.CreateAsync();
+            var service = _youTubeServiceFactory.Create();
 
             var videoRequest = service.Videos.List("snippet,liveStreamingDetails");
             videoRequest.Id = id;
@@ -104,7 +104,7 @@ namespace ApiReview.Server.Services
 
         public async Task<IReadOnlyList<ApiReviewVideo>> GetVideosAsync(DateTimeOffset start, DateTimeOffset end)
         {
-            var service = await _youTubeServiceFactory.CreateAsync();
+            var service = _youTubeServiceFactory.Create();
 
             var result = new List<Video>();
             var nextPageToken = "";

@@ -57,7 +57,7 @@ namespace ApiReview.Server.Services
                                                 .Replace("<", "(")
                                                 .Replace(">", ")");
 
-            var service = await _youTubeServiceFactory.CreateAsync();
+            var service = _youTubeServiceFactory.Create();
 
             var listRequest = service.Videos.List("snippet");
             listRequest.Id = summary.Video.Id;
