@@ -6,17 +6,22 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.Extensions.Configuration;
 
 namespace ApiReview.Client.Data
 {
     internal sealed class ApiReviewHttpClientFactory
     {
+        private readonly string _url;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public ApiReviewHttpClientFactory(IOptions<JsonOptions> jsonOptions, IHttpContextAccessor httpContextAccessor)
+        public ApiReviewHttpClientFactory(IConfiguration configuration,
+                                          IHttpContextAccessor httpContextAccessor,
+                                          IOptions<JsonOptions> jsonOptions)
         {
-            JsonOptions = jsonOptions.Value.JsonSerializerOptions;
+            _url = configuration["apireview-api-url"];
             _httpContextAccessor = httpContextAccessor;
+            JsonOptions = jsonOptions.Value.JsonSerializerOptions;
         }
 
         public JsonSerializerOptions JsonOptions { get; }
@@ -27,7 +32,7 @@ namespace ApiReview.Client.Data
 
             var client = new HttpClient
             {
-                BaseAddress = new Uri("https://localhost:44305"),
+                BaseAddress = new Uri(_url),
                 DefaultRequestHeaders = {
                     { "Authorization", "Bearer " + token }
                 }
