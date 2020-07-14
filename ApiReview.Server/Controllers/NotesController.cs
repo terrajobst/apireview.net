@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-
-using ApiReview.Shared;
-using ApiReview.Server.Services;
+using System.Linq;
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using System.Linq;
+using Microsoft.Extensions.Logging;
+
+using ApiReview.Shared;
+using ApiReview.Server.Services;
 
 namespace ApiReview.Server.Controllers
 {
@@ -16,12 +17,17 @@ namespace ApiReview.Server.Controllers
     [Authorize(Roles = ApiReviewConstants.ApiApproverRole)]
     public class NotesController : ControllerBase
     {
+        private readonly ILogger<NotesController> _logger;
         private readonly IYouTubeManager _youTubeManager;
         private readonly SummaryManager _summaryManager;
         private readonly SummaryPublishingService _summaryPublishingService;
 
-        public NotesController(IYouTubeManager youTubeManager, SummaryManager summaryManager, SummaryPublishingService summaryPublishingService)
+        public NotesController(ILogger<NotesController> logger,
+                               IYouTubeManager youTubeManager,
+                               SummaryManager summaryManager,
+                               SummaryPublishingService summaryPublishingService)
         {
+            _logger = logger;
             _youTubeManager = youTubeManager;
             _summaryManager = summaryManager;
             _summaryPublishingService = summaryPublishingService;
@@ -51,8 +57,16 @@ namespace ApiReview.Server.Controllers
             if (summary?.Items?.Any() != true)
                 return Ok();
 
-            var result = await _summaryPublishingService.PublishAsync(summary);
-            return Ok(result);
+            try
+            {
+                var result = await _summaryPublishingService.PublishAsync(summary);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Can't publish notes");
+                return Problem();
+            }
         }
     }
 }

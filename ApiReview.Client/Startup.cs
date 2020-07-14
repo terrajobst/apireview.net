@@ -69,12 +69,10 @@ namespace ApiReview.Client
                         options.Events.OnCreatingTicket = async context =>
                         {
                             var accessToken = context.AccessToken;
-                            //var orgName = ApiReviewConstants.ApiApproverOrgName;
-                            //var teamName = ApiReviewConstants.ApiApproverTeamSlug;
+                            var orgName = ApiReviewConstants.ApiApproverOrgName;
+                            var teamName = ApiReviewConstants.ApiApproverTeamSlug;
                             var userName = context.Identity.Name;
-                            // TODO: Switch to proper membership
-                            var isMember = string.Equals(userName, "terrajobst", StringComparison.OrdinalIgnoreCase);
-                            // var isMember = await GitHubAuthHelpers.IsMemberOfTeamAsync(accessToken, orgName, teamName, userName);
+                            var isMember = await GitHubAuthHelpers.IsMemberOfTeamAsync(accessToken, orgName, teamName, userName);
                             if (isMember)
                                 context.Identity.AddClaim(new Claim(context.Identity.RoleClaimType, ApiReviewConstants.ApiApproverRole));
 

@@ -1,11 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using System.Threading.Tasks;
-
-using ApiReview.Shared;
-using ApiReview.Server.Services;
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Logging;
+using ApiReview.Server.Services;
 
 namespace ApiReview.Server.Controllers
 {
@@ -14,17 +13,28 @@ namespace ApiReview.Server.Controllers
     [Authorize]
     public class IssuesController : ControllerBase
     {
+        private readonly ILogger<IssuesController> _logger;
         private readonly IGitHubManager _gitHubManager;
 
-        public IssuesController(IGitHubManager gitHubManager)
+        public IssuesController(ILogger<IssuesController> logger, IGitHubManager gitHubManager)
         {
+            _logger = logger;
             _gitHubManager = gitHubManager;
         }
 
         [HttpGet]
-        public Task<IReadOnlyList<ApiReviewIssue>> Get()
+        public async Task<IActionResult> Get()
         {
-            return _gitHubManager.GetIssuesAsync();
+            try
+            {
+                var result = await _gitHubManager.GetIssuesAsync();
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Can't retreive issues.");
+                return Problem();
+            }
         }
     }
 }
