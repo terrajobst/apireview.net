@@ -4,7 +4,8 @@ This site allows us to browse the backlog and share notes.
 
 ## Missing
 
-* Sharing notes
+* The server is in UTC; this means that our UI is parsed and rendered in UTC
+  too, which we don't want.
 * We should consider using GraphQL to speed up retreival of issues
 
 ## Dashboard

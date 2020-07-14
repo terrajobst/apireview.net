@@ -43,8 +43,6 @@ namespace ApiReview.Server.Services
 
     public sealed class GitHubManager : IGitHubManager
     {
-        // TODO: Extract to config
-        private const string _repoList = "dotnet/designs,dotnet/runtime,dotnet/winforms";
         private readonly GitHubClientFactory _clientFactory;
 
         public GitHubManager(GitHubClientFactory clientFactory)
@@ -54,7 +52,7 @@ namespace ApiReview.Server.Services
 
         public Task<IReadOnlyList<ApiReviewFeedback>> GetFeedbackAsync(DateTimeOffset start, DateTimeOffset end)
         {
-            var repos = OrgAndRepo.ParseList(_repoList).ToArray();
+            var repos = OrgAndRepo.ParseList(ApiReviewConstants.RepoList).ToArray();
             return GetFeedbackAsync(repos, start, end);
         }
 
@@ -62,9 +60,9 @@ namespace ApiReview.Server.Services
         {
             static bool IsApiIssue(Issue issue)
             {
-                var isReadyForReview = issue.Labels.Any(l => l.Name == "api-ready-for-review");
-                var isApproved = issue.Labels.Any(l => l.Name == "api-approved");
-                var needsWork = issue.Labels.Any(l => l.Name == "api-needs-work");
+                var isReadyForReview = issue.Labels.Any(l => l.Name == ApiReviewConstants.ApiReadyForReview);
+                var isApproved = issue.Labels.Any(l => l.Name == ApiReviewConstants.ApiApproved);
+                var needsWork = issue.Labels.Any(l => l.Name == ApiReviewConstants.ApiNeedsWork);
                 return isReadyForReview || isApproved || needsWork;
             }
 
@@ -155,7 +153,7 @@ namespace ApiReview.Server.Services
 
         public async Task<IReadOnlyList<ApiReviewIssue>> GetIssuesAsync()
         {
-            var repos = OrgAndRepo.ParseList(_repoList).ToArray();
+            var repos = OrgAndRepo.ParseList(ApiReviewConstants.RepoList).ToArray();
 
             var github = await _clientFactory.CreateAsync();
             var result = new List<ApiReviewIssue>();
@@ -167,7 +165,7 @@ namespace ApiReview.Server.Services
                     Filter = IssueFilter.All,
                     State = ItemStateFilter.Open
                 };
-                request.Labels.Add("api-ready-for-review");
+                request.Labels.Add(ApiReviewConstants.ApiReadyForReview);
 
                 var issues = await github.Issue.GetAllForRepository(owner, repo, request);
 
@@ -220,20 +218,17 @@ namespace ApiReview.Server.Services
                 {
                     switch (e.Event.StringValue)
                     {
-                        case "labeled" when string.Equals(e.Label.Name, "api-ready-for-review", StringComparison.OrdinalIgnoreCase):
+                        case "labeled" when string.Equals(e.Label.Name, ApiReviewConstants.ApiReadyForReview, StringComparison.OrdinalIgnoreCase):
                             current = null;
                             readyEvent = e;
                             break;
-                        case "labeled" when string.Equals(e.Label.Name, "api-approved", StringComparison.OrdinalIgnoreCase):
+                        case "labeled" when string.Equals(e.Label.Name, ApiReviewConstants.ApiApproved, StringComparison.OrdinalIgnoreCase):
                             current = new ApiReviewOutcome(ApiReviewDecision.Approved, e.Actor.Login, e.CreatedAt);
                             readyEvent = null;
                             break;
-                        case "labeled" when string.Equals(e.Label.Name, "api-needs-work", StringComparison.OrdinalIgnoreCase):
-                            if (readyEvent != null)
-                            {
-                                current = new ApiReviewOutcome(ApiReviewDecision.NeedsWork, e.Actor.Login, e.CreatedAt);
-                                readyEvent = null;
-                            }
+                        case "labeled" when string.Equals(e.Label.Name, ApiReviewConstants.ApiNeedsWork, StringComparison.OrdinalIgnoreCase):
+                            current = new ApiReviewOutcome(ApiReviewDecision.NeedsWork, e.Actor.Login, e.CreatedAt);
+                            readyEvent = null;
                             break;
                         case "reopened":
                             rejection = null;

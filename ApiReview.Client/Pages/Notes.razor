@@ -1,6 +1,6 @@
 ﻿@page "/notes"
 @using System.Threading;
-@attribute [Authorize(Roles = "api-approver")]
+@attribute [Authorize(Roles = ApiReviewConstants.ApiApproverRole)]
 @inject ApiReviewNoteService NoteService
 
 <div class="form-group row">
@@ -47,7 +47,7 @@
 </div>
 <div class="form-group row">
     <div class="col-sm-10">
-        <button class="btn btn-secondary" disabled="@(!CanSearch)" @onclick="FindIssuesAsync">Find Issues</button>
+        <button class="btn btn-secondary" disabled="@(!CanSearch)" @onclick="FindIssuesAsync">Find issues</button>
     </div>
 </div>
 
@@ -66,25 +66,16 @@
     }
 </div>
 
-@if (IsLoading)
+@if (Summary != null && Summary.Items.Count == 0)
 {
-    <div class="ml-1 mt-2 mb-4">
-        <div class="spinner-border" role="status">
-            <span class="sr-only">Loading...</span>
-        </div>
-    </div>
+    <div class="alert alert-secondary">No issues found.</div>
 }
-else if (Summary != null && Summary.Items.Count == 0)
-{
-    <p class="text-muted">No issues found.</p>
-}
-else if (Summary != null)
+else if (Summary != null && Summary.Items.Any())
 {
     <div class="mt-2 gh-issue-list">
         @foreach (var item in Summary.Items)
         {
             <div class="gh-issue-cell">
-                <input type="checkbox" checked />
                 <a class="gh-issue-title" href="@item.Feedback.Issue.Url">@item.Feedback.Issue.Title</a>
                 <span>
                     @foreach (var label in item.Feedback.Issue.Labels)
@@ -106,7 +97,33 @@ else if (Summary != null)
         }
     </div>
 
-    <button class="btn btn-primary mb-4">Share Notes</button>
+    @if (PublicationResult == null)
+    {
+        if (!IsLoading)
+        {
+            <button class="btn btn-primary mb-4" @onclick="PublishNotesAsync">Publish notes</button>
+        }
+    }
+    else
+    {
+        if (PublicationResult.Success)
+        {
+            <div class="mt-3 mb-4 alert alert-success">Notes published <a href="@PublicationResult.Url">here</a>.</div>
+        }
+        else
+        {
+            <div class="mt-3 mb-4 alert alert-danger">There was a problem publishing the notes.</div>
+        }
+    }
+}
+
+@if (IsLoading)
+{
+    <div class="ml-1 mt-2 mb-4">
+        <div class="spinner-border" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
 }
 
 @code
@@ -162,6 +179,8 @@ else if (Summary != null)
     private bool IsLoading { get; set; }
     private ApiReviewSummary Summary { get; set; }
 
+    private ApiReviewPublicationResult PublicationResult { get; set; }
+
     protected override void OnInitialized()
     {
         _start = DateTime.Now.Date;
@@ -205,6 +224,8 @@ else if (Summary != null)
         IsLoading = true;
         Videos = Array.Empty<ApiReviewVideo>();
         SelectedVideo = null;
+        Summary = null;
+        PublicationResult = null;
         StateHasChanged();
 
         if (_cts != null)
@@ -244,7 +265,12 @@ else if (Summary != null)
 
     private async Task SelectVideoAsync(ApiReviewVideo video)
     {
+        if (video == SelectedVideo)
+            return;
+
         SelectedVideo = video;
+        Summary = null;
+        PublicationResult = null;
         IsLoading = true;
         StateHasChanged();
 
@@ -260,6 +286,15 @@ else if (Summary != null)
             return;
 
         Summary = summary;
+        IsLoading = false;
+    }
+
+    private async Task PublishNotesAsync()
+    {
+        IsLoading = true;
+
+        PublicationResult = await NoteService.PublishNotesAsync(Summary);
+
         IsLoading = false;
     }
 }

@@ -3,7 +3,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
-
+using ApiReview.Shared;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -59,9 +59,8 @@ namespace ApiReview.Server.GitHubAuth
                 new Claim(ClaimTypes.Name, userName)
             }, "Bearer");
 
-            // TODO: Extract to config
             if (isApiApprover)
-                identity.AddClaim(new Claim(identity.RoleClaimType, "api-approver"));
+                identity.AddClaim(new Claim(identity.RoleClaimType, ApiReviewConstants.ApiApproverRole));
             var principal = new ClaimsPrincipal(identity);
 
             var ticket = new AuthenticationTicket(principal, "Bearer");
@@ -77,17 +76,15 @@ namespace ApiReview.Server.GitHubAuth
 
         private async Task<(string UserName, bool IsApiApprover)> GetUserInfo(string token)
         {
-            // TODO: Extract to config
-            var productInformation = new ProductHeaderValue("apireview.azurewebsites.net");
+            var productInformation = new ProductHeaderValue(ApiReviewConstants.ProductName);
             var connection = new Connection(productInformation, token);
 
             var query = new Query()
                 .Select(q => new
                 {
                     User = q.Viewer.Select(u => u.Login).Single(),
-                    // TODO: Extract to config
-                    TeamMembers = q.Organization("dotnet")
-                                   .Team("fxdc")
+                    TeamMembers = q.Organization(ApiReviewConstants.ApiApproverOrgName)
+                                   .Team(ApiReviewConstants.ApiApproverTeamSlug)
                                    .Members(null, null, null, null, null, null, null, null)
                                    .AllPages()
                                    .Select(u => u.Login)

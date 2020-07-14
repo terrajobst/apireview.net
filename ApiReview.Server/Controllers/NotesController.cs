@@ -7,21 +7,30 @@ using ApiReview.Server.Services;
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using System.Linq;
 
 namespace ApiReview.Server.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    [Authorize(Roles = "api-approver")]
+    [Authorize(Roles = ApiReviewConstants.ApiApproverRole)]
     public class NotesController : ControllerBase
     {
-        private readonly SummaryManager _summaryManager;
         private readonly IYouTubeManager _youTubeManager;
+        private readonly SummaryManager _summaryManager;
+        private readonly SummaryPublishingService _summaryPublishingService;
 
-        public NotesController(SummaryManager summaryManager, IYouTubeManager youTubeManager)
+        public NotesController(IYouTubeManager youTubeManager, SummaryManager summaryManager, SummaryPublishingService summaryPublishingService)
         {
-            _summaryManager = summaryManager;
             _youTubeManager = youTubeManager;
+            _summaryManager = summaryManager;
+            _summaryPublishingService = summaryPublishingService;
+        }
+
+        [HttpGet("videos")]
+        public Task<IReadOnlyList<ApiReviewVideo>> GetVideos(DateTimeOffset start, DateTimeOffset end)
+        {
+            return _youTubeManager.GetVideosAsync(start, end);
         }
 
         [HttpGet("issues-for-range")]
@@ -36,10 +45,14 @@ namespace ApiReview.Server.Controllers
             return _summaryManager.GetSummaryAsync(videoId);
         }
 
-        [HttpGet("videos")]
-        public Task<IReadOnlyList<ApiReviewVideo>> GetVideos(DateTimeOffset start, DateTimeOffset end)
+        [HttpPost("publish")]
+        public async Task<IActionResult> Publish([FromBody] ApiReviewSummary summary)
         {
-            return _youTubeManager.GetVideosAsync(start, end);
+            if (summary?.Items?.Any() != true)
+                return Ok();
+
+            var result = await _summaryPublishingService.PublishAsync(summary);
+            return Ok(result);
         }
     }
 }

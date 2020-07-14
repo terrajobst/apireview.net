@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 using ApiReview.Shared;
 
-namespace ApiReview.Client.Data
+namespace ApiReview.Client.Services
 {
     internal sealed class ApiReviewNoteService
     {
@@ -14,6 +14,13 @@ namespace ApiReview.Client.Data
         public ApiReviewNoteService(ApiReviewHttpClientFactory clientFactory)
         {
             _clientFactory = clientFactory;
+        }
+
+        public async Task<IReadOnlyList<ApiReviewVideo>> GetVideos(DateTimeOffset start, DateTimeOffset end)
+        {
+            var client = await _clientFactory.CreateAsync();
+            var url = $"notes/videos?start={start:s}&end={end:s}";
+            return await client.GetFromJsonAsync<IReadOnlyList<ApiReviewVideo>>(url, _clientFactory.JsonOptions);
         }
 
         public async Task<ApiReviewSummary> IssuesForRange(DateTimeOffset start, DateTimeOffset end)
@@ -30,11 +37,19 @@ namespace ApiReview.Client.Data
             return await client.GetFromJsonAsync<ApiReviewSummary>(url, _clientFactory.JsonOptions);
         }
 
-        public async Task<IReadOnlyList<ApiReviewVideo>> GetVideos(DateTimeOffset start, DateTimeOffset end)
+        public async Task<ApiReviewPublicationResult> PublishNotesAsync(ApiReviewSummary summary)
         {
-            var client = await _clientFactory.CreateAsync();
-            var url = $"notes/videos?start={start:s}&end={end:s}";
-            return await client.GetFromJsonAsync<IReadOnlyList<ApiReviewVideo>>(url, _clientFactory.JsonOptions);
+            try
+            {
+                var client = await _clientFactory.CreateAsync();
+                var url = $"notes/publish";
+                var response = await client.PostAsJsonAsync(url, summary, _clientFactory.JsonOptions);
+                return await response.Content.ReadFromJsonAsync<ApiReviewPublicationResult>(_clientFactory.JsonOptions);
+            }
+            catch
+            {
+                return ApiReviewPublicationResult.Failed();
+            }
         }
     }
 }

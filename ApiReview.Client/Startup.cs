@@ -1,3 +1,4 @@
+using System;
 using System.Security.Claims;
 
 using Microsoft.AspNetCore.Authentication;
@@ -8,8 +9,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-using ApiReview.Client.Data;
+using ApiReview.Client.Services;
 using ApiReview.Shared;
+using System.Threading.Tasks;
 
 namespace ApiReview.Client
 {
@@ -46,31 +48,39 @@ namespace ApiReview.Client
                     {
                         options.LoginPath = "/signin";
                         options.LogoutPath = "/signout";
+                        options.Events.OnValidatePrincipal = context =>
+                        {
+                            // If scope requirements changed, then let's make everyone log back in
+                            var scopeClaim = context.Principal.FindFirst(ApiReviewConstants.GitHubScopesClaim);
+                            if (!string.Equals(scopeClaim?.Value, ApiReviewConstants.GitHubScopeString, StringComparison.Ordinal))
+                                context.RejectPrincipal();
+
+                            return Task.CompletedTask;
+                        };
                     })
                     .AddGitHub(options =>
                     {
                         options.ClientId = Configuration["GitHubClientId"];
                         options.ClientSecret = Configuration["GitHubClientSecret"];
-                        // TODO: Extract to config
-                        options.Scope.Add("read:org");
+                        foreach (var scope in ApiReviewConstants.GitHubScopes)
+                            options.Scope.Add(scope);
                         options.SaveTokens = true;
-                        // TODO: Extract to config
-                        options.ClaimActions.MapJsonKey("avatar_url", "avatar_url");
-                        if (Env.IsDevelopment())
+                        options.ClaimActions.MapJsonKey(ApiReviewConstants.GitHubAvatarUrl, ApiReviewConstants.GitHubAvatarUrl);
+                        options.Events.OnCreatingTicket = async context =>
                         {
-                            options.Events.OnCreatingTicket = async context =>
-                            {
-                                var accessToken = context.AccessToken;
-                                // TODO: Extract to config
-                                var orgName = "dotnet";
-                                var teamName = "fxdc";
-                                var userName = context.Identity.Name;
-                                var isMember = await GitHubAuthHelpers.IsMemberOfTeamAsync(accessToken, orgName, teamName, userName);
-                                // TODO: Extract to config
-                                if (isMember)
-                                        context.Identity.AddClaim(new Claim(context.Identity.RoleClaimType, "api-approver"));
-                            };
-                        }
+                            var accessToken = context.AccessToken;
+                            //var orgName = ApiReviewConstants.ApiApproverOrgName;
+                            //var teamName = ApiReviewConstants.ApiApproverTeamSlug;
+                            var userName = context.Identity.Name;
+                            // TODO: Switch to proper membership
+                            var isMember = string.Equals(userName, "terrajobst", StringComparison.OrdinalIgnoreCase);
+                            // var isMember = await GitHubAuthHelpers.IsMemberOfTeamAsync(accessToken, orgName, teamName, userName);
+                            if (isMember)
+                                context.Identity.AddClaim(new Claim(context.Identity.RoleClaimType, ApiReviewConstants.ApiApproverRole));
+
+                            // Remember the GitHub scopes.
+                            context.Identity.AddClaim(new Claim(ApiReviewConstants.GitHubScopesClaim, ApiReviewConstants.GitHubScopeString));
+                        };
                     });
         }
 

@@ -26,22 +26,22 @@ namespace ApiReview.Server.Services
             {
                 new ApiReviewVideo(
                     "q7ODj3RJnME",
-                    DateTimeOffset.Parse("2020-06-25T16:53:18Z"),
-                    DateTimeOffset.Parse("2020-06-25T17:42:57Z"),
+                    DateTime.Parse("2020-06-25T16:53:18Z"),
+                    DateTime.Parse("2020-06-25T17:42:57Z"),
                     "Desktop: .NET Community Standup - June 25th 2020 - New XAML Desktop Features",
                     "https://i.ytimg.com/vi/q7ODj3RJnME/mqdefault.jpg"
                 ),
                 new ApiReviewVideo(
                     "rx_098IdZU0",
-                    DateTimeOffset.Parse("2020-06-25T16:54:00Z"),
-                    DateTimeOffset.Parse("2020-06-25T19:02:22Z"),
+                    DateTime.Parse("2020-06-25T16:54:00Z"),
+                    DateTime.Parse("2020-06-25T19:02:22Z"),
                     "GitHub Quick Reviews",
                     "https://i.ytimg.com/vi/rx_098IdZU0/mqdefault.jpg"
                 ),
                 new ApiReviewVideo(
                     "R5G4scTRRNQ",
-                    DateTimeOffset.Parse("2020-06-26T17:00:12Z"),
-                    DateTimeOffset.Parse("2020-06-26T18:55:24Z"),
+                    DateTime.Parse("2020-06-26T17:00:12Z"),
+                    DateTime.Parse("2020-06-26T18:55:24Z"),
                     "GitHub Quick Reviews",
                     "https://i.ytimg.com/vi/R5G4scTRRNQ/mqdefault.jpg"
                 )
@@ -74,8 +74,6 @@ namespace ApiReview.Server.Services
 
     public class YouTubeManager : IYouTubeManager
     {
-        // TODO: Extract to config
-        private const string _netFoundationChannelId = "UCiaZbznpWV1o-KLxj8zqR6A";
         private readonly YouTubeServiceFactory _youTubeServiceFactory;
 
         public YouTubeManager(YouTubeServiceFactory youTubeServiceFactory)
@@ -110,7 +108,7 @@ namespace ApiReview.Server.Services
             var nextPageToken = "";
 
             var searchRequest = service.Search.List("snippet");
-            searchRequest.ChannelId = _netFoundationChannelId;
+            searchRequest.ChannelId = ApiReviewConstants.NetFoundationChannelId;
             searchRequest.Type = "video";
             searchRequest.EventType = EventTypeEnum.Completed;
             searchRequest.PublishedAfter = start.DateTime;

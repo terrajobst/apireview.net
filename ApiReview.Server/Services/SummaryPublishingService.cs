@@ -1,45 +1,101 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Mail;
 using System.Threading.Tasks;
 
 using ApiReview.Shared;
+using Markdig;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 
 using Octokit;
 
 namespace ApiReview.Server.Services
 {
-    public sealed class NoteSharingService
+    public sealed class SummaryPublishingService
     {
+        private readonly IWebHostEnvironment _env;
+        private readonly IConfiguration _configuration;
         private readonly GitHubClientFactory _clientFactory;
         private readonly YouTubeServiceFactory _youTubeServiceFactory;
 
-        public NoteSharingService(GitHubClientFactory clientFactory, YouTubeServiceFactory youTubeServiceFactory)
+        public SummaryPublishingService(IWebHostEnvironment env, IConfiguration configuration, GitHubClientFactory clientFactory, YouTubeServiceFactory youTubeServiceFactory)
         {
+            _env = env;
+            _configuration = configuration;
             _clientFactory = clientFactory;
             _youTubeServiceFactory = youTubeServiceFactory;
         }
 
-        public async Task ShareNotesAsync(ApiReviewSummary summary)
+        public async Task<ApiReviewPublicationResult> PublishAsync(ApiReviewSummary summary)
         {
-            await UpdateVideoDescriptionAsync(summary);
-            await UpdateCommentsAsync(summary);
-            await CommitAsync(summary);
-            // await SendEmailAsync(summary);
+            if (!summary.Items.Any())
+                return ApiReviewPublicationResult.Failed();
+
+            string url;
+
+            if (_env.IsDevelopment())
+            {
+                url = "https://github.com/dotnet/apireviews";
+            }
+            else
+            {
+                await UpdateVideoDescriptionAsync(summary);
+                await UpdateCommentsAsync(summary);
+                url = await CommitAsync(summary);
+            }
+
+            await SendEmailAsync(summary);
+            return ApiReviewPublicationResult.Suceess(url);
         }
 
-        //private static Task SendEmailAsync(ApiReviewSummary summary)
-        //{
-        //    var markdown = summary.GetMarkdown();
-        //    var html = Markdown.ToHtml(markdown);
+        private async Task SendEmailAsync(ApiReviewSummary summary)
+        {
+            var from = _configuration["MailFrom"];
+            var to = _configuration["MailTo"];
+            var userName = _configuration["MailUserName"];
+            var password = _configuration["MailPassword"];
+            var host = _configuration["MailHost"];
+            var port = Convert.ToInt32(_configuration["MailPort"]);
 
-        //    var outlookApp = new Microsoft.Office.Interop.Outlook.Application();
-        //    var mailItem = (MailItem)outlookApp.CreateItem(OlItemType.olMailItem);
-        //    mailItem.To = "FXDR";
-        //    mailItem.Subject = $"API Review Notes {Date.ToString("d")}";
-        //    mailItem.HTMLBody = html;
-        //    mailItem.Send();
-        //}
+            var date = summary.Items.First().Feedback.FeedbackDateTime.Date;
+            var subject = $"API Review Notes {date:d}";
+            var markdown = GetMarkdown(summary);
+            var body = Markdown.ToHtml(markdown);
+
+            var msg = new MailMessage
+            {
+                From = new MailAddress(from),
+                To = {
+                    new MailAddress(to)
+                },
+                Subject = subject,
+                Body = body,
+                IsBodyHtml = true
+            };
+
+            var client = new SmtpClient
+            {
+                UseDefaultCredentials = false,
+                Credentials = new NetworkCredential(userName, password),
+                Port = port,
+                Host = host,
+                DeliveryMethod = SmtpDeliveryMethod.Network,
+                EnableSsl = true
+            };
+
+            try
+            {
+                await client.SendMailAsync(msg);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
+        }
 
         private async Task UpdateVideoDescriptionAsync(ApiReviewSummary summary)
         {
@@ -78,7 +134,7 @@ namespace ApiReview.Server.Services
             {
                 var feedback = item.Feedback;
 
-                if (feedback.VideoUrl == null && feedback.FeedbackId != null)
+                if (feedback.VideoUrl == null && feedback.FeedbackId != null && item.VideoTimeCodeUrl != null)
                 {
                     var updatedMarkdown = $"[Video]({item.VideoTimeCodeUrl})\n\n{feedback.FeedbackMarkdown}";
                     var commentId = Convert.ToInt32(feedback.FeedbackId);
@@ -87,21 +143,19 @@ namespace ApiReview.Server.Services
             }
         }
 
-        private async Task CommitAsync(ApiReviewSummary summary)
+        private async Task<string> CommitAsync(ApiReviewSummary summary)
         {
-            if (summary.Items.Count == 0)
-                return;
-
-            var owner = "dotnet";
-            var repo = "apireviews";
-            var branch = "heads/master";
+            var owner = ApiReviewConstants.ApiReviewsOrgName;
+            var repo = ApiReviewConstants.ApiReviewsRepoName;
+            var branch = ApiReviewConstants.ApiReviewsBranch;
+            var head = $"heads/{branch}";
             var date = summary.Items.FirstOrDefault().Feedback.FeedbackDateTime.DateTime;
             var markdown = $"# Quick Reviews {date:d}\n\n{GetMarkdown(summary)}";
             var path = $"{date.Year}/{date.Month:00}-{date.Day:00}-quick-reviews/README.md";
             var commitMessage = $"Add quick review notes for {date:d}";
 
             var github = await _clientFactory.CreateAsync();
-            var masterReference = await github.Git.Reference.Get(owner, repo, branch);
+            var masterReference = await github.Git.Reference.Get(owner, repo, head);
             var latestCommit = await github.Git.Commit.Get(owner, repo, masterReference.Object.Sha);
 
             var recursiveTreeResponse = await github.Git.Tree.GetRecursive(owner, repo, latestCommit.Tree.Sha);
@@ -127,8 +181,11 @@ namespace ApiReview.Server.Services
                 var newCommitResponse = await github.Git.Commit.Create(owner, repo, newCommit);
 
                 var newReference = new ReferenceUpdate(newCommitResponse.Sha);
-                var newReferenceResponse = await github.Git.Reference.Update(owner, repo, branch, newReference);
+                var newReferenceResponse = await github.Git.Reference.Update(owner, repo, head, newReference);
             }
+
+            var url = $"https://github.com/{owner}/{repo}/blob/{branch}/{path}";
+            return url;
         }
 
         private static string GetMarkdown(ApiReviewSummary summary)

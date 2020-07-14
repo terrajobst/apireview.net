@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 using ApiReview.Shared;
 
-namespace ApiReview.Client.Data
+namespace ApiReview.Client.Services
 {
     internal sealed class ApiReviewService
     {

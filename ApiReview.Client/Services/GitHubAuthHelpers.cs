@@ -2,9 +2,11 @@
 using System.Linq;
 using System.Threading.Tasks;
 
+using ApiReview.Shared;
+
 using Octokit.GraphQL;
 
-namespace ApiReview.Client.Data
+namespace ApiReview.Client.Services
 {
     internal static class GitHubAuthHelpers
     {
@@ -12,8 +14,7 @@ namespace ApiReview.Client.Data
         {
             try
             {
-                // TODO: Extract to config
-                var productInformation = new ProductHeaderValue("apireview.azurewebsites.net");
+                var productInformation = new ProductHeaderValue(ApiReviewConstants.ProductName);
                 var connection = new Connection(productInformation, accessToken);
 
                 var query = new Query()

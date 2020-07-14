@@ -1,5 +1,7 @@
 ﻿using System.Threading.Tasks;
 
+using ApiReview.Shared;
+
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 
@@ -19,8 +21,7 @@ namespace ApiReview.Server.Services
         public async Task<GitHubClient> CreateAsync()
         {
             var accessToken = await _httpContextAccessor.HttpContext.GetTokenAsync("access_token");
-            // TODO: Extract to config
-            var productInformation = new ProductHeaderValue("apireviews.azurewebsites.net");
+            var productInformation = new ProductHeaderValue(ApiReviewConstants.ProductName);
             var client = new GitHubClient(productInformation)
             {
                 Credentials = new Credentials(accessToken)

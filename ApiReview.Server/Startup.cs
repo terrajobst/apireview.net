@@ -43,6 +43,7 @@ namespace ApiReview.Server
             }
 
             services.AddSingleton<SummaryManager>();
+            services.AddSingleton<SummaryPublishingService>();
             services.AddHttpContextAccessor();
 
             services.AddAuthentication("Bearer").AddGitHubBearer();

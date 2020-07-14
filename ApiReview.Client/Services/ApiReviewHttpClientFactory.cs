@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Configuration;
 
-namespace ApiReview.Client.Data
+namespace ApiReview.Client.Services
 {
     internal sealed class ApiReviewHttpClientFactory
     {
