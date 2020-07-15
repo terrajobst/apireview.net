@@ -1,4 +1,3 @@
-using System;
 using System.Security.Claims;
 
 using Microsoft.AspNetCore.Authentication;
@@ -11,7 +10,6 @@ using Microsoft.Extensions.Hosting;
 
 using ApiReview.Client.Services;
 using ApiReview.Shared;
-using System.Threading.Tasks;
 
 namespace ApiReview.Client
 {
@@ -48,22 +46,11 @@ namespace ApiReview.Client
                     {
                         options.LoginPath = "/signin";
                         options.LogoutPath = "/signout";
-                        options.Events.OnValidatePrincipal = context =>
-                        {
-                            // If scope requirements changed, then let's make everyone log back in
-                            var scopeClaim = context.Principal.FindFirst(ApiReviewConstants.GitHubScopesClaim);
-                            if (!string.Equals(scopeClaim?.Value, ApiReviewConstants.GitHubScopeString, StringComparison.Ordinal))
-                                context.RejectPrincipal();
-
-                            return Task.CompletedTask;
-                        };
                     })
                     .AddGitHub(options =>
                     {
                         options.ClientId = Configuration["GitHubClientId"];
                         options.ClientSecret = Configuration["GitHubClientSecret"];
-                        foreach (var scope in ApiReviewConstants.GitHubScopes)
-                            options.Scope.Add(scope);
                         options.SaveTokens = true;
                         options.ClaimActions.MapJsonKey(ApiReviewConstants.GitHubAvatarUrl, ApiReviewConstants.GitHubAvatarUrl);
                         options.Events.OnCreatingTicket = async context =>
@@ -75,9 +62,6 @@ namespace ApiReview.Client
                             var isMember = await GitHubAuthHelpers.IsMemberOfTeamAsync(accessToken, orgName, teamName, userName);
                             if (isMember)
                                 context.Identity.AddClaim(new Claim(context.Identity.RoleClaimType, ApiReviewConstants.ApiApproverRole));
-
-                            // Remember the GitHub scopes.
-                            context.Identity.AddClaim(new Claim(ApiReviewConstants.GitHubScopesClaim, ApiReviewConstants.GitHubScopeString));
                         };
                     });
         }

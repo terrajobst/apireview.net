@@ -22,7 +22,10 @@ namespace ApiReview.Server.Services
         private readonly GitHubClientFactory _clientFactory;
         private readonly YouTubeServiceFactory _youTubeServiceFactory;
 
-        public SummaryPublishingService(IWebHostEnvironment env, IConfiguration configuration, GitHubClientFactory clientFactory, YouTubeServiceFactory youTubeServiceFactory)
+        public SummaryPublishingService(IWebHostEnvironment env,
+                                        IConfiguration configuration,
+                                        GitHubClientFactory clientFactory,
+                                        YouTubeServiceFactory youTubeServiceFactory)
         {
             _env = env;
             _configuration = configuration;
@@ -35,11 +38,9 @@ namespace ApiReview.Server.Services
             if (!summary.Items.Any())
                 return ApiReviewPublicationResult.Failed();
 
-            string url;
-
             if (_env.IsDevelopment())
             {
-                url = "https://github.com/dotnet/apireviews";
+                await UpdateCommentsDevAsync(summary);
             }
             else
             {
@@ -48,9 +49,9 @@ namespace ApiReview.Server.Services
                 //
                 // await UpdateVideoDescriptionAsync(summary);
                 await UpdateCommentsAsync(summary);
-                url = await CommitAsync(summary);
             }
 
+            var url = await CommitAsync(summary);
             await SendEmailAsync(summary);
             return ApiReviewPublicationResult.Suceess(url);
         }
@@ -131,7 +132,7 @@ namespace ApiReview.Server.Services
 
         private async Task UpdateCommentsAsync(ApiReviewSummary summary)
         {
-            var github = await _clientFactory.CreateAsync();
+            var github = await _clientFactory.CreateForAppAsync();
 
             foreach (var item in summary.Items)
             {
@@ -146,10 +147,35 @@ namespace ApiReview.Server.Services
             }
         }
 
+        private async Task UpdateCommentsDevAsync(ApiReviewSummary summary)
+        {
+            var testRepo = _configuration["RepoList"];
+            var (owner, repo) = OrgAndRepo.Parse(testRepo);
+
+            if (!summary.Items.All(i => i.Feedback.Issue.Owner == owner &&
+                                        i.Feedback.Issue.Repo == repo))
+                return;
+
+            var github = await _clientFactory.CreateForAppAsync();
+
+            foreach (var item in summary.Items)
+            {
+                var feedback = item.Feedback;
+
+                if (feedback.FeedbackId != null)
+                {
+                    var status = feedback.Decision.ToString();
+                    var updatedMarkdown = $"[Video]({status})\n\n{feedback.FeedbackMarkdown}";
+                    var commentId = Convert.ToInt32(feedback.FeedbackId);
+                    await github.Issue.Comment.Update(feedback.Issue.Owner, feedback.Issue.Repo, commentId, updatedMarkdown);
+                }
+            }
+        }
+
         private async Task<string> CommitAsync(ApiReviewSummary summary)
         {
-            var owner = ApiReviewConstants.ApiReviewsOrgName;
-            var repo = ApiReviewConstants.ApiReviewsRepoName;
+            var ownerRepoString = _configuration["ApiReviewsRepo"];
+            var (owner, repo) = OrgAndRepo.Parse(ownerRepoString);
             var branch = ApiReviewConstants.ApiReviewsBranch;
             var head = $"heads/{branch}";
             var date = summary.Items.FirstOrDefault().Feedback.FeedbackDateTime.DateTime;
@@ -157,7 +183,7 @@ namespace ApiReview.Server.Services
             var path = $"{date.Year}/{date.Month:00}-{date.Day:00}-quick-reviews/README.md";
             var commitMessage = $"Add quick review notes for {date:d}";
 
-            var github = await _clientFactory.CreateAsync();
+            var github = await _clientFactory.CreateForAppAsync();
             var masterReference = await github.Git.Reference.Get(owner, repo, head);
             var latestCommit = await github.Git.Commit.Get(owner, repo, masterReference.Object.Sha);
 

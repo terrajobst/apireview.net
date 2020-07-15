@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 
 using ApiReview.Shared;
 
+using Microsoft.Extensions.Configuration;
+
 using Octokit;
 
 namespace ApiReview.Server.Services
@@ -43,16 +45,19 @@ namespace ApiReview.Server.Services
 
     public sealed class GitHubManager : IGitHubManager
     {
+        private readonly IConfiguration _configuration;
         private readonly GitHubClientFactory _clientFactory;
 
-        public GitHubManager(GitHubClientFactory clientFactory)
+        public GitHubManager(IConfiguration configuration, GitHubClientFactory clientFactory)
         {
+            _configuration = configuration;
             _clientFactory = clientFactory;
         }
 
         public Task<IReadOnlyList<ApiReviewFeedback>> GetFeedbackAsync(DateTimeOffset start, DateTimeOffset end)
         {
-            var repos = OrgAndRepo.ParseList(ApiReviewConstants.RepoList).ToArray();
+            var repoList = _configuration["RepoList"];
+            var repos = OrgAndRepo.ParseList(repoList).ToArray();
             return GetFeedbackAsync(repos, start, end);
         }
 
@@ -88,7 +93,11 @@ namespace ApiReview.Server.Services
                 return (null, body);
             }
 
-            var github = await _clientFactory.CreateAsync();
+            // NOTE: Ideally, we'd use the user here, but if we do, we get a FORBIDDEN error.
+            //       Not a biggie though, this API is only called by people with the api-approver
+            //       role, so using the app quota seems fine.
+
+            var github = await _clientFactory.CreateForAppAsync();
             var results = new List<ApiReviewFeedback>();
 
             foreach (var (owner, repo) in repos)
@@ -153,9 +162,10 @@ namespace ApiReview.Server.Services
 
         public async Task<IReadOnlyList<ApiReviewIssue>> GetIssuesAsync()
         {
-            var repos = OrgAndRepo.ParseList(ApiReviewConstants.RepoList).ToArray();
+            var repoList = _configuration["RepoList"];
+            var repos = OrgAndRepo.ParseList(repoList).ToArray();
 
-            var github = await _clientFactory.CreateAsync();
+            var github = await _clientFactory.CreateForUserAsync();
             var result = new List<ApiReviewIssue>();
 
             foreach (var (owner, repo) in repos)
