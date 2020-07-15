@@ -43,7 +43,10 @@ namespace ApiReview.Server.Services
             }
             else
             {
-                await UpdateVideoDescriptionAsync(summary);
+                // Apparently, we can't easily modify video descriptions in the cloud.
+                // If someone has a fix for that, I'd be massively thankful.
+                //
+                // await UpdateVideoDescriptionAsync(summary);
                 await UpdateCommentsAsync(summary);
                 url = await CommitAsync(summary);
             }
