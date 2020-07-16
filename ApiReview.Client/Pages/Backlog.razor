@@ -67,6 +67,11 @@ else
                 </span>
                 <div class="gh-details-cell">
                     @issue.DetailText
+
+                    @if (issue.Milestone != null)
+                    {
+                        <span class="ml-2 mr-1 oi oi-signpost" aria-hidden="true"></span>@issue.Milestone
+                    }
                 </div>
             </div>
         }
