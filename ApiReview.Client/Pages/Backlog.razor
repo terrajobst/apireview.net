@@ -44,6 +44,24 @@ else
                 <div class="float-right">
                     <button class="btn btn-secondary btn-sm" @onclick="RefreshAsync">Refresh</button>
                 </div>
+                @if (_milestones != null)
+                {
+                    <div class="mr-2 float-right">
+                        <div class="dropdown">
+                            <button class="btn btn-light btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Milestones
+                            </button>
+                            <ol class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                @foreach (var (k, v) in _milestones)
+                                {
+                                    <div class="m-2 checkbox">
+                                        <label><input class="mr-2 " type="checkbox" checked="@v" @onchange="_ => MilestoneChecked(k)" >@k</label>
+                                    </div>
+                                }
+                            </ol>
+                        </div>
+                    </div>
+                }
             </div>
         </div>
     </div>
@@ -70,7 +88,7 @@ else
 
                     @if (issue.Milestone != null)
                     {
-                        <span class="ml-2 mr-1 oi oi-signpost" aria-hidden="true"></span>@issue.Milestone
+                        <span class="ml-2 mr-1 oi oi-signpost text-muted" aria-hidden="true"></span>@issue.Milestone
                     }
                 </div>
             </div>
@@ -82,20 +100,26 @@ else
 
     private IReadOnlyList<ApiReviewIssue> _issues;
     private string _filter;
+    private SortedDictionary<string, bool> _milestones;
 
-    protected override async Task OnInitializedAsync()
+    protected override Task OnInitializedAsync()
     {
-        _issues = await ApiReviewService.GetIssuesAsync();
+        return RefreshAsync();
     }
 
     private async Task RefreshAsync()
     {
-        await ApiReviewService.RefreshAsync();
+        if (_issues != null)
+            await ApiReviewService.RefreshAsync();
         _issues = await ApiReviewService.GetIssuesAsync();
+        _milestones = CreateMilestones(_issues, _milestones);
     }
 
     private bool IsVisible(ApiReviewIssue issue)
     {
+        if (_milestones != null && _milestones.TryGetValue(issue.Milestone, out var isChecked) && !isChecked)
+            return false;
+
         if (string.IsNullOrEmpty(_filter))
             return true;
 
@@ -115,5 +139,31 @@ else
         }
 
         return false;
+    }
+
+    private SortedDictionary<string, bool> CreateMilestones(IReadOnlyList<ApiReviewIssue> issues,
+                                                            SortedDictionary<string, bool> existingMilestones)
+    {
+        var result = new SortedDictionary<string, bool>();
+
+        foreach (var issue in issues)
+            result[issue.Milestone] = true;
+
+        if (existingMilestones != null)
+        {
+            foreach (var (k, v) in existingMilestones)
+            {
+                if (result.ContainsKey(k))
+                    result[k] = v;
+            }
+        }
+
+        return result;
+    }
+
+    private void MilestoneChecked(string milestone)
+    {
+        if (_milestones.TryGetValue(milestone, out var isChecked))
+            _milestones[milestone] = !isChecked;
     }
 }
