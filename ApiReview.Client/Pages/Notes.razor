@@ -51,20 +51,23 @@
     </div>
 </div>
 
-<div class="d-flex flex-row flex-wrap">
-    @foreach (var video in Videos)
-    {
-        <div class="p-2 @(SelectedVideo == video ? "yt-video-selected" : null)" @onclick="@(e => SelectVideoAsync(video))">
-            <div class="yt-video">
-                <div><img src="@video.ThumbnailUrl" /></div>
-                <a class="mt-2 yt-video-title" href="@video.Url">@video.Title</a>
-                <div class="text-muted text-sm-left">
-                    @video.StartDateTime.FormatAge() at @video.StartDateTime.ToString("h tt")
+@if (Videos.Any())
+{
+    <div class="mb-3 d-flex flex-row flex-wrap">
+        @foreach (var video in Videos)
+        {
+            <div class="p-2 @(SelectedVideo == video ? "yt-video-selected" : null)" @onclick="@(e => SelectVideoAsync(video))">
+                <div class="yt-video">
+                    <div><img src="@video.ThumbnailUrl" /></div>
+                    <a class="mt-2 yt-video-title" href="@video.Url">@video.Title</a>
+                    <div class="text-muted text-sm-left">
+                        @video.StartDateTime.FormatAge() at @video.StartDateTime.ToString("h tt")
+                    </div>
                 </div>
             </div>
-        </div>
-    }
-</div>
+        }
+    </div>
+}
 
 @if (Summary != null && Summary.Items.Count == 0)
 {
@@ -72,7 +75,7 @@
 }
 else if (Summary != null && Summary.Items.Any())
 {
-    <div class="mt-2 gh-issue-list">
+    <div class="gh-issue-list">
         @foreach (var item in Summary.Items)
         {
             <div class="gh-issue-cell">
