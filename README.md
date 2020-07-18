@@ -80,3 +80,55 @@ This query gets us the data from GitHub:
   }
 }
 ```
+
+### Requesting
+
+* Mark api-ready-for-review
+* Mark as blocking
+
+### Notifications
+
+* Issue labbeled as api-ready-for-review
+* Review completed
+
+### Reviews
+
+`/reviews`
+  - filter by date
+  - list of reviews, paged
+
+`/reviews/new`
+  - creates new review
+
+`/reviews/{id}`
+  - shows a given review
+  - complete
+    - find video + review decisions
+    - saving that will update comments
+  - edit title + date
+  - edit description
+  - add/remove issues
+  - delete
+
+`/reviews/today` or even `/`
+  - same as `/review/{id}`, but points to the first review on today's day that wasn't completed yet.
+
+-------------------------------------
+
+Title
+Relative Date
+Status
+
+MarkdownDescription
+
+#if !complete
+* links to isses
+
+#if complete
+* links to decision comment
+* decison
+* video
+
+Embedded Video
+
+-------------------------------------
