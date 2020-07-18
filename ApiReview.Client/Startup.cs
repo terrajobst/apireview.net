@@ -35,9 +35,9 @@ namespace ApiReview.Client
             services.AddServerSideBlazor();
             services.AddControllers();
             services.AddHttpContextAccessor();
-            services.AddSingleton<ApiReviewHttpClientFactory>();
-            services.AddSingleton<ApiReviewService>();
-            services.AddSingleton<ApiReviewNoteService>();
+            services.AddSingleton<BackendHttpClientFactory>();
+            services.AddSingleton<IssueService>();
+            services.AddSingleton<NotesService>();
             services.AddAuthentication(options =>
                     {
                         options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;

@@ -7,11 +7,11 @@ using ApiReview.Shared;
 
 namespace ApiReview.Client.Services
 {
-    internal sealed class ApiReviewNoteService
+    internal sealed class NotesService
     {
-        private readonly ApiReviewHttpClientFactory _clientFactory;
+        private readonly BackendHttpClientFactory _clientFactory;
 
-        public ApiReviewNoteService(ApiReviewHttpClientFactory clientFactory)
+        public NotesService(BackendHttpClientFactory clientFactory)
         {
             _clientFactory = clientFactory;
         }

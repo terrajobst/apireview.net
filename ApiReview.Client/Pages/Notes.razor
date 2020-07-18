@@ -1,7 +1,7 @@
 ﻿@page "/notes"
 @using System.Threading;
 @attribute [Authorize(Roles = ApiReviewConstants.ApiApproverRole)]
-@inject ApiReviewNoteService NoteService
+@inject NotesService NotesService
 
 <div class="form-group row">
     <div class="col-sm-2">
@@ -242,7 +242,7 @@ else if (Summary != null && Summary.Items.Any())
 
         if (IncludeVideo)
         {
-            videos = await NoteService.GetVideos(Start, End);
+            videos = await NotesService.GetVideos(Start, End);
 
             if (token.IsCancellationRequested)
                 return;
@@ -255,9 +255,9 @@ else if (Summary != null && Summary.Items.Any())
         ApiReviewSummary summary;
 
         if (SelectedVideo != null)
-            summary = await NoteService.IssuesForVideo(SelectedVideo.Id);
+            summary = await NotesService.IssuesForVideo(SelectedVideo.Id);
         else
-            summary = await NoteService.IssuesForRange(Start, End);
+            summary = await NotesService.IssuesForRange(Start, End);
 
         if (token.IsCancellationRequested)
             return;
@@ -284,7 +284,7 @@ else if (Summary != null && Summary.Items.Any())
 
         var token = _cts.Token;
 
-        var summary = await NoteService.IssuesForVideo(video.Id);
+        var summary = await NotesService.IssuesForVideo(video.Id);
         if (token.IsCancellationRequested)
             return;
 
@@ -296,7 +296,7 @@ else if (Summary != null && Summary.Items.Any())
     {
         IsLoading = true;
 
-        PublicationResult = await NoteService.PublishNotesAsync(Summary);
+        PublicationResult = await NotesService.PublishNotesAsync(Summary);
 
         IsLoading = false;
     }

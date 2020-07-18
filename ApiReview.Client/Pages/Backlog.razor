@@ -1,6 +1,6 @@
 ﻿@page "/backlog"
 @inject IJSRuntime JSRuntime;
-@inject ApiReviewService ApiReviewService;
+@inject IssueService IssueService;
 @attribute [Authorize]
 
 @if (_issues == null)
@@ -110,8 +110,8 @@ else
     private async Task RefreshAsync()
     {
         if (_issues != null)
-            await ApiReviewService.RefreshAsync();
-        _issues = await ApiReviewService.GetIssuesAsync();
+            await IssueService.RefreshAsync();
+        _issues = await IssueService.GetAsync();
         _milestones = CreateMilestones(_issues, _milestones);
     }
 

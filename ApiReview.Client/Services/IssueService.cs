@@ -6,17 +6,17 @@ using ApiReview.Shared;
 
 namespace ApiReview.Client.Services
 {
-    internal sealed class ApiReviewService
+    internal sealed class IssueService
     {
-        private readonly ApiReviewHttpClientFactory _clientFactory;
+        private readonly BackendHttpClientFactory _clientFactory;
         private IReadOnlyList<ApiReviewIssue> _issues;
 
-        public ApiReviewService(ApiReviewHttpClientFactory clientFactory)
+        public IssueService(BackendHttpClientFactory clientFactory)
         {
             _clientFactory = clientFactory;
         }
 
-        public async Task<IReadOnlyList<ApiReviewIssue>> GetIssuesAsync()
+        public async Task<IReadOnlyList<ApiReviewIssue>> GetAsync()
         {
             if (_issues == null)
                 await RefreshAsync();

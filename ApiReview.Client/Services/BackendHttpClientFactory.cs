@@ -10,12 +10,12 @@ using Microsoft.Extensions.Configuration;
 
 namespace ApiReview.Client.Services
 {
-    internal sealed class ApiReviewHttpClientFactory
+    internal sealed class BackendHttpClientFactory
     {
         private readonly string _url;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public ApiReviewHttpClientFactory(IConfiguration configuration,
+        public BackendHttpClientFactory(IConfiguration configuration,
                                           IHttpContextAccessor httpContextAccessor,
                                           IOptions<JsonOptions> jsonOptions)
         {
