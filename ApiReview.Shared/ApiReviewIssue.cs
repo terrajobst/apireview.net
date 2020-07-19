@@ -19,7 +19,7 @@ namespace ApiReview.Shared
 
         public DateTimeOffset CreatedAt { get; set; }
 
-        public string DetailText => $"{IdFull} {CreatedAt.FormatAge()} by {Author}";
+        public string DetailText => $"{IdFull} {CreatedAt.FormatRelative()} by {Author}";
 
         public string Url { get; set; }
 

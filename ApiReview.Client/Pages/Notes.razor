@@ -61,7 +61,7 @@
                     <div><img src="@video.ThumbnailUrl" /></div>
                     <a class="mt-2 yt-video-title" href="@video.Url">@video.Title</a>
                     <div class="text-muted text-sm-left">
-                        @video.StartDateTime.FormatAge() at @video.StartDateTime.ToString("h tt")
+                        @video.StartDateTime.FormatRelative() at @video.StartDateTime.ToString("h tt")
                     </div>
                 </div>
             </div>
