@@ -19,26 +19,40 @@ else
     <div class="gh-issue-header">
         <div class="row">
             <div class="col align-self-center">
-                <p class="text-muted m-0">
-                    @{
-                        var numberOfOrgs = _issues.Select(i => i.Owner).Distinct().Count();
-                        var numberOfRepos = _issues.Select(i => i.Repo).Distinct().Count();
-                        var visibleIssues = _issues.Count(IsVisible);
-                    }
+                @if (_checkedIssues.Count == 0)
+                {
+                    <p class="text-muted m-0">
+                        @{
+                            var numberOfOrgs = _issues.Select(i => i.Owner).Distinct().Count();
+                            var numberOfRepos = _issues.Select(i => i.Repo).Distinct().Count();
+                            var visibleIssues = _issues.Count(IsVisible);
+                        }
 
-                    @if (visibleIssues == _issues.Count)
-                    {
-                        <text>
-                            @_issues.Count issues across @numberOfOrgs orgs and @numberOfRepos repos
-                        </text>
-                    }
-                    else
-                    {
-                        <text>
-                            @visibleIssues of @_issues.Count issues across @numberOfOrgs orgs and @numberOfRepos repos
-                        </text>
-                    }
-                </p>
+                        @if (visibleIssues == _issues.Count)
+                        {
+                            <text>
+                                @_issues.Count issues across @numberOfOrgs orgs and @numberOfRepos repos
+                            </text>
+                        }
+                        else
+                        {
+                            <text>
+                                @visibleIssues of @_issues.Count issues across @numberOfOrgs orgs and @numberOfRepos repos
+                            </text>
+                        }
+                    </p>
+                }
+                else
+                {
+                    <div class="dropdown">
+                        <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            @_checkedIssues.Count items selected...
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <a class="dropdown-item" href="#" @onclick:preventDefault @onclick="() => CopySelectedItems()">Copy links</a>
+                        </div>
+                    </div>
+                }
             </div>
             <div class="col">
                 <div class="float-right">
@@ -75,21 +89,28 @@ else
             var background = issue.IsBlocking ? "gh-issue-blocking" : "";
 
             <div class="gh-issue-cell @background">
-                <a class="gh-issue-title" href="@issue.Url">@issue.Title</a>
-                <span>
-                    @foreach (var label in issue.Labels)
-                    {
-                        <span class="gh-label"
-                              style="background: @("#" + label.BackgroundColor); color: @label.ForegroundColor">@label.Name</span>
-                        }
-                </span>
-                <div class="gh-details-cell">
-                    @issue.DetailText
+                <div class="d-flex flex-row align-items-center">
+                    <div class="align-self-center">
+                        <input class="ml-2 mr-3" type="checkbox" checked="@_checkedIssues.Contains(issue)" @onchange="e => CheckIssue(issue, (bool)e.Value)" />
+                    </div>
+                    <div>
+                        <a class="gh-issue-title" href="@issue.Url">@issue.Title</a>
+                        <span>
+                            @foreach (var label in issue.Labels)
+                            {
+                                <span class="gh-label"
+                                      style="background: @("#" + label.BackgroundColor); color: @label.ForegroundColor">@label.Name</span>
+                                }
+                        </span>
+                        <div class="gh-details-cell">
+                            @issue.DetailText
 
-                    @if (issue.Milestone != null)
-                    {
-                        <span class="ml-2 mr-1 oi oi-signpost text-muted" aria-hidden="true"></span>@issue.Milestone
-                    }
+                            @if (issue.Milestone != null)
+                            {
+                                <span class="ml-2 mr-1 oi oi-signpost text-muted" aria-hidden="true"></span>@issue.Milestone
+                            }
+                        </div>
+                    </div>
                 </div>
             </div>
         }
@@ -101,6 +122,7 @@ else
     private IReadOnlyList<ApiReviewIssue> _issues;
     private string _filter;
     private SortedDictionary<string, bool> _milestones;
+    private HashSet<ApiReviewIssue> _checkedIssues = new HashSet<ApiReviewIssue>();
 
     protected override Task OnInitializedAsync()
     {
@@ -165,5 +187,37 @@ else
     {
         if (_milestones.TryGetValue(milestone, out var isChecked))
             _milestones[milestone] = !isChecked;
+    }
+
+    private async Task CopySelectedItems()
+    {
+        var text = GetMarkdown();
+        if (text == null)
+            return;
+
+        var html= Markdig.Markdown.ToHtml(text);
+        await JSRuntime.InvokeVoidAsync("clipboardCopy.copyText", text, html);
+        _checkedIssues.Clear();
+    }
+
+    private string GetMarkdown()
+    {
+        if (_issues == null)
+            return null;
+
+        var sb = new System.Text.StringBuilder();
+
+        foreach (var issue in _issues.Where(_checkedIssues.Contains))
+            sb.AppendLine($"* [{issue.IdFull}]({issue.Url}): {issue.Title}");
+
+        return sb.ToString();
+    }
+
+    private void CheckIssue(ApiReviewIssue issue, bool value)
+    {
+        if (value)
+            _checkedIssues.Add(issue);
+        else
+            _checkedIssues.Remove(issue);
     }
 }
