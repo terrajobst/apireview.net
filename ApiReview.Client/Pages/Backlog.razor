@@ -2,6 +2,7 @@
 @inject IJSRuntime JSRuntime;
 @inject IssueService IssueService;
 @attribute [Authorize]
+@implements IDisposable
 
 @if (_issues == null)
 {
@@ -55,9 +56,6 @@ else
                 }
             </div>
             <div class="col">
-                <div class="float-right">
-                    <button class="btn btn-secondary btn-sm" @onclick="RefreshAsync">Refresh</button>
-                </div>
                 @if (_milestones != null)
                 {
                     <div class="mr-2 float-right">
@@ -69,7 +67,7 @@ else
                                 @foreach (var (k, v) in _milestones)
                                 {
                                     <div class="m-2 checkbox">
-                                        <label><input class="mr-2 " type="checkbox" checked="@v" @onchange="_ => MilestoneChecked(k)" >@k</label>
+                                        <label><input class="mr-2 " type="checkbox" checked="@v" @onchange="_ => MilestoneChecked(k)">@k</label>
                                     </div>
                                 }
                             </ol>
@@ -124,17 +122,31 @@ else
     private SortedDictionary<string, bool> _milestones;
     private HashSet<ApiReviewIssue> _checkedIssues = new HashSet<ApiReviewIssue>();
 
-    protected override Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
     {
-        return RefreshAsync();
+        await LoadData();
+        IssueService.Changed += IssuesChanged;
     }
 
-    private async Task RefreshAsync()
+    public void Dispose()
     {
-        if (_issues != null)
-            await IssueService.RefreshAsync();
+        IssueService.Changed -= IssuesChanged;
+    }
+
+    private async Task LoadData()
+    {
         _issues = await IssueService.GetAsync();
         _milestones = CreateMilestones(_issues, _milestones);
+        _checkedIssues.Clear();
+    }
+
+    private async void IssuesChanged(object sender, EventArgs e)
+    {
+        await InvokeAsync(async () =>
+        {
+            await LoadData();
+            StateHasChanged();
+        });
     }
 
     private bool IsVisible(ApiReviewIssue issue)
@@ -195,7 +207,7 @@ else
         if (text == null)
             return;
 
-        var html= Markdig.Markdown.ToHtml(text);
+        var html = Markdig.Markdown.ToHtml(text);
         await JSRuntime.InvokeVoidAsync("clipboardCopy.copyText", text, html);
         _checkedIssues.Clear();
     }

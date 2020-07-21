@@ -34,6 +34,7 @@ namespace ApiReview.Client
             });
             services.AddServerSideBlazor();
             services.AddControllers();
+            services.AddSingleton<IssueChangedNotificationService>();
             services.AddScoped<BackendHttpClientFactory>();
             services.AddScoped<IssueService>();
             services.AddScoped<NotesService>();

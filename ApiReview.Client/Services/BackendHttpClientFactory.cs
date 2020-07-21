@@ -12,7 +12,7 @@ using ApiReview.Shared;
 
 namespace ApiReview.Client.Services
 {
-    internal sealed class BackendHttpClientFactory
+    public sealed class BackendHttpClientFactory
     {
         private readonly string _url;
         private readonly AuthenticationStateProvider _provider;
