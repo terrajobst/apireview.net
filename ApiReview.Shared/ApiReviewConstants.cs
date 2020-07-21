@@ -6,6 +6,7 @@ namespace ApiReview.Shared
     public static class ApiReviewConstants
     {
         public const string ProductName = "apireview.azurewebsites.net";
+        public const string TokenClaim = "acess_token";
         public const string ApiApproverOrgName = "dotnet";
         public const string ApiApproverTeamSlug = "fxdc";
         public const string ApiApproverRole = "api-approver";

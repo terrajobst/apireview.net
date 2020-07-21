@@ -2,34 +2,36 @@
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Components.Authorization;
+
+using ApiReview.Shared;
 
 namespace ApiReview.Client.Services
 {
     internal sealed class BackendHttpClientFactory
     {
         private readonly string _url;
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly AuthenticationStateProvider _provider;
 
         public BackendHttpClientFactory(IConfiguration configuration,
-                                          IHttpContextAccessor httpContextAccessor,
-                                          IOptions<JsonOptions> jsonOptions)
+                                        AuthenticationStateProvider provider,
+                                        IOptions<JsonOptions> jsonOptions)
         {
             _url = configuration["apireview-api-url"];
-            _httpContextAccessor = httpContextAccessor;
             JsonOptions = jsonOptions.Value.JsonSerializerOptions;
+            _provider = provider;
         }
 
         public JsonSerializerOptions JsonOptions { get; }
 
         public async Task<HttpClient> CreateAsync()
         {
-            var token = await _httpContextAccessor.HttpContext.GetTokenAsync("access_token");
-
+            var state = await _provider.GetAuthenticationStateAsync();
+            var token = state.User.FindFirst(ApiReviewConstants.TokenClaim)?.Value;
             var client = new HttpClient
             {
                 BaseAddress = new Uri(_url),

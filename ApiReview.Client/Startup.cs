@@ -34,10 +34,9 @@ namespace ApiReview.Client
             });
             services.AddServerSideBlazor();
             services.AddControllers();
-            services.AddHttpContextAccessor();
-            services.AddSingleton<BackendHttpClientFactory>();
-            services.AddSingleton<IssueService>();
-            services.AddSingleton<NotesService>();
+            services.AddScoped<BackendHttpClientFactory>();
+            services.AddScoped<IssueService>();
+            services.AddScoped<NotesService>();
             services.AddAuthentication(options =>
                     {
                         options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
@@ -51,7 +50,6 @@ namespace ApiReview.Client
                     {
                         options.ClientId = Configuration["GitHubClientId"];
                         options.ClientSecret = Configuration["GitHubClientSecret"];
-                        options.SaveTokens = true;
                         options.ClaimActions.MapJsonKey(ApiReviewConstants.GitHubAvatarUrl, ApiReviewConstants.GitHubAvatarUrl);
                         options.Events.OnCreatingTicket = async context =>
                         {
@@ -62,6 +60,8 @@ namespace ApiReview.Client
                             var isMember = await GitHubAuthHelpers.IsMemberOfTeamAsync(accessToken, orgName, teamName, userName);
                             if (isMember)
                                 context.Identity.AddClaim(new Claim(context.Identity.RoleClaimType, ApiReviewConstants.ApiApproverRole));
+
+                            context.Identity.AddClaim(new Claim(ApiReviewConstants.TokenClaim, accessToken));
                         };
                     });
         }
