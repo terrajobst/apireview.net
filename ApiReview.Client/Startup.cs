@@ -32,6 +32,7 @@ namespace ApiReview.Client
             {
                 o.JsonSerializerOptions.Converters.Add(new TimeSpanJsonConverter());
             });
+            services.AddApplicationInsightsTelemetry(Configuration["APPINSIGHTS_INSTRUMENTATIONKEY"]);
             services.AddServerSideBlazor();
             services.AddControllers();
             services.AddSingleton<IssueChangedNotificationService>();
