@@ -17,5 +17,6 @@ namespace ApiReview.Shared
         public const string ApiReadyForReview = "api-ready-for-review";
         public const string ApiNeedsWork = "api-needs-work";
         public const string ApiApproved = "api-approved";
+        public const string NoMilestone = "(None)";
     }
 }

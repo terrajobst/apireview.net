@@ -200,7 +200,7 @@ namespace ApiReview.Server.Services
                 Author = issue.User.Login,
                 CreatedAt = issue.CreatedAt,
                 Labels = issue.Labels.Select(l => new ApiReviewLabel { Name = l.Name, BackgroundColor = l.Color, Description = l.Description }).ToArray(),
-                Milestone = issue.Milestone?.Title ?? "(None)",
+                Milestone = issue.Milestone?.Title ?? ApiReviewConstants.NoMilestone,
                 Title = GitHubIssueHelpers.FixTitle(issue.Title),
                 Url = issue.HtmlUrl,
                 Id = issue.Number
