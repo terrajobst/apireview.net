@@ -8,6 +8,7 @@ using ApiReview.Client.Services;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace ApiReview.Client.Controllers
 {
@@ -16,10 +17,13 @@ namespace ApiReview.Client.Controllers
     [AllowAnonymous]
     public sealed class GitHubWebHookController : Controller
     {
+        private readonly ILogger<GitHubWebHookController> _logger;
         private readonly IssueChangedNotificationService _notificationService;
 
-        public GitHubWebHookController(IssueChangedNotificationService notificationService)
+        public GitHubWebHookController(ILogger<GitHubWebHookController> logger,
+                                       IssueChangedNotificationService notificationService)
         {
+            _logger = logger;
             _notificationService = notificationService;
         }
 
@@ -34,6 +38,7 @@ namespace ApiReview.Client.Controllers
             using (StreamReader reader = new StreamReader(Request.Body, Encoding.UTF8))
                 payload = await reader.ReadToEndAsync();
 
+            _logger.LogInformation("GitHub web hook {payload}", payload);
             _notificationService.Notify();
             return Ok();
         }
