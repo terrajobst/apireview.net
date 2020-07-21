@@ -27,7 +27,7 @@ namespace ApiReview.Shared
 
         public ApiReviewLabel[] Labels { get; set; }
 
-        public bool IsBlocking => Labels != null && Labels.Any(l => string.Equals(l.Name, "blocking", StringComparison.OrdinalIgnoreCase));
+        public bool IsBlocking => Labels != null && Labels.Any(l => string.Equals(l.Name, ApiReviewConstants.Blocking, StringComparison.OrdinalIgnoreCase));
 
         public int CompareTo(ApiReviewIssue other)
         {
