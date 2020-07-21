@@ -18,7 +18,15 @@ else
         <input class="form-control" type="text" placeholder="Filter" @bind="_filter" @bind:event="oninput">
     </div>
     <div class="gh-issue-header">
-        <div class="row">
+        <div class="row no-gutters">
+
+            <div class="col-auto align-self-center">
+                @{
+                    var isChecked = _checkedIssues.Count == _issues?.Count;
+                }
+                <input class="ml-2 mr-3" type="checkbox" value="@isChecked" @onchange="e => CheckAllIssues((bool)e.Value)" />
+            </div>
+
             <div class="col align-self-center">
                 @if (_checkedIssues.Count == 0)
                 {
@@ -26,7 +34,7 @@ else
                         @{
                             var numberOfOrgs = _issues.Select(i => i.Owner).Distinct().Count();
                             var numberOfRepos = _issues.Select(i => i.Repo).Distinct().Count();
-                            var visibleIssues = _issues.Count(IsVisible);
+                            var visibleIssues = VisibleIssues.Count(IsVisible);
                         }
 
                         @if (visibleIssues == _issues.Count)
@@ -47,7 +55,7 @@ else
                 {
                     <div class="dropdown">
                         <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            @_checkedIssues.Count items selected...
+                            @SelectedIssues.Count() items selected...
                         </button>
                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                             <a class="dropdown-item" href="#" @onclick:preventDefault @onclick="() => CopySelectedItems()">Copy links</a>
@@ -121,6 +129,10 @@ else
     private string _filter;
     private SortedDictionary<string, bool> _milestones;
     private HashSet<ApiReviewIssue> _checkedIssues = new HashSet<ApiReviewIssue>();
+
+    public IEnumerable<ApiReviewIssue> Issues => _issues ?? Array.Empty<ApiReviewIssue>();
+    public IEnumerable<ApiReviewIssue> VisibleIssues => Issues.Where(IsVisible);
+    public IEnumerable<ApiReviewIssue> SelectedIssues => VisibleIssues.Where(_checkedIssues.Contains);
 
     protected override async Task OnInitializedAsync()
     {
@@ -214,15 +226,20 @@ else
 
     private string GetMarkdown()
     {
-        if (_issues == null)
-            return null;
-
         var sb = new System.Text.StringBuilder();
 
-        foreach (var issue in _issues.Where(_checkedIssues.Contains))
+        foreach (var issue in SelectedIssues)
             sb.AppendLine($"* [{issue.IdFull}]({issue.Url}): {issue.Title}");
 
         return sb.ToString();
+    }
+
+    private void CheckAllIssues(bool value)
+    {
+        if (value)
+            _checkedIssues.UnionWith(VisibleIssues);
+        else
+            _checkedIssues.ExceptWith(VisibleIssues);
     }
 
     private void CheckIssue(ApiReviewIssue issue, bool value)
