@@ -1,15 +1,19 @@
+using System;
 using System.Security.Claims;
 
+using ApiReview.Client.Services;
+using ApiReview.Shared;
+
+using Microsoft.ApplicationInsights.AspNetCore.Extensions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-
-using ApiReview.Client.Services;
-using ApiReview.Shared;
+using Microsoft.Net.Http.Headers;
 
 namespace ApiReview.Client
 {
@@ -81,6 +85,30 @@ namespace ApiReview.Client
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
+            // Redirect to apireview.net
+
+            app.Use(async (context, next) =>
+            {
+                const string oldHost = "apireviews.azurewebsites.net";
+                const string newHost = "apireview.net";
+                var url = context.Request.GetUri();                
+                if (url.Host.Equals(oldHost, StringComparison.OrdinalIgnoreCase))
+                {
+                    var response = context.Response;
+                    response.StatusCode = StatusCodes.Status301MovedPermanently;
+
+                    var newUrl = new UriBuilder(url)
+                    {
+                        Host = newHost
+                    }.ToString();
+
+                    response.Headers[HeaderNames.Location] = newUrl;
+                    return;
+                }
+
+                await next();
+            });
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
