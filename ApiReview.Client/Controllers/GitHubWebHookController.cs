@@ -44,13 +44,13 @@ namespace ApiReview.Client.Controllers
         };
 
         private readonly ILogger<GitHubWebHookController> _logger;
-        private readonly IssueChangedNotificationService _notificationService;
+        private readonly IssueService _issueService;
 
         public GitHubWebHookController(ILogger<GitHubWebHookController> logger,
-                                       IssueChangedNotificationService notificationService)
+                                       IssueService issueService)
         {
             _logger = logger;
-            _notificationService = notificationService;
+            _issueService = issueService;
         }
 
         [HttpPost]
@@ -81,7 +81,7 @@ namespace ApiReview.Client.Controllers
             _logger.LogInformation("Processed GitHub web hook: {payloadResult}", payloadResult);
 
             if (isRelevant)
-                _notificationService.Notify();
+                await _issueService.InvalidateAsync();
 
             return Ok();
         }

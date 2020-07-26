@@ -165,7 +165,7 @@ namespace ApiReview.Server.Services
             var repoList = _configuration["RepoList"];
             var repos = OrgAndRepo.ParseList(repoList).ToArray();
 
-            var github = await _clientFactory.CreateForUserAsync();
+            var github = await _clientFactory.CreateForAppAsync();
             var result = new List<ApiReviewIssue>();
 
             foreach (var (owner, repo) in repos)

@@ -9,9 +9,9 @@ namespace ApiReview.Client.Services
 {
     internal sealed class NotesService
     {
-        private readonly BackendHttpClientFactory _clientFactory;
+        private readonly AuthenticatedBackendHttpClientFactory _clientFactory;
 
-        public NotesService(BackendHttpClientFactory clientFactory)
+        public NotesService(AuthenticatedBackendHttpClientFactory clientFactory)
         {
             _clientFactory = clientFactory;
         }

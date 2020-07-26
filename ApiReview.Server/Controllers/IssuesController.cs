@@ -10,7 +10,7 @@ namespace ApiReview.Server.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    [Authorize]
+    [AllowAnonymous]
     public class IssuesController : ControllerBase
     {
         private readonly ILogger<IssuesController> _logger;

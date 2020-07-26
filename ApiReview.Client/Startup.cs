@@ -39,9 +39,10 @@ namespace ApiReview.Client
             services.AddApplicationInsightsTelemetry(Configuration["APPINSIGHTS_INSTRUMENTATIONKEY"]);
             services.AddServerSideBlazor();
             services.AddControllers();
-            services.AddSingleton<IssueChangedNotificationService>();
-            services.AddScoped<BackendHttpClientFactory>();
-            services.AddScoped<IssueService>();
+            services.AddHostedService<IssueCacheWarmUp>();
+            services.AddSingleton<IssueService>();
+            services.AddSingleton<BackendHttpClientFactory>();
+            services.AddScoped<AuthenticatedBackendHttpClientFactory>();
             services.AddScoped<NotesService>();
             services.AddAuthentication(options =>
                     {

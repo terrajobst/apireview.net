@@ -7,37 +7,27 @@ using ApiReview.Shared;
 
 namespace ApiReview.Client.Services
 {
-    public sealed class IssueService : IDisposable
+    public sealed class IssueService
     {
         private readonly BackendHttpClientFactory _clientFactory;
-        private readonly IssueChangedNotificationService _notificationService;
         private IReadOnlyList<ApiReviewIssue> _issues;
 
-        public IssueService(BackendHttpClientFactory clientFactory, IssueChangedNotificationService notificationService)
+        public IssueService(BackendHttpClientFactory clientFactory)
         {
             _clientFactory = clientFactory;
-            _notificationService = notificationService;
-            _notificationService.Changed += NotificationService_Changed;
         }
 
-        public void Dispose()
+        public async Task InvalidateAsync()
         {
-            _notificationService.Changed -= NotificationService_Changed;
-        }
-
-        private void NotificationService_Changed(object sender, EventArgs e)
-        {
-            _issues = null;
+            var client = await _clientFactory.CreateAsync();
+            _issues = await client.GetFromJsonAsync<IReadOnlyList<ApiReviewIssue>>("issues", _clientFactory.JsonOptions);
             Changed?.Invoke(this, EventArgs.Empty);
         }
 
         public async Task<IReadOnlyList<ApiReviewIssue>> GetAsync()
         {
             if (_issues == null)
-            {
-                var client = await _clientFactory.CreateAsync();
-                _issues = await client.GetFromJsonAsync<IReadOnlyList<ApiReviewIssue>>("issues", _clientFactory.JsonOptions);
-            }
+                await InvalidateAsync();
 
             return _issues;
         }
