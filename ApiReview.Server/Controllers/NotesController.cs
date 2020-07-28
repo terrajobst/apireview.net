@@ -39,6 +39,12 @@ namespace ApiReview.Server.Controllers
             return _youTubeManager.GetVideosAsync(start, end);
         }
 
+        [HttpGet("video/{videoId}")]
+        public Task<ApiReviewVideo> GetVideo(string videoId)
+        {
+            return _youTubeManager.GetVideoAsync(videoId);
+        }
+
         [HttpGet("issues-for-range")]
         public Task<ApiReviewSummary> IssuesForRange(DateTimeOffset start, DateTimeOffset end)
         {

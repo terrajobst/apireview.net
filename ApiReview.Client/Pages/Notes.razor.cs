@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Components;
 
 using ApiReview.Client.Services;
 using ApiReview.Shared;
+using System.Text.RegularExpressions;
 
 namespace ApiReview.Client.Pages
 {
@@ -21,6 +22,8 @@ namespace ApiReview.Client.Pages
         private CancellationTokenSource _cts;
         private DateTimeOffset _start;
         private DateTimeOffset _end;
+        private string _videoUrl;
+        private string _videoId;
 
         private DateTimeOffset Date
         {
@@ -53,12 +56,41 @@ namespace ApiReview.Client.Pages
             }
         }
 
+        private string VideoUrl
+        {
+            get => _videoUrl;
+            set
+            {
+                _videoUrl = value;
+                if (string.IsNullOrEmpty(_videoUrl))
+                {
+                    _videoId = null;
+                }
+                else
+                {
+                    var match = Regex.Match(_videoUrl, @"https://www\.youtube\.com/watch\?v=(?<videoId>[^&]+)");
+                    if (!match.Success)
+                    {
+                        VideoUrlValidationMessage = "The YouTube video URL isn't recognized";
+                    }
+                    else
+                    {
+                        _videoId = match.Groups["videoId"].Value;
+                        VideoUrlValidationMessage = null;
+                    }
+                }
+            }
+        }
+
         private string DateValidationMessage { get; set; }
         private string StartValidationMessage { get; set; }
         private string EndValidationMessage { get; set; }
+        private string VideoUrlValidationMessage { get; set; }
         private bool HasValidationErrors => DateValidationMessage != null ||
                                             StartValidationMessage != null ||
-                                            EndValidationMessage != null;
+                                            EndValidationMessage != null ||
+                                            VideoUrlValidationMessage != null;
+
         private bool CanSearch => !HasValidationErrors && !IsLoading;
 
         private bool IncludeVideo { get; set; }
@@ -129,7 +161,18 @@ namespace ApiReview.Client.Pages
 
             if (IncludeVideo)
             {
-                videos = await NotesService.GetVideos(Start, End);
+                if (string.IsNullOrEmpty(_videoId))
+                {
+                    videos = await NotesService.GetVideos(Start, End);
+                }
+                else
+                {
+                    var video = await NotesService.GetVideo(_videoId);
+                    if (video == null)
+                        videos = Array.Empty<ApiReviewVideo>();
+                    else
+                        videos = new[] { video };
+                }
 
                 if (token.IsCancellationRequested)
                     return;

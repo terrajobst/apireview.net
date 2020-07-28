@@ -43,6 +43,18 @@
     </div>
 </div>
 <div class="form-group row">
+    <div class="col">
+        <label for="inputVideoUrl">Specific video (optional)</label>
+        <input type="text" placeholder="YouTube video URL" class="form-control @(VideoUrlValidationMessage == null ? "" : "is-invalid")" disabled="@(!IncludeVideo)"  id="inputVideoUrl" @bind="VideoUrl" @bind:event="oninput">
+        @if (VideoUrlValidationMessage != null)
+        {
+            <div class="invalid-feedback">
+                @VideoUrlValidationMessage
+            </div>
+        }
+    </div>
+</div>
+<div class="form-group row">
     <div class="col-sm-10">
         <button class="btn btn-secondary" disabled="@(!CanSearch)" @onclick="FindIssuesAsync">Find issues</button>
     </div>

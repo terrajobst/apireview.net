@@ -23,6 +23,13 @@ namespace ApiReview.Client.Services
             return await client.GetFromJsonAsync<IReadOnlyList<ApiReviewVideo>>(url, _clientFactory.JsonOptions);
         }
 
+        public async Task<ApiReviewVideo> GetVideo(string videoId)
+        {
+            var client = await _clientFactory.CreateAsync();
+            var url = $"notes/video/{videoId}";
+            return await client.GetFromJsonAsync<ApiReviewVideo>(url, _clientFactory.JsonOptions);
+        }
+
         public async Task<ApiReviewSummary> IssuesForRange(DateTimeOffset start, DateTimeOffset end)
         {
             var client = await _clientFactory.CreateAsync();
