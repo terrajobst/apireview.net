@@ -10,6 +10,7 @@ using Markdig;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 using Octokit;
 
@@ -17,16 +18,19 @@ namespace ApiReview.Server.Services
 {
     public sealed class SummaryPublishingService
     {
+        private readonly ILogger<SummaryPublishingService> _logger;
         private readonly IWebHostEnvironment _env;
         private readonly IConfiguration _configuration;
         private readonly GitHubClientFactory _clientFactory;
         private readonly YouTubeServiceFactory _youTubeServiceFactory;
 
-        public SummaryPublishingService(IWebHostEnvironment env,
+        public SummaryPublishingService(ILogger<SummaryPublishingService> logger,
+                                        IWebHostEnvironment env,
                                         IConfiguration configuration,
                                         GitHubClientFactory clientFactory,
                                         YouTubeServiceFactory youTubeServiceFactory)
         {
+            _logger = logger;
             _env = env;
             _configuration = configuration;
             _clientFactory = clientFactory;
@@ -97,7 +101,7 @@ namespace ApiReview.Server.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                _logger.LogError(ex, "Error sending email: {Message}", ex.Message);
             }
         }
 
