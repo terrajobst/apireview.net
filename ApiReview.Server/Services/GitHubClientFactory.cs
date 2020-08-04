@@ -45,7 +45,7 @@ namespace ApiReview.Server.Services
                 new GitHubJwtFactoryOptions
                 {
                     AppIntegrationId = appId,
-                    ExpirationSeconds = 600                    
+                    ExpirationSeconds = 8 * 60 // 600 is apparently too high
                 });
             var token = generator.CreateEncodedJwtToken();
 
