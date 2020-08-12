@@ -14,7 +14,7 @@ using System.Text.RegularExpressions;
 namespace ApiReview.Client.Pages
 {
     [Authorize(Roles = ApiReviewConstants.ApiApproverRole)]
-    public partial class Notes
+    public partial class Publish
     {
         [Inject]
         private NotesService NotesService { get; set; }
