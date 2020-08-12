@@ -12,7 +12,6 @@ using ApiReview.Shared;
 
 namespace ApiReview.Client.Pages
 {
-    [Authorize]
     public partial class Backlog : IDisposable
     {
         [Inject]
