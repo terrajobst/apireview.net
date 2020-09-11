@@ -12,7 +12,7 @@ namespace ApiReview.Shared
         public const string ApiApproverRole = "api-approver";
         public const string GitHubAvatarUrl = "avatar_url";
         public const string NetFoundationChannelId = "UCiaZbznpWV1o-KLxj8zqR6A";
-        public const string ApiReviewsBranch = "master";
+        public const string ApiReviewsBranch = "main";
         public const string Blocking = "blocking";
         public const string ApiReadyForReview = "api-ready-for-review";
         public const string ApiNeedsWork = "api-needs-work";
