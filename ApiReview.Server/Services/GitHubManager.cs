@@ -63,12 +63,13 @@ namespace ApiReview.Server.Services
 
         private async Task<IReadOnlyList<ApiReviewFeedback>> GetFeedbackAsync(OrgAndRepo[] repos, DateTimeOffset start, DateTimeOffset end)
         {
-            static bool IsApiIssue(Issue issue)
+            static bool MightBeAnApiIssue(Issue issue)
             {
+                var isClosed = issue.State.Value == ItemState.Closed;
                 var isReadyForReview = issue.Labels.Any(l => l.Name == ApiReviewConstants.ApiReadyForReview);
                 var isApproved = issue.Labels.Any(l => l.Name == ApiReviewConstants.ApiApproved);
                 var needsWork = issue.Labels.Any(l => l.Name == ApiReviewConstants.ApiNeedsWork);
-                return isReadyForReview || isApproved || needsWork;
+                return isClosed || isReadyForReview || isApproved || needsWork;
             }
 
             static (string VideoLink, string Markdown) ParseFeedback(string body)
@@ -113,7 +114,7 @@ namespace ApiReview.Server.Services
 
                 foreach (var issue in issues)
                 {
-                    if (!IsApiIssue(issue))
+                    if (!MightBeAnApiIssue(issue))
                         continue;
 
                     var events = await github.Issue.Events.GetAllForIssue(owner, repo, issue.Number);
