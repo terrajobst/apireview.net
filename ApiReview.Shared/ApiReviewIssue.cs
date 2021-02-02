@@ -44,16 +44,24 @@ namespace ApiReview.Shared
 
         private static int CompareMilestone(string x, string y)
         {
+            // The desired sort order is:
+            //
+            // 1. Milestones that look like versions, sorted by version number
+            // 2. Milestones that aren't versions, sorted by text (e.g. "Backlog", "Future")
+            // 3. No milestone
+            //
+            // Why does no milestone go last? Because we don't to punish folks for triaging milestones.
+
             static bool IsNone(string m) => string.IsNullOrEmpty(m) || m == ApiReviewConstants.NoMilestone;
 
             if (IsNone(x) && IsNone(y))
                 return 0;
 
             if (IsNone(x))
-                return -1;
+                return 1;
 
             if (IsNone(y))
-                return 1;
+                return -1;
 
             var xIsVersion = Version.TryParse(x, out var xVersion);
             var yIsVersion = Version.TryParse(y, out var yVersion);
