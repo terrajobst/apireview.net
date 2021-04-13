@@ -9,6 +9,10 @@ namespace ApiReview.Server.Services
 {
     public class SummaryManager
     {
+        // We sometimes post the comments from the last issue slightly after the stream
+        // has ended. To account for that, we'll give us 15 minutes extra.
+        private static readonly TimeSpan _extraTimeAfterStreamEnded = TimeSpan.FromMinutes(15);
+
         private readonly IYouTubeManager _youTubeManager;
         private readonly IGitHubManager _gitHubManager;
 
@@ -31,7 +35,7 @@ namespace ApiReview.Server.Services
                 return null;
 
             var start = video.StartDateTime;
-            var end = video.EndDateTime;
+            var end = video.EndDateTime + _extraTimeAfterStreamEnded;
             var items = await _gitHubManager.GetFeedbackAsync(start, end);
             return CreateSummary(video, items);
         }
@@ -55,7 +59,7 @@ namespace ApiReview.Server.Services
 
                 var reviewEnd = video == null
                                     ? items.OrderBy(i => i.FeedbackDateTime).Select(i => i.FeedbackDateTime).Last()
-                                    : video.EndDateTime.AddMinutes(15);
+                                    : video.EndDateTime + _extraTimeAfterStreamEnded;
 
                 for (var i = 0; i < items.Count; i++)
                 {
