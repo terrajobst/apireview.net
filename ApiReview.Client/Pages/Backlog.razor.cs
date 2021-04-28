@@ -123,18 +123,25 @@ namespace ApiReview.Client.Pages
             {
                 sb.AppendLine($"* [{issue.IdFull}]({issue.Url}): {issue.Title}");
 
-                foreach (var reviewer in issue.Reviewers)
+                if (issue.Reviewers.Any())
                 {
-                    if (!useOfficeMentions)
+                    sb.Append("    -");
+
+                    foreach (var reviewer in issue.Reviewers)
                     {
-                        sb.AppendLine($"    - [{reviewer.Name}](https://github.com/{reviewer.GitHubUserName})");
+                        if (!useOfficeMentions)
+                        {
+                            sb.Append($" [{reviewer.Name}](https://github.com/{reviewer.GitHubUserName})");
+                        }
+                        else
+                        {
+                            var guid = Guid.NewGuid().ToString("N").ToUpper();
+                            var id = $"OWAAM{guid}Z";
+                            sb.AppendLine($" <a id=\"{id}\" href=\"{reviewer.Email}\">{reviewer.Name}</a>");
+                        }
                     }
-                    else
-                    {
-                        var guid = Guid.NewGuid().ToString("N").ToUpper();
-                        var id = $"OWAAM{guid}Z";
-                        sb.AppendLine($"    - <a id=\"{id}\" href=\"{reviewer.Email}\">{reviewer.Name}</a>");
-                    }
+
+                    sb.AppendLine();
                 }
             }
 
