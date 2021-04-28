@@ -26,7 +26,9 @@ namespace ApiReview.Shared
 
         public string[] Assignees { get; set; }
 
-        public string AreaOwner { get; set; }
+        public string MarkedReadyForReviewBy { get; set; }
+
+        public string[] AreaOwners { get; set; }
 
         public DateTimeOffset CreatedAt { get; set; }
 

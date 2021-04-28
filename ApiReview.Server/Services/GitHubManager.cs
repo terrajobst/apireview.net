@@ -47,12 +47,14 @@ namespace ApiReview.Server.Services
     {
         private readonly IConfiguration _configuration;
         private readonly GitHubClientFactory _clientFactory;
+        private readonly AreaOwnerService _areaOwnerService;
         private readonly OspoService _ospoService;
 
-        public GitHubManager(IConfiguration configuration, GitHubClientFactory clientFactory, OspoService ospoService)
+        public GitHubManager(IConfiguration configuration, GitHubClientFactory clientFactory, AreaOwnerService areaOwnerService, OspoService ospoService)
         {
             _configuration = configuration;
             _clientFactory = clientFactory;
+            _areaOwnerService = areaOwnerService;
             _ospoService = ospoService;
         }
 
@@ -120,7 +122,6 @@ namespace ApiReview.Server.Services
                         continue;
 
                     var events = await github.Issue.Events.GetAllForIssue(owner, repo, issue.Number);
-                    var readyEvent = ApiReadyEvent.Get(events, issue.CreatedAt, end);
                     var reviewOutcome = ApiReviewOutcome.Get(events, start, end);
 
                     if (reviewOutcome != null)
@@ -142,9 +143,7 @@ namespace ApiReview.Server.Services
                         var feedbackUrl = comment?.HtmlUrl ?? issue.HtmlUrl;
                         var (videoUrl, feedbackMarkdown) = ParseFeedback(comment?.Body);
 
-                        var apiReviewIssue = CreateIssue(owner, repo, issue);
-                        apiReviewIssue.AreaOwner = readyEvent?.DecisionMaker;
-                        apiReviewIssue.Reviewers = await GetReviewers(apiReviewIssue);
+                        var apiReviewIssue = await CreateIssue(owner, repo, issue, events, end);
 
                         var feedback = new ApiReviewFeedback
                         {
@@ -188,11 +187,7 @@ namespace ApiReview.Server.Services
                 foreach (var issue in issues)
                 {
                     var events = await github.Issue.Events.GetAllForIssue(owner, repo, issue.Number);
-                    var apiReadyEvent = ApiReadyEvent.Get(events, issue.CreatedAt, DateTime.Now);
-
-                    var apiReviewIssue = CreateIssue(owner, repo, issue);
-                    apiReviewIssue.AreaOwner = apiReadyEvent?.DecisionMaker;
-                    apiReviewIssue.Reviewers = await GetReviewers(apiReviewIssue);
+                    var apiReviewIssue = await CreateIssue(owner, repo, issue, events, DateTime.Now);
 
                     result.Add(apiReviewIssue);
                 }
@@ -211,7 +206,9 @@ namespace ApiReview.Server.Services
             Add(result, linkSet, apiReviewIssue.Author);
             foreach (var assignee in apiReviewIssue.Assignees ?? Array.Empty<string>())
                 Add(result, linkSet, assignee);
-            Add(result, linkSet, apiReviewIssue.AreaOwner);
+            Add(result, linkSet, apiReviewIssue.MarkedReadyForReviewBy);
+            foreach (var areaOwner in apiReviewIssue.AreaOwners ?? Array.Empty<string>())
+                Add(result, linkSet, areaOwner);
 
             return result.ToArray();
 
@@ -236,14 +233,18 @@ namespace ApiReview.Server.Services
             }
         }
 
-        private static ApiReviewIssue CreateIssue(string owner, string repo, Issue issue)
+        private async Task<ApiReviewIssue> CreateIssue(string owner, string repo, Issue issue, IEnumerable<EventInfo> events, DateTimeOffset end)
         {
+            var readyEvent = ApiReadyEvent.Get(events, issue.CreatedAt, end);
+
             var result = new ApiReviewIssue
             {
                 Owner = owner,
                 Repo = repo,
                 Author = issue.User.Login,
                 Assignees = issue.Assignees.Select(a => a.Login).ToArray(),
+                MarkedReadyForReviewBy = readyEvent?.DecisionMaker,
+                AreaOwners = GetAreaOwners(issue.Labels.Select(l => l.Name)),
                 CreatedAt = issue.CreatedAt,
                 Labels = issue.Labels.Select(l => new ApiReviewLabel { Name = l.Name, BackgroundColor = l.Color, Description = l.Description }).ToArray(),
                 Milestone = issue.Milestone?.Title ?? ApiReviewConstants.NoMilestone,
@@ -251,7 +252,23 @@ namespace ApiReview.Server.Services
                 Url = issue.HtmlUrl,
                 Id = issue.Number
             };
+
+            result.Reviewers = await GetReviewers(result);
+
             return result;
+        }
+
+        private string[] GetAreaOwners(IEnumerable<string> labels)
+        {
+            var result = new List<string>();
+
+            foreach (var label in labels)
+            {
+                var owners = _areaOwnerService.GetOwners(label);
+                result.AddRange(owners);
+            }
+
+            return result.ToArray();
         }
 
         private sealed class ApiReadyEvent
