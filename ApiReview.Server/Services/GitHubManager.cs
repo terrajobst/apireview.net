@@ -1,14 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.Json;
-using System.Threading.Tasks;
-
-using ApiReview.Shared;
+﻿using ApiReview.Shared;
 
 using Microsoft.Extensions.Configuration;
 
 using Octokit;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace ApiReview.Server.Services
 {
@@ -47,11 +47,13 @@ namespace ApiReview.Server.Services
     {
         private readonly IConfiguration _configuration;
         private readonly GitHubClientFactory _clientFactory;
+        private readonly OspoService _ospoService;
 
-        public GitHubManager(IConfiguration configuration, GitHubClientFactory clientFactory)
+        public GitHubManager(IConfiguration configuration, GitHubClientFactory clientFactory, OspoService ospoService)
         {
             _configuration = configuration;
             _clientFactory = clientFactory;
+            _ospoService = ospoService;
         }
 
         public Task<IReadOnlyList<ApiReviewFeedback>> GetFeedbackAsync(DateTimeOffset start, DateTimeOffset end)
@@ -118,6 +120,7 @@ namespace ApiReview.Server.Services
                         continue;
 
                     var events = await github.Issue.Events.GetAllForIssue(owner, repo, issue.Number);
+                    var readyEvent = ApiReadyEvent.Get(events, issue.CreatedAt, end);
                     var reviewOutcome = ApiReviewOutcome.Get(events, start, end);
 
                     if (reviewOutcome != null)
@@ -128,7 +131,7 @@ namespace ApiReview.Server.Services
                         var decision = reviewOutcome.Decision;
                         var comments = await github.Issue.Comment.GetAllForIssue(owner, repo, issue.Number);
                         var comment = comments.Where(c => start <= c.CreatedAt && c.CreatedAt <= end)
-                                              .Where(c => string.Equals(c.User.Login, reviewOutcome.DecisionMaker, StringComparison.OrdinalIgnoreCase))                                              
+                                              .Where(c => string.Equals(c.User.Login, reviewOutcome.DecisionMaker, StringComparison.OrdinalIgnoreCase))
                                               .Select(c => (Comment: c, TimeDifference: Math.Abs((c.CreatedAt - feedbackDateTime).TotalSeconds)))
                                               .OrderBy(c => c.TimeDifference)
                                               .Select(c => c.Comment)
@@ -140,6 +143,8 @@ namespace ApiReview.Server.Services
                         var (videoUrl, feedbackMarkdown) = ParseFeedback(comment?.Body);
 
                         var apiReviewIssue = CreateIssue(owner, repo, issue);
+                        apiReviewIssue.AreaOwner = readyEvent?.DecisionMaker;
+                        apiReviewIssue.Reviewers = await GetReviewers(apiReviewIssue);
 
                         var feedback = new ApiReviewFeedback
                         {
@@ -182,7 +187,13 @@ namespace ApiReview.Server.Services
 
                 foreach (var issue in issues)
                 {
+                    var events = await github.Issue.Events.GetAllForIssue(owner, repo, issue.Number);
+                    var apiReadyEvent = ApiReadyEvent.Get(events, issue.CreatedAt, DateTime.Now);
+
                     var apiReviewIssue = CreateIssue(owner, repo, issue);
+                    apiReviewIssue.AreaOwner = apiReadyEvent?.DecisionMaker;
+                    apiReviewIssue.Reviewers = await GetReviewers(apiReviewIssue);
+
                     result.Add(apiReviewIssue);
                 }
             }
@@ -192,6 +203,39 @@ namespace ApiReview.Server.Services
             return result;
         }
 
+        private async Task<ApiReviewer[]> GetReviewers(ApiReviewIssue apiReviewIssue)
+        {
+            var linkSet = await _ospoService.GetLinkSetAsync();
+            var result = new List<ApiReviewer>();
+
+            Add(result, linkSet, apiReviewIssue.Author);
+            foreach (var assignee in apiReviewIssue.Assignees ?? Array.Empty<string>())
+                Add(result, linkSet, assignee);
+            Add(result, linkSet, apiReviewIssue.AreaOwner);
+
+            return result.ToArray();
+
+            static void Add(List<ApiReviewer> target, OspoLinkSet linkSet, string userName)
+            {
+                if (userName == null)
+                    return;
+
+                if (target.Any(r => string.Equals(r.GitHubUserName, userName, StringComparison.OrdinalIgnoreCase)))
+                    return;
+
+                if (linkSet.LinkByLogin.TryGetValue(userName, out var link))
+                {
+                    var reviewer = new ApiReviewer
+                    {
+                        GitHubUserName = userName,
+                        Name = link.MicrosoftInfo.PreferredName,
+                        Email = link.MicrosoftInfo.EmailAddress
+                    };
+                    target.Add(reviewer);
+                }
+            }
+        }
+
         private static ApiReviewIssue CreateIssue(string owner, string repo, Issue issue)
         {
             var result = new ApiReviewIssue
@@ -199,6 +243,7 @@ namespace ApiReview.Server.Services
                 Owner = owner,
                 Repo = repo,
                 Author = issue.User.Login,
+                Assignees = issue.Assignees.Select(a => a.Login).ToArray(),
                 CreatedAt = issue.CreatedAt,
                 Labels = issue.Labels.Select(l => new ApiReviewLabel { Name = l.Name, BackgroundColor = l.Color, Description = l.Description }).ToArray(),
                 Milestone = issue.Milestone?.Title ?? ApiReviewConstants.NoMilestone,
@@ -207,6 +252,38 @@ namespace ApiReview.Server.Services
                 Id = issue.Number
             };
             return result;
+        }
+
+        private sealed class ApiReadyEvent
+        {
+            public ApiReadyEvent(string decisionMaker, DateTimeOffset createdAt)
+            {
+                DecisionMaker = decisionMaker;
+                CreatedAt = createdAt;
+            }
+
+            public string DecisionMaker { get; }
+            public DateTimeOffset CreatedAt { get; }
+
+            public static ApiReadyEvent Get(IEnumerable<EventInfo> events, DateTimeOffset start, DateTimeOffset end)
+            {
+                var readyEvent = default(EventInfo);
+
+                foreach (var e in events.Where(e => e.CreatedAt <= end)
+                                        .OrderByDescending(e => e.CreatedAt))
+                {
+                    switch (e.Event.StringValue)
+                    {
+                        case "labeled" when string.Equals(e.Label.Name, ApiReviewConstants.ApiReadyForReview, StringComparison.OrdinalIgnoreCase):
+                            readyEvent = e;
+                            break;
+                    }
+                }
+
+                return readyEvent == null
+                        ? null
+                        : new ApiReadyEvent(readyEvent.Actor.Login, readyEvent.CreatedAt);
+            }
         }
 
         private sealed class ApiReviewOutcome

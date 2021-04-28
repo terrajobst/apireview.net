@@ -28,8 +28,10 @@ namespace ApiReview.Server
             {
                 o.JsonSerializerOptions.Converters.Add(new TimeSpanJsonConverter());
             });
+            services.AddHostedService<OspoServiceWarmup>();
             services.AddSingleton<GitHubClientFactory>();
             services.AddSingleton<YouTubeServiceFactory>();
+            services.AddSingleton<OspoService>();
 
             if (Env.IsDevelopment())
             {

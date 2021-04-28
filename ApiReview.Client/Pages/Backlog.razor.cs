@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
@@ -110,21 +109,34 @@ namespace ApiReview.Client.Pages
 
         private async Task CopySelectedItems()
         {
-            var text = GetMarkdown();
-            if (text == null)
-                return;
-
-            var html = Markdig.Markdown.ToHtml(text);
+            var text = GetMarkdown(useOfficeMentions: false);
+            var html = Markdig.Markdown.ToHtml(GetMarkdown(useOfficeMentions: true));
             await JSRuntime.InvokeVoidAsync("clipboardCopy.copyText", text, html);
             _checkedIssues.Clear();
         }
 
-        private string GetMarkdown()
+        private string GetMarkdown(bool useOfficeMentions)
         {
             var sb = new System.Text.StringBuilder();
 
             foreach (var issue in SelectedIssues)
+            {
                 sb.AppendLine($"* [{issue.IdFull}]({issue.Url}): {issue.Title}");
+
+                foreach (var reviewer in issue.Reviewers)
+                {
+                    if (!useOfficeMentions)
+                    {
+                        sb.AppendLine($"    - [{reviewer.Name}](https://github.com/{reviewer.GitHubUserName})");
+                    }
+                    else
+                    {
+                        var guid = Guid.NewGuid().ToString("N").ToUpper();
+                        var id = $"OWAAM{guid}Z";
+                        sb.AppendLine($"    - <a id=\"{id}\" href=\"{reviewer.Email}\">{reviewer.Name}</a>");
+                    }
+                }
+            }
 
             return sb.ToString();
         }

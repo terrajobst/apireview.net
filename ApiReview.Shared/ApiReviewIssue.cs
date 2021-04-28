@@ -3,6 +3,13 @@ using System.Linq;
 
 namespace ApiReview.Shared
 {
+    public sealed class ApiReviewer
+    {
+        public string GitHubUserName { get; set; }
+        public string Name { get; set; }
+        public string Email { get; set; }
+    }
+
     public sealed class ApiReviewIssue : IComparable<ApiReviewIssue>
     {
         public string Owner { get; set; }
@@ -17,6 +24,10 @@ namespace ApiReview.Shared
 
         public string Author { get; set; }
 
+        public string[] Assignees { get; set; }
+
+        public string AreaOwner { get; set; }
+
         public DateTimeOffset CreatedAt { get; set; }
 
         public string DetailText => $"{IdFull} {CreatedAt.FormatRelative()} by {Author}";
@@ -28,6 +39,8 @@ namespace ApiReview.Shared
         public ApiReviewLabel[] Labels { get; set; }
 
         public bool IsBlocking => Labels != null && Labels.Any(l => string.Equals(l.Name, ApiReviewConstants.Blocking, StringComparison.OrdinalIgnoreCase));
+
+        public ApiReviewer[] Reviewers { get; set; }
 
         public int CompareTo(ApiReviewIssue other)
         {
