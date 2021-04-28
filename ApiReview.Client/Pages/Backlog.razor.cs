@@ -137,7 +137,7 @@ namespace ApiReview.Client.Pages
                         {
                             var guid = Guid.NewGuid().ToString("N").ToUpper();
                             var id = $"OWAAM{guid}Z";
-                            sb.AppendLine($" <a id=\"{id}\" href=\"{reviewer.Email}\">{reviewer.Name}</a>");
+                            sb.AppendLine($" <a id=\"{id}\" href=\"{reviewer.Email}\">@{reviewer.Name}</a>");
                         }
                     }
 
