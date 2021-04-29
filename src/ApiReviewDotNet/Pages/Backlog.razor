@@ -1,0 +1,109 @@
+﻿@page "/backlog"
+
+<div class="form-group">
+    <input class="form-control" type="text" placeholder="Filter" @bind="Filter" @bind:event="oninput">
+</div>
+<div class="gh-issue-header">
+    <div class="row no-gutters">
+
+        <div class="col-auto align-self-center">
+            @{
+                var isChecked = _checkedIssues.Count == Issues.Count;
+            }
+            <input class="ml-2 mr-3" type="checkbox" value="@isChecked" @onchange="e => CheckAllIssues((bool)e.Value)" />
+        </div>
+
+        <div class="col align-self-center">
+            @if (_checkedIssues.Count == 0)
+            {
+                <p class="text-muted m-0">
+                    @{
+                        var numberOfOrgs = Issues.Select(i => i.Owner).Distinct().Count();
+                        var numberOfRepos = Issues.Select(i => i.Repo).Distinct().Count();
+                        var visibleIssues = VisibleIssues.Count(IsVisible);
+                    }
+
+                    @if (visibleIssues == Issues.Count)
+                    {
+                        <text>
+                            @Issues.Count issues across @numberOfOrgs orgs and @numberOfRepos repos
+                        </text>
+                    }
+                    else
+                    {
+                        <text>
+                            @visibleIssues of @Issues.Count issues across @numberOfOrgs orgs and @numberOfRepos repos
+                        </text>
+                    }
+                </p>
+            }
+            else
+            {
+                <div class="dropdown">
+                    <button class="btn btn-secondary btn-sm" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        @SelectedIssues.Count() items selected...
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
+                        <a class="dropdown-item" href="#" @onclick:preventDefault @onclick="() => CopySelectedItems()">Copy links</a>
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="col">
+            @if (_milestones != null)
+            {
+                <div class="mr-2 float-right">
+                    <div class="dropdown">
+                        <button class="btn btn-light btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Milestones
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
+                            @foreach (var (k, v) in _milestones)
+                            {
+                                <div class="m-2 checkbox">
+                                    <label><input class="mr-2 " type="checkbox" checked="@v" @onchange="_ => MilestoneChecked(k)">@k</label>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+<div class="gh-issue-list">
+
+    @foreach (var issue in Issues)
+    {
+        if (!IsVisible(issue))
+            continue;
+
+        var background = issue.IsBlocking ? "gh-issue-blocking" : "";
+
+        <div class="gh-issue-cell @background">
+            <div class="d-flex flex-row align-items-center">
+                <div class="align-self-center">
+                    <input class="ml-2 mr-3" type="checkbox" checked="@_checkedIssues.Contains(issue)" @onchange="e => CheckIssue(issue, (bool)e.Value)" />
+                </div>
+                <div>
+                    <a class="gh-issue-title" href="@issue.Url">@issue.Title</a>
+                    <span>
+                        @foreach (var label in issue.Labels)
+                        {
+                            <span class="gh-label"
+                                    style="background: @("#" + label.BackgroundColor); color: @label.ForegroundColor">@label.Name</span>
+                            }
+                    </span>
+                    <div class="gh-details-cell">
+                        @issue.DetailText
+
+                        @if (issue.Milestone != null)
+                        {
+                            <span class="ml-2 mr-1 oi oi-signpost text-muted" aria-hidden="true"></span>@issue.Milestone
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
