@@ -1,26 +1,32 @@
-﻿using System;
-using System.Drawing;
+﻿using System.Drawing;
 using System.Globalization;
+using System.Text;
 
 namespace ApiReviewDotNet.Data
 {
     public sealed class ApiReviewLabel
     {
-        private string _foregroundColor;
-
         public string Name { get; set; }
-        public string BackgroundColor { get; set; }
+        public string Color { get; set; }
         public string Description { get; set; }
 
-        public string ForegroundColor
+        public string GetStyle()
         {
-            get
-            {
-                if (_foregroundColor == null)
-                    _foregroundColor = GetForegroundColor(BackgroundColor);
-
-                return _foregroundColor;
-            }
+            var color = ParseColor(Color);
+            var labelR = color.R;
+            var labelG = color.G;
+            var labelB = color.B;
+            var labelH = color.GetHue();
+            var labelS = color.GetSaturation() * 100;
+            var labelL = color.GetBrightness() * 100;
+            var sb = new StringBuilder();
+            sb.Append($"--label-r: {labelR};");
+            sb.Append($"--label-g: {labelG};");
+            sb.Append($"--label-b: {labelB};");
+            sb.Append($"--label-h: {labelH};");
+            sb.Append($"--label-s: {labelS};");
+            sb.Append($"--label-l: {labelL};");
+            return sb.ToString();
         }
 
         private static Color ParseColor(string color)
@@ -30,26 +36,10 @@ namespace ApiReviewDotNet.Data
                 int.TryParse(color.Substring(2, 2), NumberStyles.HexNumber, null, out var g) &&
                 int.TryParse(color.Substring(4, 2), NumberStyles.HexNumber, null, out var b))
             {
-                return Color.FromArgb(r, g, b);
+                return System.Drawing.Color.FromArgb(r, g, b);
             }
 
-            return Color.Black;
-        }
-
-        private static int PerceivedBrightness(string color)
-        {
-            var c = ParseColor(color);
-            return (int)Math.Sqrt(
-                c.R * c.R * .241 +
-                c.G * c.G * .691 +
-                c.B * c.B * .068);
-        }
-
-        private static string GetForegroundColor(string backgroundColor)
-        {
-            var brightness = PerceivedBrightness(backgroundColor);
-            var foregroundColor = brightness > 130 ? "black" : "white";
-            return foregroundColor;
+            return System.Drawing.Color.Black;
         }
     }
 }

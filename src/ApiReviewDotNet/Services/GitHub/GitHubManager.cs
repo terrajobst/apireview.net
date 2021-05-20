@@ -215,7 +215,7 @@ namespace ApiReviewDotNet.Services.GitHub
                 MarkedReadyForReviewBy = readyEvent?.DecisionMaker,
                 AreaOwners = GetAreaOwners(issue.Labels.Select(l => l.Name)),
                 CreatedAt = issue.CreatedAt,
-                Labels = issue.Labels.Select(l => new ApiReviewLabel { Name = l.Name, BackgroundColor = l.Color, Description = l.Description }).ToArray(),
+                Labels = issue.Labels.Select(l => new ApiReviewLabel { Name = l.Name, Color = l.Color, Description = l.Description }).ToArray(),
                 Milestone = issue.Milestone?.Title ?? ApiReviewConstants.NoMilestone,
                 Title = GitHubIssueHelpers.FixTitle(issue.Title),
                 Url = issue.HtmlUrl,

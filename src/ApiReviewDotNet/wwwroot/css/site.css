@@ -1,5 +1,27 @@
 @import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
 
+:root {
+    --dotnet-purple: #512bd4;
+    --dotnet-purple-hover: #4411BB;
+    --dotnet-purple-border-hover: #3311BB;
+}
+
+.bg-dotnet {
+    background-color: var(--dotnet-purple) !important;
+}
+
+.btn-dotnet {
+    color: #fff;
+    background-color: var(--dotnet-purple);
+    border-color: var(--dotnet-purple);
+}
+
+    .btn-dotnet:hover {
+        color: #fff;
+        background-color: var(--dotnet-purple-hover);
+        border-color: var(--dotnet-purple-border-hover);
+    }
+
 html, body {
     font-family: 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
@@ -18,92 +40,6 @@ app {
     position: relative;
     display: flex;
     flex-direction: column;
-}
-
-.top-row {
-    height: 3.5rem;
-    display: flex;
-    align-items: center;
-    z-index: 9999;
-}
-
-.main {
-    flex: 1;
-}
-
-    .main .top-row {
-        background-color: #f7f7f7;
-        border-bottom: 1px solid #d6d5d5;
-        justify-content: flex-end;
-    }
-
-        .main .top-row > a, .main .top-row .btn-link {
-            white-space: nowrap;
-            margin-left: 1.5rem;
-        }
-
-.main .top-row a:first-child {
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.sidebar {
-    background-image: linear-gradient(180deg, rgb(5, 39, 103) 0%, #3a0647 70%);
-}
-
-    .sidebar .top-row {
-        background-color: rgba(0,0,0,0.4);
-    }
-
-    .sidebar .navbar-brand {
-        font-size: 1.1rem;
-    }
-
-    .sidebar .oi {
-        width: 2rem;
-        font-size: 1.1rem;
-        vertical-align: text-top;
-        top: -2px;
-    }
-
-    .sidebar .nav-item {
-        font-size: 0.9rem;
-        padding-bottom: 0.5rem;
-    }
-
-        .sidebar .nav-item:first-of-type {
-            padding-top: 1rem;
-        }
-
-        .sidebar .nav-item:last-of-type {
-            padding-bottom: 1rem;
-        }
-
-        .sidebar .nav-item a {
-            color: #d7d7d7;
-            border-radius: 4px;
-            height: 3rem;
-            display: flex;
-            align-items: center;
-            line-height: 3rem;
-        }
-
-            .sidebar .nav-item a.active {
-                background-color: rgba(255,255,255,0.25);
-                color: white;
-            }
-
-            .sidebar .nav-item a:hover {
-                background-color: rgba(255,255,255,0.1);
-                color: white;
-            }
-
-.content {
-    padding-top: 1.1rem;
-}
-
-.navbar-toggler {
-    background-color: rgba(255, 255, 255, 0.1);
 }
 
 .valid.modified:not([type=checkbox]) {
@@ -137,51 +73,7 @@ app {
     top: 0.5rem;
 }
 
-@media (max-width: 767.98px) {
-    .main .top-row:not(.auth) {
-        display: none;
-    }
-
-    .main .top-row.auth {
-        justify-content: space-between;
-    }
-
-    .main .top-row a, .main .top-row .btn-link {
-        margin-left: 0;
-    }
-}
-
-@media (min-width: 768px) {
-    app {
-        flex-direction: row;
-    }
-
-    .sidebar {
-        width: 250px;
-        height: 100vh;
-        position: sticky;
-        top: 0;
-    }
-
-    .main .top-row {
-        position: sticky;
-        top: 0;
-    }
-
-    .main > div {
-        padding-left: 2rem !important;
-        padding-right: 1.5rem !important;
-    }
-
-    .navbar-toggler {
-        display: none;
-    }
-
-    .sidebar .collapse {
-        /* Never collapse the sidebar for wide screens */
-        display: block;
-    }
-}
+/* Custom */
 
 .gh-issue-list {
     border: 1px solid #e1e4e8;
@@ -205,16 +97,20 @@ app {
     padding: 10px;
 }
 
+    .gh-issue-cell:first-of-type {
+        border-top: 0px;
+    }
+
     .gh-issue-cell:hover {
         background-color: #f6f8fa;
     }
 
 .gh-issue-blocking {
-    background: #ffd9d9;
+    background-color: rgb(255 0 0 / 0.15);
 }
 
     .gh-issue-blocking:hover {
-        background-color: #ffd9d96b;
+        background-color: rgb(255 0 0 / 0.20);
     }
 
 .gh-label {
@@ -227,6 +123,14 @@ app {
     border: 1px solid transparent;
     display: inline-block;
     vertical-align: top;
+    --perceived-lightness: calc((var(--label-r)*0.2126 + var(--label-g)*0.7152 + var(--label-b)*0.0722)/255);
+    --lightness-switch: max(0,min(calc((var(--perceived-lightness) - var(--lightness-threshold))*-1000),1));
+    --lightness-threshold: 0.453;
+    --border-threshold: 0.96;
+    --border-alpha: max(0,min(calc((var(--perceived-lightness) - var(--border-threshold))*100),1));
+    background: rgb(var(--label-r),var(--label-g),var(--label-b));
+    color: hsl(0,0%,calc(var(--lightness-switch)*100%));
+    border-color: hsla(var(--label-h),calc(var(--label-s)*1%),calc((var(--label-l) - 25)*1%),var(--border-alpha));
 }
 
 .gh-details-cell {
@@ -238,7 +142,7 @@ app {
 
 .gh-issue-title {
     text-decoration: none !important;
-    color: black;
+    color: var(--color-text-primary);
     font-weight: bold;
 }
 
@@ -256,5 +160,57 @@ app {
 }
 
 .yt-video-selected {
-    background: lightblue;
+    background: var(--yellow);
+}
+
+@media (prefers-color-scheme: dark) {
+
+    a:hover {
+        color: rgb(88, 166, 255);
+    }
+
+    .gh-issue-list {
+        border: 1px solid rgb(48, 54, 61);
+    }
+
+    .gh-issue-header {
+        border: 1px solid rgb(48, 54, 61);
+        background-color: rgb(22, 27, 34);
+    }
+
+    .gh-issue-header .btn {
+        background: var(--color-dark);
+        color: var(--color-light);
+        border: var(--color-light);
+    }
+
+        .gh-issue-header .btn:hover {
+            background: rgb(48, 54, 61);
+        }
+
+    .gh-issue-cell {
+        border-top: 1px solid rgb(48, 54, 61);
+    }
+
+        .gh-issue-cell:hover:not(.gh-issue-blocking) {
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+
+    .gh-details-cell {
+        color: rgb(139, 148, 158) !important;
+    }
+
+    .gh-label {
+        --lightness-threshold: 0.6;
+        --background-alpha: 0.18;
+        --border-alpha: 0.3;
+        --lighten-by: calc((var(--lightness-threshold) - var(--perceived-lightness))*100*var(--lightness-switch));
+        background: rgba(var(--label-r),var(--label-g),var(--label-b),var(--background-alpha));
+        color: hsl(var(--label-h),calc(var(--label-s)*1%),calc((var(--label-l) + var(--lighten-by))*1%));
+        border-color: hsla(var(--label-h),calc(var(--label-s)*1%),calc((var(--label-l) + var(--lighten-by))*1%),var(--border-alpha));
+    }
+
+    .yt-video-selected {
+        background: rgb(48, 54, 61);
+    }
 }

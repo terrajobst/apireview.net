@@ -93,8 +93,9 @@ else if (Summary != null && Summary.Items.Any())
                     @foreach (var label in item.Feedback.Issue.Labels)
                     {
                         <span class="gh-label"
-                              style="background: @("#" + label.BackgroundColor); color: @label.ForegroundColor">@label.Name</span>
-                        }
+                              style="@label.GetStyle()"
+                              title="@label.Description">@label.Name</span>
+                    }
                 </span>
                 <div class="gh-details-cell">
                     <strong><a href="@item.Feedback.FeedbackUrl">@item.Feedback.Decision</a></strong>

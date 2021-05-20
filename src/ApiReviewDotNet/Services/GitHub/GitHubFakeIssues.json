@@ -13,27 +13,23 @@
     "Labels": [
       {
         "Name": "api-ready-for-review",
-        "BackgroundColor": "5319e7",
-        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews",
-        "ForegroundColor": "white"
+        "Color": "5319e7",
+        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews"
       },
       {
         "Name": "area-Extensions-Logging",
-        "BackgroundColor": "d4c5f9",
-        "Description": "",
-        "ForegroundColor": "black"
+        "Color": "d4c5f9",
+        "Description": ""
       },
       {
         "Name": "blocking",
-        "BackgroundColor": "b60205",
-        "Description": "Marks issues that we want to fast track in order to unblock other important work",
-        "ForegroundColor": "white"
+        "Color": "b60205",
+        "Description": "Marks issues that we want to fast track in order to unblock other important work"
       },
       {
         "Name": "enhancement",
-        "BackgroundColor": "200dff",
-        "Description": "Product code improvement that does NOT require public API changes/additions",
-        "ForegroundColor": "white"
+        "Color": "200dff",
+        "Description": "Product code improvement that does NOT require public API changes/additions"
       }
     ],
     "IsBlocking": true
@@ -52,27 +48,23 @@
     "Labels": [
       {
         "Name": "api-ready-for-review",
-        "BackgroundColor": "5319e7",
-        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews",
-        "ForegroundColor": "white"
+        "Color": "5319e7",
+        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews"
       },
       {
         "Name": "area-System.Text.Encoding",
-        "BackgroundColor": "d4c5f9",
-        "Description": "",
-        "ForegroundColor": "black"
+        "Color": "d4c5f9",
+        "Description": ""
       },
       {
         "Name": "blocking",
-        "BackgroundColor": "b60205",
-        "Description": "Marks issues that we want to fast track in order to unblock other important work",
-        "ForegroundColor": "white"
+        "Color": "b60205",
+        "Description": "Marks issues that we want to fast track in order to unblock other important work"
       },
       {
         "Name": "breaking-change",
-        "BackgroundColor": "ffa500",
-        "Description": "Issue or PR that represents a breaking API or functional change over a prerelease.",
-        "ForegroundColor": "black"
+        "Color": "ffa500",
+        "Description": "Issue or PR that represents a breaking API or functional change over a prerelease."
       }
     ],
     "IsBlocking": true
@@ -91,21 +83,18 @@
     "Labels": [
       {
         "Name": "api-ready-for-review",
-        "BackgroundColor": "5319e7",
-        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews",
-        "ForegroundColor": "white"
+        "Color": "5319e7",
+        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews"
       },
       {
         "Name": "area-System.Net.Http",
-        "BackgroundColor": "d4c5f9",
-        "Description": null,
-        "ForegroundColor": "black"
+        "Color": "d4c5f9",
+        "Description": null
       },
       {
         "Name": "blocking",
-        "BackgroundColor": "b60205",
-        "Description": "Marks issues that we want to fast track in order to unblock other important work",
-        "ForegroundColor": "white"
+        "Color": "b60205",
+        "Description": "Marks issues that we want to fast track in order to unblock other important work"
       }
     ],
     "IsBlocking": true
@@ -124,33 +113,28 @@
     "Labels": [
       {
         "Name": "api-approved",
-        "BackgroundColor": "159818",
-        "Description": "API was approved in API review, it can be implemented",
-        "ForegroundColor": "white"
+        "Color": "159818",
+        "Description": "API was approved in API review, it can be implemented"
       },
       {
         "Name": "api-ready-for-review",
-        "BackgroundColor": "5319e7",
-        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews",
-        "ForegroundColor": "white"
+        "Color": "5319e7",
+        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews"
       },
       {
         "Name": "arch-arm64",
-        "BackgroundColor": "eb6420",
-        "Description": null,
-        "ForegroundColor": "black"
+        "Color": "eb6420",
+        "Description": null
       },
       {
         "Name": "area-System.Runtime.Intrinsics",
-        "BackgroundColor": "d4c5f9",
-        "Description": null,
-        "ForegroundColor": "black"
+        "Color": "d4c5f9",
+        "Description": null
       },
       {
         "Name": "blocking",
-        "BackgroundColor": "b60205",
-        "Description": "Marks issues that we want to fast track in order to unblock other important work",
-        "ForegroundColor": "white"
+        "Color": "b60205",
+        "Description": "Marks issues that we want to fast track in order to unblock other important work"
       }
     ],
     "IsBlocking": true
@@ -169,21 +153,18 @@
     "Labels": [
       {
         "Name": "api-ready-for-review",
-        "BackgroundColor": "5319e7",
-        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews",
-        "ForegroundColor": "white"
+        "Color": "5319e7",
+        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews"
       },
       {
         "Name": "area-Interop-coreclr",
-        "BackgroundColor": "d4c5f9",
-        "Description": "",
-        "ForegroundColor": "black"
+        "Color": "d4c5f9",
+        "Description": ""
       },
       {
         "Name": "blocking",
-        "BackgroundColor": "b60205",
-        "Description": "Marks issues that we want to fast track in order to unblock other important work",
-        "ForegroundColor": "white"
+        "Color": "b60205",
+        "Description": "Marks issues that we want to fast track in order to unblock other important work"
       }
     ],
     "IsBlocking": true
@@ -202,21 +183,18 @@
     "Labels": [
       {
         "Name": "api-ready-for-review",
-        "BackgroundColor": "5319e7",
-        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews",
-        "ForegroundColor": "white"
+        "Color": "5319e7",
+        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews"
       },
       {
         "Name": "area-System.Runtime.CompilerServices",
-        "BackgroundColor": "d4c5f9",
-        "Description": null,
-        "ForegroundColor": "black"
+        "Color": "d4c5f9",
+        "Description": null
       },
       {
         "Name": "blocking",
-        "BackgroundColor": "b60205",
-        "Description": "Marks issues that we want to fast track in order to unblock other important work",
-        "ForegroundColor": "white"
+        "Color": "b60205",
+        "Description": "Marks issues that we want to fast track in order to unblock other important work"
       }
     ],
     "IsBlocking": true
@@ -235,27 +213,23 @@
     "Labels": [
       {
         "Name": "api-ready-for-review",
-        "BackgroundColor": "5319e7",
-        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews",
-        "ForegroundColor": "white"
+        "Color": "5319e7",
+        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews"
       },
       {
         "Name": "area-System.Runtime",
-        "BackgroundColor": "d4c5f9",
-        "Description": null,
-        "ForegroundColor": "black"
+        "Color": "d4c5f9",
+        "Description": null
       },
       {
         "Name": "blocking",
-        "BackgroundColor": "b60205",
-        "Description": "Marks issues that we want to fast track in order to unblock other important work",
-        "ForegroundColor": "white"
+        "Color": "b60205",
+        "Description": "Marks issues that we want to fast track in order to unblock other important work"
       },
       {
         "Name": "untriaged",
-        "BackgroundColor": "fbca04",
-        "Description": "",
-        "ForegroundColor": "black"
+        "Color": "fbca04",
+        "Description": ""
       }
     ],
     "IsBlocking": true
@@ -274,21 +248,18 @@
     "Labels": [
       {
         "Name": "api-ready-for-review",
-        "BackgroundColor": "5319e7",
-        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews",
-        "ForegroundColor": "white"
+        "Color": "5319e7",
+        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews"
       },
       {
         "Name": "area-System.Diagnostics.Tracing",
-        "BackgroundColor": "d4c5f9",
-        "Description": null,
-        "ForegroundColor": "black"
+        "Color": "d4c5f9",
+        "Description": null
       },
       {
         "Name": "blocking",
-        "BackgroundColor": "b60205",
-        "Description": "Marks issues that we want to fast track in order to unblock other important work",
-        "ForegroundColor": "white"
+        "Color": "b60205",
+        "Description": "Marks issues that we want to fast track in order to unblock other important work"
       }
     ],
     "IsBlocking": true
@@ -307,15 +278,13 @@
     "Labels": [
       {
         "Name": "api-ready-for-review",
-        "BackgroundColor": "5319e7",
-        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews",
-        "ForegroundColor": "white"
+        "Color": "5319e7",
+        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews"
       },
       {
         "Name": "area-System.Diagnostics.Process",
-        "BackgroundColor": "d4c5f9",
-        "Description": null,
-        "ForegroundColor": "black"
+        "Color": "d4c5f9",
+        "Description": null
       }
     ],
     "IsBlocking": false
@@ -334,15 +303,13 @@
     "Labels": [
       {
         "Name": "api-ready-for-review",
-        "BackgroundColor": "5319e7",
-        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews",
-        "ForegroundColor": "white"
+        "Color": "5319e7",
+        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews"
       },
       {
         "Name": "area-System.Security",
-        "BackgroundColor": "d4c5f9",
-        "Description": null,
-        "ForegroundColor": "black"
+        "Color": "d4c5f9",
+        "Description": null
       }
     ],
     "IsBlocking": false
@@ -361,15 +328,13 @@
     "Labels": [
       {
         "Name": "api-ready-for-review",
-        "BackgroundColor": "5319e7",
-        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews",
-        "ForegroundColor": "white"
+        "Color": "5319e7",
+        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews"
       },
       {
         "Name": "area-System.Buffers",
-        "BackgroundColor": "d4c5f9",
-        "Description": null,
-        "ForegroundColor": "black"
+        "Color": "d4c5f9",
+        "Description": null
       }
     ],
     "IsBlocking": false
@@ -388,15 +353,13 @@
     "Labels": [
       {
         "Name": "api-ready-for-review",
-        "BackgroundColor": "5319e7",
-        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews",
-        "ForegroundColor": "white"
+        "Color": "5319e7",
+        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews"
       },
       {
         "Name": "area-Interop-coreclr",
-        "BackgroundColor": "d4c5f9",
-        "Description": "",
-        "ForegroundColor": "black"
+        "Color": "d4c5f9",
+        "Description": ""
       }
     ],
     "IsBlocking": false
@@ -415,21 +378,18 @@
     "Labels": [
       {
         "Name": "api-ready-for-review",
-        "BackgroundColor": "5319e7",
-        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews",
-        "ForegroundColor": "white"
+        "Color": "5319e7",
+        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews"
       },
       {
         "Name": "arch-x64",
-        "BackgroundColor": "eb6420",
-        "Description": null,
-        "ForegroundColor": "black"
+        "Color": "eb6420",
+        "Description": null
       },
       {
         "Name": "area-System.Runtime.Intrinsics",
-        "BackgroundColor": "d4c5f9",
-        "Description": null,
-        "ForegroundColor": "black"
+        "Color": "d4c5f9",
+        "Description": null
       }
     ],
     "IsBlocking": false
@@ -448,15 +408,13 @@
     "Labels": [
       {
         "Name": "api-ready-for-review",
-        "BackgroundColor": "5319e7",
-        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews",
-        "ForegroundColor": "white"
+        "Color": "5319e7",
+        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews"
       },
       {
         "Name": "area-System.Diagnostics.Process",
-        "BackgroundColor": "d4c5f9",
-        "Description": null,
-        "ForegroundColor": "black"
+        "Color": "d4c5f9",
+        "Description": null
       }
     ],
     "IsBlocking": false
@@ -475,15 +433,13 @@
     "Labels": [
       {
         "Name": "api-ready-for-review",
-        "BackgroundColor": "5319e7",
-        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews",
-        "ForegroundColor": "white"
+        "Color": "5319e7",
+        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews"
       },
       {
         "Name": "area-System.Security",
-        "BackgroundColor": "d4c5f9",
-        "Description": null,
-        "ForegroundColor": "black"
+        "Color": "d4c5f9",
+        "Description": null
       }
     ],
     "IsBlocking": false
@@ -502,15 +458,13 @@
     "Labels": [
       {
         "Name": "api-ready-for-review",
-        "BackgroundColor": "5319e7",
-        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews",
-        "ForegroundColor": "white"
+        "Color": "5319e7",
+        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews"
       },
       {
         "Name": "area-System.Security",
-        "BackgroundColor": "d4c5f9",
-        "Description": null,
-        "ForegroundColor": "black"
+        "Color": "d4c5f9",
+        "Description": null
       }
     ],
     "IsBlocking": false
@@ -529,15 +483,13 @@
     "Labels": [
       {
         "Name": "api-ready-for-review",
-        "BackgroundColor": "5319e7",
-        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews",
-        "ForegroundColor": "white"
+        "Color": "5319e7",
+        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews"
       },
       {
         "Name": "area-System.Runtime.CompilerServices",
-        "BackgroundColor": "d4c5f9",
-        "Description": null,
-        "ForegroundColor": "black"
+        "Color": "d4c5f9",
+        "Description": null
       }
     ],
     "IsBlocking": false
@@ -556,21 +508,18 @@
     "Labels": [
       {
         "Name": "api-ready-for-review",
-        "BackgroundColor": "5319e7",
-        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews",
-        "ForegroundColor": "white"
+        "Color": "5319e7",
+        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews"
       },
       {
         "Name": "arch-x64",
-        "BackgroundColor": "eb6420",
-        "Description": null,
-        "ForegroundColor": "black"
+        "Color": "eb6420",
+        "Description": null
       },
       {
         "Name": "area-System.Runtime.Intrinsics",
-        "BackgroundColor": "d4c5f9",
-        "Description": null,
-        "ForegroundColor": "black"
+        "Color": "d4c5f9",
+        "Description": null
       }
     ],
     "IsBlocking": false
@@ -589,15 +538,13 @@
     "Labels": [
       {
         "Name": "api-ready-for-review",
-        "BackgroundColor": "5319e7",
-        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews",
-        "ForegroundColor": "white"
+        "Color": "5319e7",
+        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews"
       },
       {
         "Name": "area-System.Text.Json",
-        "BackgroundColor": "d4c5f9",
-        "Description": "",
-        "ForegroundColor": "black"
+        "Color": "d4c5f9",
+        "Description": ""
       }
     ],
     "IsBlocking": false
@@ -616,15 +563,13 @@
     "Labels": [
       {
         "Name": "api-ready-for-review",
-        "BackgroundColor": "5319e7",
-        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews",
-        "ForegroundColor": "white"
+        "Color": "5319e7",
+        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews"
       },
       {
         "Name": "area-System.Numerics",
-        "BackgroundColor": "d4c5f9",
-        "Description": null,
-        "ForegroundColor": "black"
+        "Color": "d4c5f9",
+        "Description": null
       }
     ],
     "IsBlocking": false
@@ -643,15 +588,13 @@
     "Labels": [
       {
         "Name": "api-ready-for-review",
-        "BackgroundColor": "5319e7",
-        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews",
-        "ForegroundColor": "white"
+        "Color": "5319e7",
+        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews"
       },
       {
         "Name": "area-System.Net",
-        "BackgroundColor": "d4c5f9",
-        "Description": null,
-        "ForegroundColor": "black"
+        "Color": "d4c5f9",
+        "Description": null
       }
     ],
     "IsBlocking": false
@@ -670,15 +613,13 @@
     "Labels": [
       {
         "Name": "api-ready-for-review",
-        "BackgroundColor": "5319e7",
-        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews",
-        "ForegroundColor": "white"
+        "Color": "5319e7",
+        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews"
       },
       {
         "Name": "area-System.Runtime",
-        "BackgroundColor": "d4c5f9",
-        "Description": null,
-        "ForegroundColor": "black"
+        "Color": "d4c5f9",
+        "Description": null
       }
     ],
     "IsBlocking": false
@@ -697,15 +638,13 @@
     "Labels": [
       {
         "Name": "api-ready-for-review",
-        "BackgroundColor": "5319e7",
-        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews",
-        "ForegroundColor": "white"
+        "Color": "5319e7",
+        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews"
       },
       {
         "Name": "area-System.IO",
-        "BackgroundColor": "d4c5f9",
-        "Description": null,
-        "ForegroundColor": "black"
+        "Color": "d4c5f9",
+        "Description": null
       }
     ],
     "IsBlocking": false
@@ -724,15 +663,13 @@
     "Labels": [
       {
         "Name": "api-ready-for-review",
-        "BackgroundColor": "5319e7",
-        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews",
-        "ForegroundColor": "white"
+        "Color": "5319e7",
+        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews"
       },
       {
         "Name": "area-System.Numerics",
-        "BackgroundColor": "d4c5f9",
-        "Description": null,
-        "ForegroundColor": "black"
+        "Color": "d4c5f9",
+        "Description": null
       }
     ],
     "IsBlocking": false
@@ -751,15 +688,13 @@
     "Labels": [
       {
         "Name": "api-ready-for-review",
-        "BackgroundColor": "5319e7",
-        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews",
-        "ForegroundColor": "white"
+        "Color": "5319e7",
+        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews"
       },
       {
         "Name": "area-System.Console",
-        "BackgroundColor": "d4c5f9",
-        "Description": null,
-        "ForegroundColor": "black"
+        "Color": "d4c5f9",
+        "Description": null
       }
     ],
     "IsBlocking": false
@@ -778,15 +713,13 @@
     "Labels": [
       {
         "Name": "api-ready-for-review",
-        "BackgroundColor": "5319e7",
-        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews",
-        "ForegroundColor": "white"
+        "Color": "5319e7",
+        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews"
       },
       {
         "Name": "area-System.IO",
-        "BackgroundColor": "d4c5f9",
-        "Description": null,
-        "ForegroundColor": "black"
+        "Color": "d4c5f9",
+        "Description": null
       }
     ],
     "IsBlocking": false
@@ -805,15 +738,13 @@
     "Labels": [
       {
         "Name": "api-ready-for-review",
-        "BackgroundColor": "5319e7",
-        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews",
-        "ForegroundColor": "white"
+        "Color": "5319e7",
+        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews"
       },
       {
         "Name": "area-System.IO.Compression",
-        "BackgroundColor": "d4c5f9",
-        "Description": null,
-        "ForegroundColor": "black"
+        "Color": "d4c5f9",
+        "Description": null
       }
     ],
     "IsBlocking": false
@@ -832,15 +763,13 @@
     "Labels": [
       {
         "Name": "api-ready-for-review",
-        "BackgroundColor": "5319e7",
-        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews",
-        "ForegroundColor": "white"
+        "Color": "5319e7",
+        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews"
       },
       {
         "Name": "area-System.Globalization",
-        "BackgroundColor": "d4c5f9",
-        "Description": null,
-        "ForegroundColor": "black"
+        "Color": "d4c5f9",
+        "Description": null
       }
     ],
     "IsBlocking": false
@@ -859,15 +788,13 @@
     "Labels": [
       {
         "Name": "api-ready-for-review",
-        "BackgroundColor": "5319e7",
-        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews",
-        "ForegroundColor": "white"
+        "Color": "5319e7",
+        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews"
       },
       {
         "Name": "area-System.Threading",
-        "BackgroundColor": "d4c5f9",
-        "Description": null,
-        "ForegroundColor": "black"
+        "Color": "d4c5f9",
+        "Description": null
       }
     ],
     "IsBlocking": false
@@ -886,21 +813,18 @@
     "Labels": [
       {
         "Name": "api-ready-for-review",
-        "BackgroundColor": "5319e7",
-        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews",
-        "ForegroundColor": "white"
+        "Color": "5319e7",
+        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews"
       },
       {
         "Name": "area-Extensions-Logging",
-        "BackgroundColor": "d4c5f9",
-        "Description": "",
-        "ForegroundColor": "black"
+        "Color": "d4c5f9",
+        "Description": ""
       },
       {
         "Name": "up-for-grabs",
-        "BackgroundColor": "23ef90",
-        "Description": "Good issue for external contributors",
-        "ForegroundColor": "black"
+        "Color": "23ef90",
+        "Description": "Good issue for external contributors"
       }
     ],
     "IsBlocking": false
@@ -919,15 +843,13 @@
     "Labels": [
       {
         "Name": "api-ready-for-review",
-        "BackgroundColor": "5319e7",
-        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews",
-        "ForegroundColor": "white"
+        "Color": "5319e7",
+        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews"
       },
       {
         "Name": "area-System.Data",
-        "BackgroundColor": "d4c5f9",
-        "Description": null,
-        "ForegroundColor": "black"
+        "Color": "d4c5f9",
+        "Description": null
       }
     ],
     "IsBlocking": false
@@ -946,21 +868,18 @@
     "Labels": [
       {
         "Name": "api-ready-for-review",
-        "BackgroundColor": "5319e7",
-        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews",
-        "ForegroundColor": "white"
+        "Color": "5319e7",
+        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews"
       },
       {
         "Name": "arch-wasm",
-        "BackgroundColor": "eb6420",
-        "Description": "WebAssembly architecture",
-        "ForegroundColor": "black"
+        "Color": "eb6420",
+        "Description": "WebAssembly architecture"
       },
       {
         "Name": "area-System.Net.Http",
-        "BackgroundColor": "d4c5f9",
-        "Description": null,
-        "ForegroundColor": "black"
+        "Color": "d4c5f9",
+        "Description": null
       }
     ],
     "IsBlocking": false
@@ -979,15 +898,13 @@
     "Labels": [
       {
         "Name": "api-ready-for-review",
-        "BackgroundColor": "5319e7",
-        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews",
-        "ForegroundColor": "white"
+        "Color": "5319e7",
+        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews"
       },
       {
         "Name": "area-System.Data",
-        "BackgroundColor": "d4c5f9",
-        "Description": null,
-        "ForegroundColor": "black"
+        "Color": "d4c5f9",
+        "Description": null
       }
     ],
     "IsBlocking": false
@@ -1006,15 +923,13 @@
     "Labels": [
       {
         "Name": "api-ready-for-review",
-        "BackgroundColor": "5319e7",
-        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews",
-        "ForegroundColor": "white"
+        "Color": "5319e7",
+        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews"
       },
       {
         "Name": "area-System.IO",
-        "BackgroundColor": "d4c5f9",
-        "Description": null,
-        "ForegroundColor": "black"
+        "Color": "d4c5f9",
+        "Description": null
       }
     ],
     "IsBlocking": false
@@ -1033,15 +948,13 @@
     "Labels": [
       {
         "Name": "api-ready-for-review",
-        "BackgroundColor": "5319e7",
-        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews",
-        "ForegroundColor": "white"
+        "Color": "5319e7",
+        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews"
       },
       {
         "Name": "area-System.Net",
-        "BackgroundColor": "d4c5f9",
-        "Description": null,
-        "ForegroundColor": "black"
+        "Color": "d4c5f9",
+        "Description": null
       }
     ],
     "IsBlocking": false
@@ -1060,15 +973,13 @@
     "Labels": [
       {
         "Name": "api-ready-for-review",
-        "BackgroundColor": "5319e7",
-        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews",
-        "ForegroundColor": "white"
+        "Color": "5319e7",
+        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews"
       },
       {
         "Name": "area-System.Data",
-        "BackgroundColor": "d4c5f9",
-        "Description": null,
-        "ForegroundColor": "black"
+        "Color": "d4c5f9",
+        "Description": null
       }
     ],
     "IsBlocking": false
@@ -1087,21 +998,18 @@
     "Labels": [
       {
         "Name": "api-ready-for-review",
-        "BackgroundColor": "5319e7",
-        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews",
-        "ForegroundColor": "white"
+        "Color": "5319e7",
+        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews"
       },
       {
         "Name": "area-System.Runtime.InteropServices",
-        "BackgroundColor": "d4c5f9",
-        "Description": null,
-        "ForegroundColor": "black"
+        "Color": "d4c5f9",
+        "Description": null
       },
       {
         "Name": "code-analyzer",
-        "BackgroundColor": "0f46ad",
-        "Description": "Marks an issue that suggests a Roslyn analyzer",
-        "ForegroundColor": "white"
+        "Color": "0f46ad",
+        "Description": "Marks an issue that suggests a Roslyn analyzer"
       }
     ],
     "IsBlocking": false
@@ -1120,21 +1028,18 @@
     "Labels": [
       {
         "Name": "api-ready-for-review",
-        "BackgroundColor": "5319e7",
-        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews",
-        "ForegroundColor": "white"
+        "Color": "5319e7",
+        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews"
       },
       {
         "Name": "area-System.Runtime.InteropServices",
-        "BackgroundColor": "d4c5f9",
-        "Description": null,
-        "ForegroundColor": "black"
+        "Color": "d4c5f9",
+        "Description": null
       },
       {
         "Name": "code-analyzer",
-        "BackgroundColor": "0f46ad",
-        "Description": "Marks an issue that suggests a Roslyn analyzer",
-        "ForegroundColor": "white"
+        "Color": "0f46ad",
+        "Description": "Marks an issue that suggests a Roslyn analyzer"
       }
     ],
     "IsBlocking": false
@@ -1153,21 +1058,18 @@
     "Labels": [
       {
         "Name": "api-ready-for-review",
-        "BackgroundColor": "5319e7",
-        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews",
-        "ForegroundColor": "white"
+        "Color": "5319e7",
+        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews"
       },
       {
         "Name": "area-System.Runtime.InteropServices",
-        "BackgroundColor": "d4c5f9",
-        "Description": null,
-        "ForegroundColor": "black"
+        "Color": "d4c5f9",
+        "Description": null
       },
       {
         "Name": "code-analyzer",
-        "BackgroundColor": "0f46ad",
-        "Description": "Marks an issue that suggests a Roslyn analyzer",
-        "ForegroundColor": "white"
+        "Color": "0f46ad",
+        "Description": "Marks an issue that suggests a Roslyn analyzer"
       }
     ],
     "IsBlocking": false
@@ -1186,15 +1088,13 @@
     "Labels": [
       {
         "Name": "api-ready-for-review",
-        "BackgroundColor": "5319e7",
-        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews",
-        "ForegroundColor": "white"
+        "Color": "5319e7",
+        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews"
       },
       {
         "Name": "area-System.IO",
-        "BackgroundColor": "d4c5f9",
-        "Description": null,
-        "ForegroundColor": "black"
+        "Color": "d4c5f9",
+        "Description": null
       }
     ],
     "IsBlocking": false
@@ -1213,15 +1113,13 @@
     "Labels": [
       {
         "Name": "api-ready-for-review",
-        "BackgroundColor": "5319e7",
-        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews",
-        "ForegroundColor": "white"
+        "Color": "5319e7",
+        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews"
       },
       {
         "Name": "area-System.Security",
-        "BackgroundColor": "d4c5f9",
-        "Description": null,
-        "ForegroundColor": "black"
+        "Color": "d4c5f9",
+        "Description": null
       }
     ],
     "IsBlocking": false
@@ -1240,15 +1138,13 @@
     "Labels": [
       {
         "Name": "api-ready-for-review",
-        "BackgroundColor": "5319e7",
-        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews",
-        "ForegroundColor": "white"
+        "Color": "5319e7",
+        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews"
       },
       {
         "Name": "area-System.Numerics",
-        "BackgroundColor": "d4c5f9",
-        "Description": null,
-        "ForegroundColor": "black"
+        "Color": "d4c5f9",
+        "Description": null
       }
     ],
     "IsBlocking": false
@@ -1267,21 +1163,18 @@
     "Labels": [
       {
         "Name": "api-ready-for-review",
-        "BackgroundColor": "5319e7",
-        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews",
-        "ForegroundColor": "white"
+        "Color": "5319e7",
+        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews"
       },
       {
         "Name": "area-System.Runtime",
-        "BackgroundColor": "d4c5f9",
-        "Description": null,
-        "ForegroundColor": "black"
+        "Color": "d4c5f9",
+        "Description": null
       },
       {
         "Name": "untriaged",
-        "BackgroundColor": "fbca04",
-        "Description": "",
-        "ForegroundColor": "black"
+        "Color": "fbca04",
+        "Description": ""
       }
     ],
     "IsBlocking": false
@@ -1300,15 +1193,13 @@
     "Labels": [
       {
         "Name": "api-ready-for-review",
-        "BackgroundColor": "5319e7",
-        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews",
-        "ForegroundColor": "white"
+        "Color": "5319e7",
+        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews"
       },
       {
         "Name": "area-Extensions-Primitives",
-        "BackgroundColor": "d4c5f9",
-        "Description": "",
-        "ForegroundColor": "black"
+        "Color": "d4c5f9",
+        "Description": ""
       }
     ],
     "IsBlocking": false
@@ -1327,21 +1218,18 @@
     "Labels": [
       {
         "Name": "api-ready-for-review",
-        "BackgroundColor": "5319e7",
-        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews",
-        "ForegroundColor": "white"
+        "Color": "5319e7",
+        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews"
       },
       {
         "Name": "area-System.IO.Pipelines",
-        "BackgroundColor": "d4c5f9",
-        "Description": null,
-        "ForegroundColor": "black"
+        "Color": "d4c5f9",
+        "Description": null
       },
       {
         "Name": "untriaged",
-        "BackgroundColor": "fbca04",
-        "Description": "",
-        "ForegroundColor": "black"
+        "Color": "fbca04",
+        "Description": ""
       }
     ],
     "IsBlocking": false
@@ -1360,15 +1248,13 @@
     "Labels": [
       {
         "Name": "api-ready-for-review",
-        "BackgroundColor": "5319e7",
-        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews",
-        "ForegroundColor": "white"
+        "Color": "5319e7",
+        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews"
       },
       {
         "Name": "area-System.Collections",
-        "BackgroundColor": "d4c5f9",
-        "Description": null,
-        "ForegroundColor": "black"
+        "Color": "d4c5f9",
+        "Description": null
       }
     ],
     "IsBlocking": false
@@ -1387,15 +1273,13 @@
     "Labels": [
       {
         "Name": "api-ready-for-review",
-        "BackgroundColor": "5319e7",
-        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews",
-        "ForegroundColor": "white"
+        "Color": "5319e7",
+        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews"
       },
       {
         "Name": "area-System.Data",
-        "BackgroundColor": "d4c5f9",
-        "Description": null,
-        "ForegroundColor": "black"
+        "Color": "d4c5f9",
+        "Description": null
       }
     ],
     "IsBlocking": false
@@ -1414,15 +1298,13 @@
     "Labels": [
       {
         "Name": "api-ready-for-review",
-        "BackgroundColor": "5319e7",
-        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews",
-        "ForegroundColor": "white"
+        "Color": "5319e7",
+        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews"
       },
       {
         "Name": "area-System.Security",
-        "BackgroundColor": "d4c5f9",
-        "Description": null,
-        "ForegroundColor": "black"
+        "Color": "d4c5f9",
+        "Description": null
       }
     ],
     "IsBlocking": false
@@ -1441,15 +1323,13 @@
     "Labels": [
       {
         "Name": "api-ready-for-review",
-        "BackgroundColor": "5319e7",
-        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews",
-        "ForegroundColor": "white"
+        "Color": "5319e7",
+        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews"
       },
       {
         "Name": "area-System.Runtime.InteropServices",
-        "BackgroundColor": "d4c5f9",
-        "Description": null,
-        "ForegroundColor": "black"
+        "Color": "d4c5f9",
+        "Description": null
       }
     ],
     "IsBlocking": false
@@ -1468,33 +1348,28 @@
     "Labels": [
       {
         "Name": "api-ready-for-review",
-        "BackgroundColor": "5319e7",
-        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews",
-        "ForegroundColor": "white"
+        "Color": "5319e7",
+        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews"
       },
       {
         "Name": "area-System.Diagnostics",
-        "BackgroundColor": "d4c5f9",
-        "Description": null,
-        "ForegroundColor": "black"
+        "Color": "d4c5f9",
+        "Description": null
       },
       {
         "Name": "code-analyzer",
-        "BackgroundColor": "0f46ad",
-        "Description": "Marks an issue that suggests a Roslyn analyzer",
-        "ForegroundColor": "white"
+        "Color": "0f46ad",
+        "Description": "Marks an issue that suggests a Roslyn analyzer"
       },
       {
         "Name": "code-fixer",
-        "BackgroundColor": "0f46ad",
-        "Description": "Marks an issue that suggests a Roslyn code fixer",
-        "ForegroundColor": "white"
+        "Color": "0f46ad",
+        "Description": "Marks an issue that suggests a Roslyn code fixer"
       },
       {
         "Name": "untriaged",
-        "BackgroundColor": "fbca04",
-        "Description": "",
-        "ForegroundColor": "black"
+        "Color": "fbca04",
+        "Description": ""
       }
     ],
     "IsBlocking": false
@@ -1513,15 +1388,13 @@
     "Labels": [
       {
         "Name": "api-ready-for-review",
-        "BackgroundColor": "5319e7",
-        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews",
-        "ForegroundColor": "white"
+        "Color": "5319e7",
+        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews"
       },
       {
         "Name": "area-System.Drawing",
-        "BackgroundColor": "d4c5f9",
-        "Description": null,
-        "ForegroundColor": "black"
+        "Color": "d4c5f9",
+        "Description": null
       }
     ],
     "IsBlocking": false
@@ -1540,15 +1413,13 @@
     "Labels": [
       {
         "Name": "api-ready-for-review",
-        "BackgroundColor": "5319e7",
-        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews",
-        "ForegroundColor": "white"
+        "Color": "5319e7",
+        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews"
       },
       {
         "Name": "area-System.Numerics",
-        "BackgroundColor": "d4c5f9",
-        "Description": null,
-        "ForegroundColor": "black"
+        "Color": "d4c5f9",
+        "Description": null
       }
     ],
     "IsBlocking": false
@@ -1567,15 +1438,13 @@
     "Labels": [
       {
         "Name": "api-ready-for-review",
-        "BackgroundColor": "5319e7",
-        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews",
-        "ForegroundColor": "white"
+        "Color": "5319e7",
+        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews"
       },
       {
         "Name": "area-System.Numerics",
-        "BackgroundColor": "d4c5f9",
-        "Description": null,
-        "ForegroundColor": "black"
+        "Color": "d4c5f9",
+        "Description": null
       }
     ],
     "IsBlocking": false
@@ -1594,15 +1463,13 @@
     "Labels": [
       {
         "Name": "api-ready-for-review",
-        "BackgroundColor": "5319e7",
-        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews",
-        "ForegroundColor": "white"
+        "Color": "5319e7",
+        "Description": "API is ready for formal API review - https://github.com/dotnet/apireviews"
       },
       {
         "Name": "area-System.Security",
-        "BackgroundColor": "d4c5f9",
-        "Description": null,
-        "ForegroundColor": "black"
+        "Color": "d4c5f9",
+        "Description": null
       }
     ],
     "IsBlocking": false
