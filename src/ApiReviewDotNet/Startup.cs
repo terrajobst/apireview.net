@@ -1,5 +1,4 @@
-﻿using System;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 
 using ApiReviewDotNet.Data;
 using ApiReviewDotNet.Services;
@@ -7,16 +6,13 @@ using ApiReviewDotNet.Services.GitHub;
 using ApiReviewDotNet.Services.Ospo;
 using ApiReviewDotNet.Services.YouTube;
 
-using Microsoft.ApplicationInsights.AspNetCore.Extensions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Net.Http.Headers;
 
 namespace ApiReviewDotNet
 {
@@ -106,29 +102,7 @@ namespace ApiReviewDotNet
                 app.UseHsts();
             }
 
-            // Redirect to apireview.net
-
-            app.Use(async (context, next) =>
-            {
-                const string oldHost = "apireviews.azurewebsites.net";
-                const string newHost = "apireview.net";
-                var url = context.Request.GetUri();
-                if (url.Host.Equals(oldHost, StringComparison.OrdinalIgnoreCase))
-                {
-                    var response = context.Response;
-                    response.StatusCode = StatusCodes.Status301MovedPermanently;
-
-                    var newUrl = new UriBuilder(url)
-                    {
-                        Host = newHost
-                    }.ToString();
-
-                    response.Headers[HeaderNames.Location] = newUrl;
-                    return;
-                }
-
-                await next();
-            });
+            app.UseHostRedirection("apireviews.azurewebsites.net", "apireview.net");
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
