@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace ApiReviewDotNet.Services
@@ -13,6 +13,7 @@ namespace ApiReviewDotNet.Services
 
         public string OrgName { get; }
         public string RepoName { get; }
+        public string FullName => $"{OrgName}/{RepoName}";
 
         public static OrgAndRepo Parse(string text)
         {
@@ -33,7 +34,7 @@ namespace ApiReviewDotNet.Services
 
         public override string ToString()
         {
-            return $"{OrgName}/{RepoName}";
+            return FullName;
         }
 
         public void Deconstruct(out string orgName, out string repoName)

@@ -26,6 +26,7 @@ namespace ApiReviewDotNet.Services
         private readonly ILogger<SummaryPublishingService> _logger;
         private readonly IWebHostEnvironment _env;
         private readonly IOptions<MailOptions> _mailOptions;
+        private readonly RepositoryGroupService _repositoryGroupService;
         private readonly IConfiguration _configuration;
         private readonly GitHubClientFactory _clientFactory;
         private readonly YouTubeServiceFactory _youTubeServiceFactory;
@@ -33,6 +34,7 @@ namespace ApiReviewDotNet.Services
         public SummaryPublishingService(ILogger<SummaryPublishingService> logger,
                                         IWebHostEnvironment env,
                                         IOptions<MailOptions> mailOptions,
+                                        RepositoryGroupService repositoryGroupService,
                                         IConfiguration configuration,
                                         GitHubClientFactory clientFactory,
                                         YouTubeServiceFactory youTubeServiceFactory)
@@ -40,6 +42,7 @@ namespace ApiReviewDotNet.Services
             _logger = logger;
             _env = env;
             _mailOptions = mailOptions;
+            _repositoryGroupService = repositoryGroupService;
             _configuration = configuration;
             _clientFactory = clientFactory;
             _youTubeServiceFactory = youTubeServiceFactory;
@@ -155,8 +158,7 @@ namespace ApiReviewDotNet.Services
 
         private async Task UpdateCommentsDevAsync(ApiReviewSummary summary)
         {
-            var testRepo = _configuration["RepoList"];
-            var (owner, repo) = OrgAndRepo.Parse(testRepo);
+            var (owner, repo) = _repositoryGroupService.Repositories.First();
 
             if (!summary.Items.All(i => i.Feedback.Issue.Owner == owner &&
                                         i.Feedback.Issue.Repo == repo))

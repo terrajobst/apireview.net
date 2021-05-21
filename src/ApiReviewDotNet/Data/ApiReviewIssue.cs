@@ -9,6 +9,8 @@ namespace ApiReviewDotNet.Data
 
         public string Repo { get; set; }
 
+        public string RepoFull => $"{Owner}/{Repo}";
+
         public int Id { get; set; }
 
         public string IdFull => $"{Owner}/{Repo}#{Id}";

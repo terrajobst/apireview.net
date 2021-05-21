@@ -24,9 +24,26 @@ namespace ApiReviewDotNet.Pages
         [Inject]
         private IssueService IssueService { get; set; }
 
+        [Inject]
+        private RepositoryGroupService RepositoryGroupService { get; set; }
+
+        private RepositoryGroup _selectedGroup;
         private string _filter;
         private SortedDictionary<string, bool> _milestones;
         private readonly HashSet<ApiReviewIssue> _checkedIssues = new HashSet<ApiReviewIssue>();
+
+        private RepositoryGroup SelectedGroup
+        {
+            get => _selectedGroup;
+            set
+            {
+                if (_selectedGroup != value)
+                {
+                    _selectedGroup = value;
+                    ChangeUrl();
+                }
+            }
+        }
 
         public string Filter
         {
@@ -47,15 +64,24 @@ namespace ApiReviewDotNet.Pages
 
         protected override void OnInitialized()
         {
+            _selectedGroup = RepositoryGroupService.RepositoryGroups.First();
             LoadData();
 
             var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
 
             var queryParameters = QueryHelpers.ParseQuery(uri.Query);
 
+            if (queryParameters.TryGetValue("g", out var g))
+            {
+                var name = g.ToString();
+                var group = RepositoryGroupService.RepositoryGroups.FirstOrDefault(g => string.Equals(g.Name, name, StringComparison.OrdinalIgnoreCase));
+                if (group != null)
+                    _selectedGroup = group;
+            }
+
             if (queryParameters.TryGetValue("q", out var q))
                 _filter = q;
-            
+
             if (queryParameters.TryGetValue("m", out var selectedMilestones))
             {
                 foreach (var m in _milestones.Keys.ToArray())
@@ -79,6 +105,9 @@ namespace ApiReviewDotNet.Pages
         private async void ChangeUrl()
         {
             var query = "";
+
+            if (SelectedGroup != RepositoryGroupService.RepositoryGroups.First())
+                query += $"?g={Uri.EscapeDataString(SelectedGroup.Name)}";
 
             if (!string.IsNullOrEmpty(Filter))
                 query += $"?q={Uri.EscapeDataString(Filter)}";
@@ -118,6 +147,9 @@ namespace ApiReviewDotNet.Pages
 
         private bool IsVisible(ApiReviewIssue issue)
         {
+            if (!SelectedGroup.Repos.Any(r => string.Equals(r.FullName, issue.RepoFull, StringComparison.OrdinalIgnoreCase)))
+                return false;
+
             if (_milestones != null && _milestones.TryGetValue(issue.Milestone, out var isChecked) && !isChecked)
                 return false;
 

@@ -19,9 +19,11 @@ namespace ApiReviewDotNet.Services.GitHub
             _feedback = JsonSerializer.Deserialize<IReadOnlyList<ApiReviewFeedback>>(Resources.GitHubFakeFeedback);
         }
 
-        public Task<IReadOnlyList<ApiReviewFeedback>> GetFeedbackAsync(DateTimeOffset start, DateTimeOffset end)
+        public Task<IReadOnlyList<ApiReviewFeedback>> GetFeedbackAsync(IReadOnlyCollection<OrgAndRepo> repos, DateTimeOffset start, DateTimeOffset end)
         {
-            var result = _feedback.Where(f => start <= f.FeedbackDateTime && f.FeedbackDateTime <= end)
+            var result = _feedback.Where(f => start <= f.FeedbackDateTime
+                                              && f.FeedbackDateTime <= end
+                                              && repos.Any(r => string.Equals(r.FullName, f.Issue.RepoFull, StringComparison.OrdinalIgnoreCase)))
                                   .ToArray();
 
             return Task.FromResult<IReadOnlyList<ApiReviewFeedback>>(result);

@@ -38,14 +38,14 @@ namespace ApiReviewDotNet.Services
             return _youTubeManager.GetVideoAsync(videoId);
         }
 
-        public Task<ApiReviewSummary> IssuesForRange(DateTimeOffset start, DateTimeOffset end)
+        public Task<ApiReviewSummary> IssuesForRange(OrgAndRepo[] repos, DateTimeOffset start, DateTimeOffset end)
         {
-            return _summaryManager.GetSummaryAsync(start, end);
+            return _summaryManager.GetSummaryAsync(repos, start, end);
         }
 
-        public Task<ApiReviewSummary> IssuesForVideo(string videoId)
+        public Task<ApiReviewSummary> IssuesForVideo(OrgAndRepo[] repos, string videoId)
         {
-            return _summaryManager.GetSummaryAsync(videoId);
+            return _summaryManager.GetSummaryAsync(repos, videoId);
         }
 
         public async Task<ApiReviewPublicationResult> PublishNotesAsync(ApiReviewSummary summary)

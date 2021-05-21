@@ -24,13 +24,13 @@ namespace ApiReviewDotNet.Services
             _gitHubManager = gitHubManager;
         }
 
-        public async Task<ApiReviewSummary> GetSummaryAsync(DateTimeOffset start, DateTimeOffset end)
+        public async Task<ApiReviewSummary> GetSummaryAsync(OrgAndRepo[] repos, DateTimeOffset start, DateTimeOffset end)
         {
-            var items = await _gitHubManager.GetFeedbackAsync(start, end);
+            var items = await _gitHubManager.GetFeedbackAsync(repos, start, end);
             return CreateSummary(null, items);
         }
 
-        public async Task<ApiReviewSummary> GetSummaryAsync(string videoId)
+        public async Task<ApiReviewSummary> GetSummaryAsync(OrgAndRepo[] repos, string videoId)
         {
             var video = await _youTubeManager.GetVideoAsync(videoId);
             if (video == null)
@@ -38,7 +38,7 @@ namespace ApiReviewDotNet.Services
 
             var start = video.StartDateTime;
             var end = video.EndDateTime + _extraTimeAfterStreamEnded;
-            var items = await _gitHubManager.GetFeedbackAsync(start, end);
+            var items = await _gitHubManager.GetFeedbackAsync(repos, start, end);
             return CreateSummary(video, items);
         }
 

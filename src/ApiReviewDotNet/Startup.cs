@@ -44,6 +44,7 @@ namespace ApiReviewDotNet
             services.AddSingleton<YouTubeServiceFactory>();
             services.AddSingleton<AreaOwnerService>();
             services.AddSingleton<OspoService>();
+            services.AddSingleton<RepositoryGroupService>();
             services.Configure<MailOptions>(Configuration.GetSection("Mail"));
 
             if (Env.IsDevelopment())

@@ -17,6 +17,9 @@ namespace ApiReviewDotNet.Pages
     public partial class Publish
     {
         [Inject]
+        private RepositoryGroupService RepositoryGroupService { get; set; }
+
+        [Inject]
         private NotesService NotesService { get; set; }
 
         private CancellationTokenSource _cts;
@@ -24,6 +27,10 @@ namespace ApiReviewDotNet.Pages
         private DateTimeOffset _end;
         private string _videoUrl;
         private string _videoId;
+
+        private string SelectedRepositoryGroupName { get; set; }
+
+        private RepositoryGroup SelectedRepositoryGroup => RepositoryGroupService.RepositoryGroups.First(rg => rg.Name == SelectedRepositoryGroupName);
 
         private DateTimeOffset Date
         {
@@ -105,6 +112,7 @@ namespace ApiReviewDotNet.Pages
 
         protected override void OnInitialized()
         {
+            SelectedRepositoryGroupName = RepositoryGroupService.RepositoryGroups.First().Name;
             _start = DateTime.Now.Date;
             _end = _start.AddHours(23).AddMinutes(59);
             IncludeVideo = true;
@@ -185,9 +193,9 @@ namespace ApiReviewDotNet.Pages
             ApiReviewSummary summary;
 
             if (SelectedVideo != null)
-                summary = await NotesService.IssuesForVideo(SelectedVideo.Id);
+                summary = await NotesService.IssuesForVideo(SelectedRepositoryGroup.Repos, SelectedVideo.Id);
             else
-                summary = await NotesService.IssuesForRange(Start, End);
+                summary = await NotesService.IssuesForRange(SelectedRepositoryGroup.Repos, Start, End);
 
             if (token.IsCancellationRequested)
                 return;
@@ -214,7 +222,7 @@ namespace ApiReviewDotNet.Pages
 
             var token = _cts.Token;
 
-            var summary = await NotesService.IssuesForVideo(video.Id);
+            var summary = await NotesService.IssuesForVideo(SelectedRepositoryGroup.Repos, video.Id);
             if (token.IsCancellationRequested)
                 return;
 

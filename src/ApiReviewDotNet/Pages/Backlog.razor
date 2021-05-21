@@ -1,8 +1,18 @@
 ﻿@page "/backlog"
 
-<div class="form-group">
+<div class="input-group mb-3">
+    <div class="input-group-prepend">
+        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">@SelectedGroup.Name</button>
+        <div class="dropdown-menu">
+            @foreach (var rg in RepositoryGroupService.RepositoryGroups)
+            {
+                <button class="dropdown-item" @onclick="_ => SelectedGroup = rg">@rg.Name</button>
+            }
+        </div>
+    </div>
     <input class="form-control" type="text" placeholder="Filter" @bind="Filter" @bind:event="oninput">
 </div>
+
 <div class="gh-issue-header">
     <div class="row no-gutters">
 

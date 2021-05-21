@@ -6,35 +6,26 @@ using System.Threading.Tasks;
 using ApiReviewDotNet.Data;
 using ApiReviewDotNet.Services.Ospo;
 
-using Microsoft.Extensions.Configuration;
-
 using Octokit;
 
 namespace ApiReviewDotNet.Services.GitHub
 {
     public sealed class GitHubManager : IGitHubManager
     {
-        private readonly IConfiguration _configuration;
+        private readonly RepositoryGroupService _repositoryGroupService;
         private readonly GitHubClientFactory _clientFactory;
         private readonly AreaOwnerService _areaOwnerService;
         private readonly OspoService _ospoService;
 
-        public GitHubManager(IConfiguration configuration, GitHubClientFactory clientFactory, AreaOwnerService areaOwnerService, OspoService ospoService)
+        public GitHubManager(RepositoryGroupService repositoryGroupService, GitHubClientFactory clientFactory, AreaOwnerService areaOwnerService, OspoService ospoService)
         {
-            _configuration = configuration;
+            _repositoryGroupService = repositoryGroupService;
             _clientFactory = clientFactory;
             _areaOwnerService = areaOwnerService;
             _ospoService = ospoService;
         }
 
-        public Task<IReadOnlyList<ApiReviewFeedback>> GetFeedbackAsync(DateTimeOffset start, DateTimeOffset end)
-        {
-            var repoList = _configuration["RepoList"];
-            var repos = OrgAndRepo.ParseList(repoList).ToArray();
-            return GetFeedbackAsync(repos, start, end);
-        }
-
-        private async Task<IReadOnlyList<ApiReviewFeedback>> GetFeedbackAsync(OrgAndRepo[] repos, DateTimeOffset start, DateTimeOffset end)
+        public async Task<IReadOnlyList<ApiReviewFeedback>> GetFeedbackAsync(IReadOnlyCollection<OrgAndRepo> repos, DateTimeOffset start, DateTimeOffset end)
         {
             static bool MightBeAnApiIssue(Issue issue)
             {
@@ -136,8 +127,7 @@ namespace ApiReviewDotNet.Services.GitHub
 
         public async Task<IReadOnlyList<ApiReviewIssue>> GetIssuesAsync()
         {
-            var repoList = _configuration["RepoList"];
-            var repos = OrgAndRepo.ParseList(repoList).ToArray();
+            var repos = _repositoryGroupService.Repositories;
 
             var github = await _clientFactory.CreateForAppAsync();
             var result = new List<ApiReviewIssue>();

@@ -1,7 +1,16 @@
 ﻿@page "/publish"
 
 <div class="form-group row">
-    <div class="col-12 col-lg-auto">
+    <div class="col col-lg-auto">
+        <label for="selectRepositoryGroup">Repo Group</label>
+        <select class="form-control" id="selectRepositoryGroup" @bind="SelectedRepositoryGroupName">
+            @foreach (var rg in RepositoryGroupService.RepositoryGroups)
+            {
+                <option value="@rg.Name">@rg.Name</option>
+            }
+        </select>
+    </div>
+    <div class="col col-lg-auto">
         <label for="inputStartDate">Date</label>
         <input type="date" class="form-control @(DateValidationMessage == null ? "" : "is-invalid")" id="inputStartDate" @bind="Date">
         @if (DateValidationMessage != null)
