@@ -80,7 +80,7 @@ namespace ApiReviewDotNet.Pages
             var query = "";
 
             if (!string.IsNullOrEmpty(Filter))
-                query = $"?q={Uri.EscapeDataString(Filter)}";
+                query += $"?q={Uri.EscapeDataString(Filter)}";
 
             var selectedMilestones = _milestones.Where(m => m.Value).Select(kv => kv.Key);
             if (selectedMilestones.Count() != _milestones.Count)
