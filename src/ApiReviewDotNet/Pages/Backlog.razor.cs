@@ -7,6 +7,7 @@ using ApiReviewDotNet.Data;
 using ApiReviewDotNet.Services;
 
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.JSInterop;
 
 namespace ApiReviewDotNet.Pages
@@ -17,12 +18,28 @@ namespace ApiReviewDotNet.Pages
         private IJSRuntime JSRuntime { get; set; }
 
         [Inject]
+        public NavigationManager NavigationManager { get; set; }
+
+        [Inject]
         private IssueService IssueService { get; set; }
 
+        private string _filter;
         private SortedDictionary<string, bool> _milestones;
         private readonly HashSet<ApiReviewIssue> _checkedIssues = new HashSet<ApiReviewIssue>();
 
-        public string Filter { get; set; }
+        public string Filter
+        {
+            get => _filter;
+            set
+            {
+                if (_filter != value)
+                {
+                    _filter = value;
+                    ChangeUrl();
+                }
+            }
+        }
+
         public IReadOnlyList<ApiReviewIssue> Issues => IssueService.Issues;
         public IEnumerable<ApiReviewIssue> VisibleIssues => Issues.Where(IsVisible);
         public IEnumerable<ApiReviewIssue> SelectedIssues => VisibleIssues.Where(_checkedIssues.Contains);
@@ -30,12 +47,57 @@ namespace ApiReviewDotNet.Pages
         protected override void OnInitialized()
         {
             LoadData();
+
+            var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+
+            var queryParameters = QueryHelpers.ParseQuery(uri.Query);
+
+            if (queryParameters.TryGetValue("q", out var q))
+                _filter = q;
+            
+            if (queryParameters.TryGetValue("m", out var selectedMilestones))
+            {
+                foreach (var m in _milestones.Keys.ToArray())
+                    _milestones[m] = false;
+
+                foreach (var m in selectedMilestones)
+                {
+                    if (_milestones.ContainsKey(m))
+                        _milestones[m] = true;
+                }
+            }
+
             IssueService.Changed += IssuesChanged;
         }
 
         public void Dispose()
         {
             IssueService.Changed -= IssuesChanged;
+        }
+
+        private async void ChangeUrl()
+        {
+            var query = "";
+
+            if (!string.IsNullOrEmpty(Filter))
+                query = $"?q={Uri.EscapeDataString(Filter)}";
+
+            var selectedMilestones = _milestones.Where(m => m.Value).Select(kv => kv.Key);
+            if (selectedMilestones.Count() != _milestones.Count)
+            {
+                foreach (var m in selectedMilestones)
+                    query += $"&m={Uri.EscapeDataString(m)}";
+            }
+
+            var uri = new UriBuilder(NavigationManager.Uri)
+            {
+                Query = query
+            }.ToString();
+
+            await JSRuntime.InvokeVoidAsync("Blazor.navigateTo",
+                                uri.ToString(),
+                                /* forceLoad */ false,
+                                /* replace */ true);
         }
 
         private void LoadData()
@@ -102,7 +164,18 @@ namespace ApiReviewDotNet.Pages
         private void MilestoneChecked(string milestone)
         {
             if (_milestones.TryGetValue(milestone, out var isChecked))
+            {
                 _milestones[milestone] = !isChecked;
+                ChangeUrl();
+            }
+        }
+
+        private void ToggleAllMilestones(bool value)
+        {
+            foreach (var m in _milestones.Keys.ToArray())
+                _milestones[m] = value;
+
+            ChangeUrl();
         }
 
         private async Task CopySelectedItems()
