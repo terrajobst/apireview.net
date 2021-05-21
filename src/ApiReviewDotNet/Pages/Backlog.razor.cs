@@ -12,7 +12,7 @@ using Microsoft.JSInterop;
 
 namespace ApiReviewDotNet.Pages
 {
-    public partial class Backlog : IDisposable
+    public sealed partial class Backlog : IDisposable
     {
         [Inject]
         private IJSRuntime JSRuntime { get; set; }
