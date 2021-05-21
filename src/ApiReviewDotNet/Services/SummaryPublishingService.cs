@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 using Octokit;
 
@@ -24,18 +25,21 @@ namespace ApiReviewDotNet.Services
     {
         private readonly ILogger<SummaryPublishingService> _logger;
         private readonly IWebHostEnvironment _env;
+        private readonly IOptions<MailOptions> _mailOptions;
         private readonly IConfiguration _configuration;
         private readonly GitHubClientFactory _clientFactory;
         private readonly YouTubeServiceFactory _youTubeServiceFactory;
 
         public SummaryPublishingService(ILogger<SummaryPublishingService> logger,
                                         IWebHostEnvironment env,
+                                        IOptions<MailOptions> mailOptions,
                                         IConfiguration configuration,
                                         GitHubClientFactory clientFactory,
                                         YouTubeServiceFactory youTubeServiceFactory)
         {
             _logger = logger;
             _env = env;
+            _mailOptions = mailOptions;
             _configuration = configuration;
             _clientFactory = clientFactory;
             _youTubeServiceFactory = youTubeServiceFactory;
@@ -66,13 +70,7 @@ namespace ApiReviewDotNet.Services
 
         private async Task SendEmailAsync(ApiReviewSummary summary)
         {
-            var from = _configuration["MailFrom"];
-            var to = _configuration["MailTo"];
-            var userName = _configuration["MailUserName"];
-            var password = _configuration["MailPassword"];
-            var host = _configuration["MailHost"];
-            var port = Convert.ToInt32(_configuration["MailPort"]);
-
+            var mailOptions = _mailOptions.Value;
             var date = summary.Items.First().Feedback.FeedbackDateTime.Date;
             var subject = $"API Review Notes {date:d}";
             var markdown = GetMarkdown(summary);
@@ -80,9 +78,9 @@ namespace ApiReviewDotNet.Services
 
             var msg = new MailMessage
             {
-                From = new MailAddress(from),
+                From = new MailAddress(mailOptions.From),
                 To = {
-                    new MailAddress(to)
+                    new MailAddress(mailOptions.To)
                 },
                 Subject = subject,
                 Body = body,
@@ -92,9 +90,9 @@ namespace ApiReviewDotNet.Services
             var client = new SmtpClient
             {
                 UseDefaultCredentials = false,
-                Credentials = new NetworkCredential(userName, password),
-                Port = port,
-                Host = host,
+                Credentials = new NetworkCredential(mailOptions.UserName, mailOptions.Password),
+                Port = mailOptions.Port,
+                Host = mailOptions.Host,
                 DeliveryMethod = SmtpDeliveryMethod.Network,
                 EnableSsl = true
             };
