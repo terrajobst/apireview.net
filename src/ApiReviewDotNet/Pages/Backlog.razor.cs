@@ -95,9 +95,9 @@ namespace ApiReviewDotNet.Pages
             }.ToString();
 
             await JSRuntime.InvokeVoidAsync("Blazor.navigateTo",
-                                uri.ToString(),
-                                /* forceLoad */ false,
-                                /* replace */ true);
+                                            uri.ToString(),
+                                            /* forceLoad */ false,
+                                            /* replace */ true);
         }
 
         private void LoadData()
