@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 using ApiReviewDotNet.Data;
@@ -188,7 +189,7 @@ namespace ApiReviewDotNet.Pages
 
         private string GetMarkdown(bool useOfficeMentions)
         {
-            var sb = new System.Text.StringBuilder();
+            var sb = new StringBuilder();
 
             foreach (var issue in SelectedIssues)
             {
