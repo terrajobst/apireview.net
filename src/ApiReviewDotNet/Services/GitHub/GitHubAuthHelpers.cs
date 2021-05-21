@@ -8,7 +8,7 @@ using Octokit.GraphQL;
 
 namespace ApiReviewDotNet.Services.GitHub
 {
-    internal static class GitHubAuthHelpers
+    public static class GitHubAuthHelpers
     {
         public static async Task<bool> IsMemberOfTeamAsync(string accessToken, string orgName, string teamName, string userName)
         {

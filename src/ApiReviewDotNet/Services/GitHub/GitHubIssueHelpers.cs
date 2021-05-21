@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 
 namespace ApiReviewDotNet.Services.GitHub
 {
-    internal static class GitHubIssueHelpers
+    public static class GitHubIssueHelpers
     {
         public static string FixTitle(string title)
         {

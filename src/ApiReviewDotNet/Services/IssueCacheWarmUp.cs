@@ -5,7 +5,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace ApiReviewDotNet.Services
 {
-    internal sealed class IssueCacheWarmUp : IHostedService
+    public sealed class IssueCacheWarmUp : IHostedService
     {
         private readonly IssueService _issueService;
 

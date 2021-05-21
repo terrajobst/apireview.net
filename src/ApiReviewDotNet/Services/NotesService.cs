@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 
 namespace ApiReviewDotNet.Services
 {
-    internal sealed class NotesService
+    public sealed class NotesService
     {
         private readonly ILogger<NotesService> _logger;
         private readonly IYouTubeManager _youTubeManager;

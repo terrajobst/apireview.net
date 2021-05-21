@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace ApiReviewDotNet.Services
 {
-    internal sealed class OrgAndRepo
+    public sealed class OrgAndRepo
     {
         public OrgAndRepo(string orgName, string repoName)
         {
