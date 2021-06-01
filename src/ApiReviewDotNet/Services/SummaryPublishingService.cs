@@ -53,6 +53,10 @@ namespace ApiReviewDotNet.Services
             if (!summary.Items.Any())
                 return ApiReviewPublicationResult.Failed();
 
+            var group = _repositoryGroupService.Get(summary.RepositoryGroup);
+            if (group is null)
+                return ApiReviewPublicationResult.Failed();
+
             if (_env.IsDevelopment())
             {
                 await UpdateCommentsDevAsync(summary);
@@ -66,13 +70,16 @@ namespace ApiReviewDotNet.Services
                 await UpdateCommentsAsync(summary);
             }
 
-            var url = await CommitAsync(summary);
-            await SendEmailAsync(summary);
+            var url = await CommitAsync(group, summary);
+            await SendEmailAsync(group, summary);
             return ApiReviewPublicationResult.Suceess(url);
         }
 
-        private async Task SendEmailAsync(ApiReviewSummary summary)
+        private async Task SendEmailAsync(RepositoryGroup group, ApiReviewSummary summary)
         {
+            if (group.MailingList is null)
+                return;
+
             var mailOptions = _mailOptions.Value;
             var date = summary.Items.First().Feedback.FeedbackDateTime.Date;
             var subject = $"API Review Notes {date:d}";
@@ -83,7 +90,7 @@ namespace ApiReviewDotNet.Services
             {
                 From = new MailAddress(mailOptions.From),
                 To = {
-                    new MailAddress(mailOptions.To)
+                    new MailAddress(group.MailingList)
                 },
                 Subject = subject,
                 Body = body,
@@ -180,16 +187,16 @@ namespace ApiReviewDotNet.Services
             }
         }
 
-        private async Task<string> CommitAsync(ApiReviewSummary summary)
+        private async Task<string> CommitAsync(RepositoryGroup group, ApiReviewSummary summary)
         {
             var ownerRepoString = _configuration["ApiReviewsRepo"];
             var (owner, repo) = OrgAndRepo.Parse(ownerRepoString);
             var branch = ApiReviewConstants.ApiReviewsBranch;
             var head = $"heads/{branch}";
             var date = summary.Items.FirstOrDefault().Feedback.FeedbackDateTime.DateTime;
-            var markdown = $"# Quick Reviews {date:d}\n\n{GetMarkdown(summary)}";
-            var path = $"{date.Year}/{date.Month:00}-{date.Day:00}-quick-reviews/README.md";
-            var commitMessage = $"Add quick review notes for {date:d}";
+            var markdown = $"# API Review {date:d}\n\n{GetMarkdown(summary)}";
+            var path = $"{date.Year}/{date.Month:00}-{date.Day:00}-{group.NotesSuffix}/README.md";
+            var commitMessage = $"Add review notes for {date:d}";
 
             var github = await _clientFactory.CreateForAppAsync();
             var masterReference = await github.Git.Reference.Get(owner, repo, head);

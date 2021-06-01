@@ -17,6 +17,11 @@ namespace ApiReviewDotNet.Services
                                            .ToArray();
         }
 
+        public RepositoryGroup Get(string name)
+        {
+            return RepositoryGroups.FirstOrDefault(rg => string.Equals(rg.Name, name, StringComparison.OrdinalIgnoreCase));
+        }
+
         public IReadOnlyList<RepositoryGroup> RepositoryGroups { get; }
         public IReadOnlyList<OrgAndRepo> Repositories { get; }
 

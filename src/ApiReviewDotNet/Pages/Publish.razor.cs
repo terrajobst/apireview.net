@@ -193,9 +193,9 @@ namespace ApiReviewDotNet.Pages
             ApiReviewSummary summary;
 
             if (SelectedVideo != null)
-                summary = await NotesService.IssuesForVideo(SelectedRepositoryGroup.Repos, SelectedVideo.Id);
+                summary = await NotesService.IssuesForVideo(SelectedRepositoryGroup, SelectedVideo.Id);
             else
-                summary = await NotesService.IssuesForRange(SelectedRepositoryGroup.Repos, Start, End);
+                summary = await NotesService.IssuesForRange(SelectedRepositoryGroup, Start, End);
 
             if (token.IsCancellationRequested)
                 return;
@@ -222,7 +222,7 @@ namespace ApiReviewDotNet.Pages
 
             var token = _cts.Token;
 
-            var summary = await NotesService.IssuesForVideo(SelectedRepositoryGroup.Repos, video.Id);
+            var summary = await NotesService.IssuesForVideo(SelectedRepositoryGroup, video.Id);
             if (token.IsCancellationRequested)
                 return;
 

@@ -9,6 +9,8 @@ namespace ApiReviewDotNet.Services
     {
         public string Name { get; set; }
         public OrgAndRepo[] Repos { get; set; }
+        public string MailingList { get; set; }
+        public string NotesSuffix { get; set; }
 
         public static IReadOnlyList<RepositoryGroup> Get(IConfiguration configuration)
         {
@@ -19,9 +21,12 @@ namespace ApiReviewDotNet.Services
                 var item = new RepositoryGroup
                 {
                     Name = groupConfiguration.Key,
-                    Repos = groupConfiguration.GetChildren()
-                                              .Select(c => OrgAndRepo.Parse(c.Value))
-                                              .ToArray()
+                    Repos = groupConfiguration.GetSection("Repos")
+                                              .GetChildren()
+                                              .Select(r => OrgAndRepo.Parse(r.Value))
+                                              .ToArray(),
+                    MailingList = groupConfiguration["MailingList"],
+                    NotesSuffix = groupConfiguration["NotesSuffix"]
                 };
 
                 result.Add(item);

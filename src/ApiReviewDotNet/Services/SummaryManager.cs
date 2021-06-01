@@ -24,13 +24,13 @@ namespace ApiReviewDotNet.Services
             _gitHubManager = gitHubManager;
         }
 
-        public async Task<ApiReviewSummary> GetSummaryAsync(OrgAndRepo[] repos, DateTimeOffset start, DateTimeOffset end)
+        public async Task<ApiReviewSummary> GetSummaryAsync(RepositoryGroup repositoryGroup, DateTimeOffset start, DateTimeOffset end)
         {
-            var items = await _gitHubManager.GetFeedbackAsync(repos, start, end);
-            return CreateSummary(null, items);
+            var items = await _gitHubManager.GetFeedbackAsync(repositoryGroup.Repos, start, end);
+            return CreateSummary(repositoryGroup, null, items);
         }
 
-        public async Task<ApiReviewSummary> GetSummaryAsync(OrgAndRepo[] repos, string videoId)
+        public async Task<ApiReviewSummary> GetSummaryAsync(RepositoryGroup repositoryGroup, string videoId)
         {
             var video = await _youTubeManager.GetVideoAsync(videoId);
             if (video == null)
@@ -38,16 +38,17 @@ namespace ApiReviewDotNet.Services
 
             var start = video.StartDateTime;
             var end = video.EndDateTime + _extraTimeAfterStreamEnded;
-            var items = await _gitHubManager.GetFeedbackAsync(repos, start, end);
-            return CreateSummary(video, items);
+            var items = await _gitHubManager.GetFeedbackAsync(repositoryGroup.Repos, start, end);
+            return CreateSummary(repositoryGroup, video, items);
         }
 
-        private static ApiReviewSummary CreateSummary(ApiReviewVideo video, IReadOnlyList<ApiReviewFeedback> items)
+        private static ApiReviewSummary CreateSummary(RepositoryGroup repositoryGroup, ApiReviewVideo video, IReadOnlyList<ApiReviewFeedback> items)
         {
             if (items.Count == 0)
             {
                 return new ApiReviewSummary
                 {
+                    RepositoryGroup = repositoryGroup.Name,
                     Video = video,
                     Items = Array.Empty<ApiReviewFeedbackWithVideo>()
                 };
@@ -103,6 +104,7 @@ namespace ApiReviewDotNet.Services
 
                 return new ApiReviewSummary
                 {
+                    RepositoryGroup = repositoryGroup.Name,
                     Video = video,
                     Items = result
                 };
