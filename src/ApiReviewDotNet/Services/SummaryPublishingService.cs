@@ -12,7 +12,6 @@ using ApiReviewDotNet.Services.YouTube;
 using Markdig;
 
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -27,7 +26,6 @@ namespace ApiReviewDotNet.Services
         private readonly IWebHostEnvironment _env;
         private readonly IOptions<MailOptions> _mailOptions;
         private readonly RepositoryGroupService _repositoryGroupService;
-        private readonly IConfiguration _configuration;
         private readonly GitHubClientFactory _clientFactory;
         private readonly YouTubeServiceFactory _youTubeServiceFactory;
 
@@ -35,7 +33,6 @@ namespace ApiReviewDotNet.Services
                                         IWebHostEnvironment env,
                                         IOptions<MailOptions> mailOptions,
                                         RepositoryGroupService repositoryGroupService,
-                                        IConfiguration configuration,
                                         GitHubClientFactory clientFactory,
                                         YouTubeServiceFactory youTubeServiceFactory)
         {
@@ -43,7 +40,6 @@ namespace ApiReviewDotNet.Services
             _env = env;
             _mailOptions = mailOptions;
             _repositoryGroupService = repositoryGroupService;
-            _configuration = configuration;
             _clientFactory = clientFactory;
             _youTubeServiceFactory = youTubeServiceFactory;
         }
