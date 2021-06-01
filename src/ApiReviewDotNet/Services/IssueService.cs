@@ -14,6 +14,12 @@ namespace ApiReviewDotNet.Services
         public IssueService(IGitHubManager gitHubManager)
         {
             _gitHubManager = gitHubManager;
+            Load();
+        }
+
+        private async void Load()
+        {
+            await ReloadAsync();
         }
 
         public async Task ReloadAsync()

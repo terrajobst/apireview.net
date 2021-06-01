@@ -38,7 +38,6 @@ namespace ApiReviewDotNet
             services.AddControllers();
             services.AddHostedService<AreaOwnerServiceWarmup>();
             services.AddHostedService<OspoServiceWarmup>();
-            services.AddHostedService<IssueCacheWarmUp>();
             services.AddSingleton<IssueService>();
             services.AddSingleton<GitHubClientFactory>();
             services.AddSingleton<YouTubeServiceFactory>();
@@ -93,6 +92,9 @@ namespace ApiReviewDotNet
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            // Warm up services
+            app.ApplicationServices.GetRequiredService<IssueService>();
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
