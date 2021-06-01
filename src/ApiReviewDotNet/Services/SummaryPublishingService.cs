@@ -189,8 +189,7 @@ namespace ApiReviewDotNet.Services
 
         private async Task<string> CommitAsync(RepositoryGroup group, ApiReviewSummary summary)
         {
-            var ownerRepoString = _configuration["ApiReviewsRepo"];
-            var (owner, repo) = OrgAndRepo.Parse(ownerRepoString);
+            var (owner, repo) = group.NotesRepo;
             var branch = ApiReviewConstants.ApiReviewsBranch;
             var head = $"heads/{branch}";
             var date = summary.Items.FirstOrDefault().Feedback.FeedbackDateTime.DateTime;

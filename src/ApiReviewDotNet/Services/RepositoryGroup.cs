@@ -10,6 +10,7 @@ namespace ApiReviewDotNet.Services
         public string Name { get; set; }
         public OrgAndRepo[] Repos { get; set; }
         public string MailingList { get; set; }
+        public OrgAndRepo NotesRepo { get; set; }
         public string NotesSuffix { get; set; }
 
         public static IReadOnlyList<RepositoryGroup> Get(IConfiguration configuration)
@@ -26,6 +27,7 @@ namespace ApiReviewDotNet.Services
                                               .Select(r => OrgAndRepo.Parse(r.Value))
                                               .ToArray(),
                     MailingList = groupConfiguration["MailingList"],
+                    NotesRepo = OrgAndRepo.Parse(groupConfiguration["NotesRepo"]),
                     NotesSuffix = groupConfiguration["NotesSuffix"]
                 };
 
