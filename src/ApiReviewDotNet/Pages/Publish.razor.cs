@@ -112,7 +112,7 @@ namespace ApiReviewDotNet.Pages
 
         protected override void OnInitialized()
         {
-            SelectedRepositoryGroupName = RepositoryGroupService.RepositoryGroups.First().Name;
+            SelectedRepositoryGroupName = RepositoryGroupService.Default.Name;
             _start = DateTime.Now.Date;
             _end = _start.AddHours(23).AddMinutes(59);
             IncludeVideo = true;
