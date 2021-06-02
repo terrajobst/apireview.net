@@ -22,6 +22,7 @@ namespace ApiReviewDotNet.Services
             return RepositoryGroups.FirstOrDefault(rg => string.Equals(rg.Name, name, StringComparison.OrdinalIgnoreCase));
         }
 
+        public RepositoryGroup Default => RepositoryGroups.First(r => r.IsDefault);
         public IReadOnlyList<RepositoryGroup> RepositoryGroups { get; }
         public IReadOnlyList<OrgAndRepo> Repositories { get; }
 

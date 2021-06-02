@@ -64,7 +64,7 @@ namespace ApiReviewDotNet.Pages
 
         protected override void OnInitialized()
         {
-            _selectedGroup = RepositoryGroupService.RepositoryGroups.First();
+            _selectedGroup = RepositoryGroupService.Default;
             LoadData();
 
             var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
@@ -106,7 +106,7 @@ namespace ApiReviewDotNet.Pages
         {
             var query = "";
 
-            if (SelectedGroup != RepositoryGroupService.RepositoryGroups.First())
+            if (SelectedGroup != RepositoryGroupService.Default)
                 query += $"?g={Uri.EscapeDataString(SelectedGroup.Name)}";
 
             if (!string.IsNullOrEmpty(Filter))
