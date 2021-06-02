@@ -5,7 +5,6 @@
         public const string ProductName = "apireview.net";
         public const string TokenClaim = "acess_token";
         public const string ApiApproverOrgName = "dotnet";
-        public const string ApiApproverTeamSlug = "fxdc";
         public const string ApiApproverRole = "api-approver";
         public const string GitHubAvatarUrl = "avatar_url";
         public const string NetFoundationChannelId = "UCiaZbznpWV1o-KLxj8zqR6A";

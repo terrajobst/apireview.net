@@ -76,11 +76,13 @@ namespace ApiReviewDotNet
                         options.ClaimActions.MapJsonKey(ApiReviewConstants.GitHubAvatarUrl, ApiReviewConstants.GitHubAvatarUrl);
                         options.Events.OnCreatingTicket = async context =>
                         {
+                            var groupService = context.HttpContext.RequestServices.GetRequiredService<RepositoryGroupService>();
+
                             var accessToken = context.AccessToken;
                             var orgName = ApiReviewConstants.ApiApproverOrgName;
-                            var teamName = ApiReviewConstants.ApiApproverTeamSlug;
+                            var teamSlugs = groupService.ApproverTeamSlugs;
                             var userName = context.Identity.Name;
-                            var isMember = await GitHubAuthHelpers.IsMemberOfTeamAsync(accessToken, orgName, teamName, userName);
+                            var isMember = await GitHubAuthHelpers.IsMemberOfAnyTeamAsync(accessToken, orgName, teamSlugs, userName);
                             if (isMember)
                                 context.Identity.AddClaim(new Claim(context.Identity.RoleClaimType, ApiReviewConstants.ApiApproverRole));
 

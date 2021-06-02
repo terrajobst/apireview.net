@@ -11,6 +11,7 @@ namespace ApiReviewDotNet.Services
         public string DisplayName { get; set; }
         public bool IsDefault { get; set; }
         public OrgAndRepo[] Repos { get; set; }
+        public string ApproverTeamSlug { get; set; }
         public string MailingList { get; set; }
         public string MailingReplyTo { get; set; }
         public OrgAndRepo NotesRepo { get; set; }
@@ -31,6 +32,7 @@ namespace ApiReviewDotNet.Services
                                               .GetChildren()
                                               .Select(r => OrgAndRepo.Parse(r.Value))
                                               .ToArray(),
+                    ApproverTeamSlug = groupConfiguration["ApproverTeamSlug"],
                     MailingList = groupConfiguration["MailingList"],
                     MailingReplyTo = groupConfiguration["MailingReplyTo"],
                     NotesRepo = OrgAndRepo.Parse(groupConfiguration["NotesRepo"]),

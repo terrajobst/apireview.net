@@ -15,6 +15,9 @@ namespace ApiReviewDotNet.Services
                                            .Distinct(StringComparer.OrdinalIgnoreCase)
                                            .Select(OrgAndRepo.Parse)
                                            .ToArray();
+            ApproverTeamSlugs = RepositoryGroups.Select(rg => rg.ApproverTeamSlug)
+                                                .Distinct()
+                                                .ToArray();
         }
 
         public RepositoryGroup Get(string name)
@@ -25,6 +28,6 @@ namespace ApiReviewDotNet.Services
         public RepositoryGroup Default => RepositoryGroups.First(r => r.IsDefault);
         public IReadOnlyList<RepositoryGroup> RepositoryGroups { get; }
         public IReadOnlyList<OrgAndRepo> Repositories { get; }
-
+        public IReadOnlyList<string> ApproverTeamSlugs { get; }
     }
 }
