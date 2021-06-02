@@ -6,7 +6,7 @@
         <select class="form-control" id="selectRepositoryGroup" @bind="SelectedRepositoryGroupName">
             @foreach (var rg in RepositoryGroupService.RepositoryGroups)
             {
-                <option value="@rg.Name">@rg.Name</option>
+                <option value="@rg.Name">@rg.DisplayName</option>
             }
         </select>
     </div>

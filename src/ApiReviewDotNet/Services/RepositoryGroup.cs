@@ -8,6 +8,7 @@ namespace ApiReviewDotNet.Services
     public sealed class RepositoryGroup
     {
         public string Name { get; set; }
+        public string DisplayName { get; set; }
         public bool IsDefault { get; set; }
         public OrgAndRepo[] Repos { get; set; }
         public string MailingList { get; set; }
@@ -24,6 +25,7 @@ namespace ApiReviewDotNet.Services
                 var item = new RepositoryGroup
                 {
                     Name = groupConfiguration.Key,
+                    DisplayName = groupConfiguration["DisplayName"],
                     IsDefault = groupConfiguration.GetValue("IsDefault", false),
                     Repos = groupConfiguration.GetSection("Repos")
                                               .GetChildren()
