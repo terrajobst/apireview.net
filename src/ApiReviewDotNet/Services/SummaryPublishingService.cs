@@ -1,8 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Net;
-using System.Net.Mail;
 using System.Threading.Tasks;
 
 using ApiReviewDotNet.Data;
@@ -12,11 +10,16 @@ using ApiReviewDotNet.Services.YouTube;
 using Markdig;
 
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 using Octokit;
+
+using SendGrid;
+using SendGrid.Helpers.Mail;
+
+using EmailAddress = SendGrid.Helpers.Mail.EmailAddress;
 
 namespace ApiReviewDotNet.Services
 {
@@ -24,21 +27,21 @@ namespace ApiReviewDotNet.Services
     {
         private readonly ILogger<SummaryPublishingService> _logger;
         private readonly IWebHostEnvironment _env;
-        private readonly IOptions<MailOptions> _mailOptions;
+        private readonly IConfiguration _configuration;
         private readonly RepositoryGroupService _repositoryGroupService;
         private readonly GitHubClientFactory _clientFactory;
         private readonly YouTubeServiceFactory _youTubeServiceFactory;
 
         public SummaryPublishingService(ILogger<SummaryPublishingService> logger,
                                         IWebHostEnvironment env,
-                                        IOptions<MailOptions> mailOptions,
+                                        IConfiguration configuration,
                                         RepositoryGroupService repositoryGroupService,
                                         GitHubClientFactory clientFactory,
                                         YouTubeServiceFactory youTubeServiceFactory)
         {
             _logger = logger;
             _env = env;
-            _mailOptions = mailOptions;
+            _configuration = configuration;
             _repositoryGroupService = repositoryGroupService;
             _clientFactory = clientFactory;
             _youTubeServiceFactory = youTubeServiceFactory;
@@ -76,36 +79,22 @@ namespace ApiReviewDotNet.Services
             if (group.MailingList is null)
                 return;
 
-            var mailOptions = _mailOptions.Value;
+            var key = _configuration["SendGridKey"];
             var date = summary.Items.First().Feedback.FeedbackDateTime.Date;
             var subject = $"API Review Notes {date:d}";
             var markdown = GetMarkdown(summary);
             var body = Markdown.ToHtml(markdown);
-
-            var msg = new MailMessage
-            {
-                From = new MailAddress(mailOptions.From),
-                To = {
-                    new MailAddress(group.MailingList)
-                },
-                Subject = subject,
-                Body = body,
-                IsBodyHtml = true
-            };
-
-            var client = new SmtpClient
-            {
-                UseDefaultCredentials = false,
-                Credentials = new NetworkCredential(mailOptions.UserName, mailOptions.Password),
-                Port = mailOptions.Port,
-                Host = mailOptions.Host,
-                DeliveryMethod = SmtpDeliveryMethod.Network,
-                EnableSsl = true
-            };
+            var msg = new SendGridMessage();
+            msg.SetFrom(new EmailAddress("notes@apireview.net", ".NET API Reviews"));
+            msg.AddTo(new EmailAddress(group.MailingList));
+            msg.SetReplyTo(new EmailAddress(group.MailingReplyTo));
+            msg.SetSubject(subject);
+            msg.AddContent(MimeType.Html, body);
 
             try
             {
-                await client.SendMailAsync(msg);
+                var client = new SendGridClient(key);
+                await client.SendEmailAsync(msg);
             }
             catch (Exception ex)
             {
