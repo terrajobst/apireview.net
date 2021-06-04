@@ -8,29 +8,39 @@
     <div class="collapse navbar-collapse" id="navbarText">
         <ul class="navbar-nav mr-auto">
 
-            <NavLink class="nav-link" href="about">
-                <span class="oi oi-info" aria-hidden="true"></span> About
-            </NavLink>
+            <li>
+                <NavLink class="nav-link" href="about">
+                    <span class="oi oi-info" aria-hidden="true"></span> About
+                </NavLink>
+            </li>
 
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Backlog
-            </NavLink>
+            <li>
+                <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                    <span class="oi oi-list-rich" aria-hidden="true"></span> Backlog
+                </NavLink>
+            </li>
 
             <AuthorizeView Roles="@ApiReviewConstants.ApiApproverRole">
-                <NavLink class="nav-link" href="publish">
-                    <span class="oi oi-envelope-open" aria-hidden="true"></span> Publish
-                </NavLink>
+                <li>
+                    <NavLink class="nav-link" href="publish">
+                        <span class="oi oi-envelope-open" aria-hidden="true"></span> Publish
+                    </NavLink>
+                </li>
             </AuthorizeView>
 
-            <NavLink class="nav-link" href="/request">
-                <span class="oi oi-question-mark" aria-hidden="true"></span> Request
-            </NavLink>
+            <li>
+                <NavLink class="nav-link" href="/request">
+                    <span class="oi oi-question-mark" aria-hidden="true"></span> Request
+                </NavLink>
+            </li>
 
             @*
             The GitHub repo is currently private, so let's not yet expose the link.
-            <NavLink class="nav-link" href="https://github.com/terrajobst/apireview.net">
-                <span class="oi oi-fork" aria-hidden="true"></span> Source
-            </NavLink>
+            <li>
+                <NavLink class="nav-link" href="https://github.com/terrajobst/apireview.net">
+                    <span class="oi oi-fork" aria-hidden="true"></span> Source
+                </NavLink>
+            </li>
             *@
         </ul>
         <AuthorizeView>
