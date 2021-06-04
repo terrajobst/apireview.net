@@ -1,6 +1,6 @@
 ﻿@inherits LayoutComponentBase
 
-<nav class="navbar navbar-expand-sm navbar-dark bg-dotnet">
+<nav class="navbar navbar-expand-md navbar-dark bg-dotnet">
     <a class="navbar-brand" href="/">.NET API Review</a>
     <button class="navbar-toggler" type="button" @onclick="ToggleNavMenu" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -29,15 +29,11 @@
                     <span class="oi oi-question-mark" aria-hidden="true"></span> Request
                 </NavLink>
             </li>
-
-            @*
-                The GitHub repo is currently private, so let's not yet expose the link.
-                <li class="nav-item">
-                    <NavLink class="nav-link" href="https://github.com/terrajobst/apireview.net">
-                        <span class="oi oi-fork" aria-hidden="true"></span> Source
-                    </NavLink>
-                </li>
-            *@
+            <li class="nav-item">
+                <NavLink class="nav-link" href="https://github.com/terrajobst/apireview.net">
+                    <span class="oi oi-code" aria-hidden="true"></span> Source
+                </NavLink>
+            </li>
         </ul>
         <AuthorizeView>
             <Authorized>
