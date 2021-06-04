@@ -1,29 +1,31 @@
 ﻿@page "/request"
 
-<h3>Request Review</h3>
+<div class="container">
+    <h3>Request Review</h3>
 
-<p>
-    There are three methods to get an API review:
-</p>
+    <p>
+        There are three methods to get an API review:
+    </p>
 
-<ul>
-    <li>
-        <strong>Get into the backlog.</strong> Generally speaking, filing an issue in <code>dotnet/runtime</code> and applying the label
-        <code>api-ready-for-review</code> on it will make your issue show up during API reviews. The downside is that we generally walk
-        the backlog oldest-newest, so your issue might not be looked at for a while. Progress of issues can be tracked via
-        <a href="backlog">the backlog</a>.
-    </li>
-    <li>
-        <strong>Fast track.</strong> If you need to bypass the backlog apply both <code>api-ready-for-review</code> and
-        <code>blocking</code>. All blocking issues are looked at before we walk the backlog.
-    </li>
-    <li>
-        <strong>Dedicated review.</strong> This only applies to area owners. If an issue you are the area owner for needs an hour or longer,
-        send an email to FXDC and we book dedicated time. Rule of thumb: if the API proposal has more than a dozen APIs and/or the APIs have
-        complex policy, then you need 60 min or more. When in doubt, send mail to FXDC.
-    </li>
-</ul>
+    <ul>
+        <li>
+            <strong>Get into the backlog.</strong> Generally speaking, filing an issue in <code>dotnet/runtime</code> and applying the label
+            <code>api-ready-for-review</code> on it will make your issue show up during API reviews. The downside is that we generally walk
+            the backlog oldest-newest, so your issue might not be looked at for a while. Progress of issues can be tracked via
+            <a href="backlog">the backlog</a>.
+        </li>
+        <li>
+            <strong>Fast track.</strong> If you need to bypass the backlog apply both <code>api-ready-for-review</code> and
+            <code>blocking</code>. All blocking issues are looked at before we walk the backlog.
+        </li>
+        <li>
+            <strong>Dedicated review.</strong> This only applies to area owners. If an issue you are the area owner for needs an hour or longer,
+            send an email to FXDC and we book dedicated time. Rule of thumb: if the API proposal has more than a dozen APIs and/or the APIs have
+            complex policy, then you need 60 min or more. When in doubt, send mail to FXDC.
+        </li>
+    </ul>
 
-<p>
-    For more details, take a look at the <a href="https://aka.ms/apireview">API review process.</a>
-</p>
+    <p>
+        For more details, take a look at the <a href="https://aka.ms/apireview">API review process.</a>
+    </p>
+</div>
