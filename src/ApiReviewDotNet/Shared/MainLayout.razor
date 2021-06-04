@@ -1,46 +1,42 @@
 ﻿@inherits LayoutComponentBase
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dotnet">
+<nav class="navbar navbar-expand-sm navbar-dark bg-dotnet">
     <a class="navbar-brand" href="/">.NET API Review</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+    <button class="navbar-toggler" type="button" @onclick="ToggleNavMenu" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
-    <div class="collapse navbar-collapse" id="navbarText">
+    <div class="navbar-collapse @NavMenuCssClass" id="navbarText">
         <ul class="navbar-nav mr-auto">
-
-            <li>
+            <li class="nav-item">
                 <NavLink class="nav-link" href="about">
                     <span class="oi oi-info" aria-hidden="true"></span> About
                 </NavLink>
             </li>
-
-            <li>
+            <li class="nav-item">
                 <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
                     <span class="oi oi-list-rich" aria-hidden="true"></span> Backlog
                 </NavLink>
             </li>
-
             <AuthorizeView Roles="@ApiReviewConstants.ApiApproverRole">
-                <li>
+                <li class="nav-item">
                     <NavLink class="nav-link" href="publish">
                         <span class="oi oi-envelope-open" aria-hidden="true"></span> Publish
                     </NavLink>
                 </li>
             </AuthorizeView>
-
-            <li>
+            <li class="nav-item">
                 <NavLink class="nav-link" href="/request">
                     <span class="oi oi-question-mark" aria-hidden="true"></span> Request
                 </NavLink>
             </li>
 
             @*
-            The GitHub repo is currently private, so let's not yet expose the link.
-            <li>
-                <NavLink class="nav-link" href="https://github.com/terrajobst/apireview.net">
-                    <span class="oi oi-fork" aria-hidden="true"></span> Source
-                </NavLink>
-            </li>
+                The GitHub repo is currently private, so let's not yet expose the link.
+                <li class="nav-item">
+                    <NavLink class="nav-link" href="https://github.com/terrajobst/apireview.net">
+                        <span class="oi oi-fork" aria-hidden="true"></span> Source
+                    </NavLink>
+                </li>
             *@
         </ul>
         <AuthorizeView>
@@ -76,3 +72,14 @@
 <main class="container-fluid mt-3">
     @Body
 </main>
+
+@code {
+    private bool _collapseNavMenu = true;
+
+    private string NavMenuCssClass => _collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu()
+    {
+        _collapseNavMenu = !_collapseNavMenu;
+    }
+}
