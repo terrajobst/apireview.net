@@ -1,0 +1,21 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Get code
+      uses: actions/checkout@v2
+
+    # Build
+
+    - name: dotnet build
+      run: |
+        cd src/ApiReviewDotNet
+        dotnet build -c Release -o '../../artifacts/ApiReviewDotNet'
+        cd ../..
