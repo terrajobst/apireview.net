@@ -18,6 +18,7 @@ namespace ApiReviewDotNet.Pages
     {
         private static readonly string Url = "https://outlook.office365.com/owa/calendar/3b9be8f4136f47bfb3bd10638b946523@microsoft.com/dedb09caf32a4c23be118e9f97ad25717678617836187798260/calendar.ics";
 
+        private DateTimeOffset? Today { get; set; }
         private DateTimeOffset? CurrentDate { get; set; }
 
         private CalendarCell[] Cells { get; set; }
@@ -33,8 +34,11 @@ namespace ApiReviewDotNet.Pages
 
         private async Task UpdateCellsAsync()
         {
+            if (Today is null)
+                Today = await TimeZoneService.ToLocalAsync(DateTime.Today);
+
             if (CurrentDate is null)
-                CurrentDate = await TimeZoneService.ToLocalAsync(DateTime.Today);
+                CurrentDate = Today;
 
             var calendar = await LoadCalendarAsync(Url);
             Cells = GetCells(calendar, CurrentDate.Value).ToArray();

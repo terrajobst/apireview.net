@@ -24,8 +24,8 @@
     {
         var isFirstCell = cell == Cells.First();
         var includeMonth = isFirstCell || cell.DateTime.Day == 1;
-        var pastClass = cell.DateTime < DateTime.Today ? "past" : "";
-        var todayClass = cell.DateTime == DateTime.Today ? "today" : "";
+        var pastClass = cell.DateTime < Today ? "past" : "";
+        var todayClass = cell.DateTime == Today ? "today" : "";
         var dayText = includeMonth
                 ? @cell.DateTime.ToString("MMM d")
                 : @cell.DateTime.Day.ToString();
