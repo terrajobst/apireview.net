@@ -1,0 +1,46 @@
+﻿@page "/schedule"
+
+@if (Rows is not null)
+{
+    <div class="calendar">
+        <div class="calendar-cell calendar-header">Sunday</div>
+        <div class="calendar-cell calendar-header">Monday</div>
+        <div class="calendar-cell calendar-header">Tuesday</div>
+        <div class="calendar-cell calendar-header">Wednesday</div>
+        <div class="calendar-cell calendar-header">Thursday</div>
+        <div class="calendar-cell calendar-header">Friday</div>
+        <div class="calendar-cell calendar-header">Saturday</div>
+        @foreach (var row in Rows)
+        {
+            @foreach (var cell in row)
+            {
+                var isFirstCell = cell == Rows.First().First();
+                var includeMonth = isFirstCell || cell.DateTime.Day == 1;
+                var pastClass = cell.DateTime < DateTime.Today ? "past" : "";
+                var todayClass = cell.DateTime == DateTime.Today ? "today" : "";
+                var dayText = includeMonth
+                        ? @cell.DateTime.ToString("MMM d")
+                        : @cell.DateTime.Day.ToString();
+
+                <div class="calendar-cell @pastClass @todayClass">
+                    <div class="calendar-day">@dayText</div>
+
+                    @if (cell.Entries.Any())
+                    {
+                        <ul class="list-unstyled">
+                            @foreach (var entry in cell.Entries)
+                            {
+                                <li><span class="time">@entry.Start.ToString("t")</span> @entry.Title</li>
+                            }
+                        </ul>
+                    }
+                </div>
+            }
+        }
+    </div>
+}
+
+<p class="mt-3 text-muted">
+    Videos are streamed to the <a href="https://www.youtube.com/channel/UCiaZbznpWV1o-KLxj8zqR6A">.NET Foundation YouTube channel</a>.
+    This calendar is available <a href="@Url">as an .ics file</a> you can add to your favorite calendar app.
+</p>

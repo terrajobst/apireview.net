@@ -232,3 +232,68 @@ app {
         background: rgb(48, 54, 61);
     }
 }
+
+/* Calendar */
+
+.calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    grid-template-rows: auto repeat(5, minmax(auto, calc(20vh - 35px)));
+}
+
+.calendar-header {
+    color: var(--color-text-primary);
+    background-color: rgba(0, 0, 0, 0.07);
+}
+
+.calendar-cell {
+    padding: 0.5em;
+    border: 1px solid rgb(48, 54, 61);
+    color: var(--color-text-primary);
+    overflow: hidden;
+}
+
+    .calendar-cell.past {
+        color: rgb(139, 148, 158);
+        background-color: rgba(0, 0, 0, 0.07);
+    }
+
+    .calendar-cell.today {
+        border-color: var(--dotnet-purple);
+        background-color: rgba(81 43 212 / 0.2);
+    }
+
+    .calendar-cell.today .calendar-day {
+        font-weight: 600;
+    }
+
+    .calendar-cell .calendar-day {
+        font-size: 1rem;
+    }
+
+    .calendar-cell .time {
+        font-size: .75em;
+        margin-right: 0.5em;
+    }
+
+@media (prefers-color-scheme: dark) {
+
+    .calendar-header {
+        color: white;
+        background-color: rgba(0, 0, 0, 0.2);
+    }
+
+    .calendar-cell {
+        color: white;
+    }
+
+        .calendar-cell.past {
+            color: rgb(139, 148, 158);
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+
+        .calendar-cell.today {
+            border-color: var(--dotnet-purple);
+            background-color: unset;
+        }
+}
