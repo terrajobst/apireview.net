@@ -35,7 +35,10 @@ namespace ApiReviewDotNet.Pages
         private async Task UpdateCellsAsync()
         {
             if (Today is null)
-                Today = await TimeZoneService.ToLocalAsync(DateTime.Today);
+            {
+                var userDateTime = await TimeZoneService.ToLocalAsync(DateTime.UtcNow);
+                Today = new DateTimeOffset(userDateTime.Year, userDateTime.Month, userDateTime.Day, 0, 0, 0, 0, userDateTime.Offset);
+            }
 
             if (CurrentDate is null)
                 CurrentDate = Today;
