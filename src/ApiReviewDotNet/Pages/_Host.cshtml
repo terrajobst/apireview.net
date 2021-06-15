@@ -50,6 +50,10 @@
                 document.removeEventListener('copy', listener);
             }
         };
+
+        window.getTimezoneOffset = function() {
+            return new Date().getTimezoneOffset();
+        }
     </script>
 </body>
 </html>

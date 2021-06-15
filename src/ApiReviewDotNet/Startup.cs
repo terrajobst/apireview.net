@@ -59,6 +59,7 @@ namespace ApiReviewDotNet
             services.AddSingleton<SummaryManager>();
             services.AddSingleton<SummaryPublishingService>();
 
+            services.AddScoped<TimeZoneService>();
             services.AddScoped<NotesService>();
             services.AddAuthentication(options =>
                     {

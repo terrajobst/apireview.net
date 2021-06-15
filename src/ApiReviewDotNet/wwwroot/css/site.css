@@ -235,15 +235,33 @@ app {
 
 /* Calendar */
 
+.calendar-nav {
+    display: flex;
+    flex-direction: row;
+    padding: 0.5em 0;
+    justify-content: center;
+    align-items: center;
+}
+
+    .calendar-nav button {
+        font-size: 0.75rem;
+        margin-left: 0.75em;
+    }
+
+    .calendar-nav button:first-of-type {
+        margin-left: 0;
+    }
+
+    .calendar-nav h3 {
+        flex-grow: 1;
+        text-align: center;
+    }
+
 .calendar {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    grid-template-rows: auto repeat(5, minmax(auto, calc(20vh - 35px)));
-}
-
-.calendar-header {
-    color: var(--color-text-primary);
-    background-color: rgba(0, 0, 0, 0.07);
+    grid-template-rows: auto;
+    grid-auto-rows: minmax(auto, calc(20vh - 50px));
 }
 
 .calendar-cell {
@@ -276,12 +294,13 @@ app {
         margin-right: 0.5em;
     }
 
-@media (prefers-color-scheme: dark) {
+.calendar-header {
+    color: var(--color-text-primary);
+    background-color: rgba(0, 0, 0, 0.07);
+    height: auto;
+}
 
-    .calendar-header {
-        color: white;
-        background-color: rgba(0, 0, 0, 0.2);
-    }
+@media (prefers-color-scheme: dark) {
 
     .calendar-cell {
         color: white;
@@ -296,4 +315,9 @@ app {
             border-color: var(--dotnet-purple);
             background-color: unset;
         }
+
+    .calendar-header {
+        color: white;
+        background-color: rgba(0, 0, 0, 0.2);
+    }
 }

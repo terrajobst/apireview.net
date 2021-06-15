@@ -4,9 +4,13 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
+using ApiReviewDotNet.Data;
+
 using Ical.Net;
 using Ical.Net.CalendarComponents;
 using Ical.Net.DataTypes;
+
+using Microsoft.AspNetCore.Components;
 
 namespace ApiReviewDotNet.Pages
 {
@@ -14,12 +18,27 @@ namespace ApiReviewDotNet.Pages
     {
         private static readonly string Url = "https://outlook.office365.com/owa/calendar/3b9be8f4136f47bfb3bd10638b946523@microsoft.com/dedb09caf32a4c23be118e9f97ad25717678617836187798260/calendar.ics";
 
-        private CalendarCell[][] Rows { get; set; }
+        private DateTimeOffset? CurrentDate { get; set; }
 
-        protected override async Task OnInitializedAsync()
+        private CalendarCell[] Cells { get; set; }
+
+        [Inject]
+        public TimeZoneService TimeZoneService { get; set; }
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
         {
+            if (firstRender)
+                await UpdateCellsAsync();
+        }
+
+        private async Task UpdateCellsAsync()
+        {
+            if (CurrentDate is null)
+                CurrentDate = await TimeZoneService.ToLocalAsync(DateTime.Today);
+
             var calendar = await LoadCalendarAsync(Url);
-            Rows = GetRows(calendar, DateTime.Today).ToArray();
+            Cells = GetCells(calendar, CurrentDate.Value).ToArray();
+            StateHasChanged();
         }
 
         private static async Task<CalendarCollection> LoadCalendarAsync(string url)
@@ -31,10 +50,10 @@ namespace ApiReviewDotNet.Pages
 
         private static IEnumerable<CalendarCell> GetCells(CalendarCollection calendars, DateTimeOffset date)
         {
-            var firstDayInMonth = new DateTime(date.Year, date.Month, 1);
+            var firstDayInMonth = new DateTimeOffset(date.Year, date.Month, 1, 0, 0, 0, date.Offset);
             var firstDay = firstDayInMonth.AddDays(-(int)firstDayInMonth.DayOfWeek);
-            var lastDayInMonth = new DateTime(date.Year, date.Month, DateTime.DaysInMonth(date.Year, date.Month));
-            var lastDay = lastDayInMonth.AddDays(6 - (int)firstDayInMonth.DayOfWeek - 1);
+            var lastDayInMonth = new DateTimeOffset(date.Year, date.Month, DateTime.DaysInMonth(date.Year, date.Month), 0, 0, 0, date.Offset);
+            var lastDay = lastDayInMonth.AddDays(6 - (int)lastDayInMonth.DayOfWeek);
 
             var current = firstDay;
             while (current <= lastDay)
@@ -48,8 +67,8 @@ namespace ApiReviewDotNet.Pages
 
         private static IEnumerable<CalendarEntry> GetEntries(CalendarCollection calendars, DateTimeOffset start, DateTimeOffset end)
         {
-            var calStart = new CalDateTime(start.DateTime);
-            var calEnd = new CalDateTime(end.DateTime);
+            var calStart = new CalDateTime(start.UtcDateTime);
+            var calEnd = new CalDateTime(end.UtcDateTime);
 
             foreach (var occurence in calendars.GetOccurrences(calStart, calEnd))
             {
@@ -60,32 +79,29 @@ namespace ApiReviewDotNet.Pages
                     {
                         Title = e.Summary,
                         Description = e.Description,
-                        Start = occurence.Period.StartTime.AsDateTimeOffset,
-                        End = occurence.Period.EndTime.AsDateTimeOffset,
+                        Start = occurence.Period.StartTime.AsDateTimeOffset.ToOffset(start.Offset),
+                        End = occurence.Period.EndTime.AsDateTimeOffset.ToOffset(start.Offset),
                     };
                 }
             }
         }
 
-        private static IEnumerable<CalendarCell[]> GetRows(CalendarCollection calendars, DateTime date)
+        private async Task TodayAsync()
         {
-            var cells = GetCells(calendars, date);
-            return GetRows(cells);
+            CurrentDate = null;
+            await UpdateCellsAsync();
         }
 
-        private static IEnumerable<CalendarCell[]> GetRows(IEnumerable<CalendarCell> cells)
+        private async Task PreviousMonthAsync()
         {
-            var row = new List<CalendarCell>(7);
+            CurrentDate = CurrentDate.Value.AddMonths(-1);
+            await UpdateCellsAsync();
+        }
 
-            foreach (var cell in cells)
-            {
-                row.Add(cell);
-                if (row.Count == 7)
-                {
-                    yield return row.ToArray();
-                    row.Clear();
-                }
-            }
+        private async Task NextMonthAsync()
+        {
+            CurrentDate = CurrentDate.Value.AddMonths(1);
+            await UpdateCellsAsync();
         }
 
         private sealed class CalendarCell
