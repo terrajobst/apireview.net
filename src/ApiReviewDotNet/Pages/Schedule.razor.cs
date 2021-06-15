@@ -74,8 +74,15 @@ namespace ApiReviewDotNet.Pages
 
         private static IEnumerable<CalendarEntry> GetEntries(CalendarCollection calendars, DateTimeOffset start, DateTimeOffset end)
         {
-            var calStart = new CalDateTime(start.UtcDateTime);
-            var calEnd = new CalDateTime(end.UtcDateTime);
+            IDateTime calStart = new CalDateTime(start.UtcDateTime);
+            IDateTime calEnd = new CalDateTime(end.UtcDateTime);
+
+            var timeZone = calendars.FirstOrDefault()?.TimeZones?.FirstOrDefault()?.TzId;
+            if (timeZone is not null)
+            {
+                calStart = calStart.ToTimeZone(timeZone);
+                calEnd = calEnd.ToTimeZone(timeZone);
+            }
 
             foreach (var occurence in calendars.GetOccurrences(calStart, calEnd))
             {
