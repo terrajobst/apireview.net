@@ -65,7 +65,10 @@
                 </div>
             </Authorized>
             <NotAuthorized>
-                <a class="btn btn-dotnet" href="signin">Sign in</a>
+                @{
+                    var returnUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+                }
+                <a class="btn btn-dotnet" href="signin?returnUrl=@returnUrl">Sign in</a>
             </NotAuthorized>
         </AuthorizeView>
     </div>
@@ -76,6 +79,9 @@
 </main>
 
 @code {
+    [Inject]
+    private NavigationManager NavigationManager { get; set; }
+
     private bool _collapseNavMenu = true;
 
     private string NavMenuCssClass => _collapseNavMenu ? "collapse" : null;
