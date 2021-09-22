@@ -1,30 +1,26 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using Microsoft.JSInterop;
 
-using Microsoft.JSInterop;
+namespace ApiReviewDotNet.Data;
 
-namespace ApiReviewDotNet.Data
+public sealed class TimeZoneService
 {
-    public sealed class TimeZoneService
+    private readonly IJSRuntime _jsRuntime;
+
+    private TimeSpan? _userOffset;
+
+    public TimeZoneService(IJSRuntime jsRuntime)
     {
-        private readonly IJSRuntime _jsRuntime;
+        _jsRuntime = jsRuntime;
+    }
 
-        private TimeSpan? _userOffset;
-
-        public TimeZoneService(IJSRuntime jsRuntime)
+    public async ValueTask<DateTimeOffset> ToLocalAsync(DateTimeOffset dateTime)
+    {
+        if (_userOffset is null)
         {
-            _jsRuntime = jsRuntime;
+            var offsetInMinutes = await _jsRuntime.InvokeAsync<int>("getTimezoneOffset");
+            _userOffset = TimeSpan.FromMinutes(-offsetInMinutes);
         }
 
-        public async ValueTask<DateTimeOffset> ToLocalAsync(DateTimeOffset dateTime)
-        {
-            if (_userOffset == null)
-            {
-                var offsetInMinutes = await _jsRuntime.InvokeAsync<int>("getTimezoneOffset");
-                _userOffset = TimeSpan.FromMinutes(-offsetInMinutes);
-            }
-
-            return dateTime.ToOffset(_userOffset.Value);
-        }
+        return dateTime.ToOffset(_userOffset.Value);
     }
 }

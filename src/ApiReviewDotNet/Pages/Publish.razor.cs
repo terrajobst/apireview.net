@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Text.RegularExpressions;
 
 using ApiReviewDotNet.Data;
 using ApiReviewDotNet.Services;
@@ -11,232 +6,231 @@ using ApiReviewDotNet.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 
-namespace ApiReviewDotNet.Pages
+namespace ApiReviewDotNet.Pages;
+
+[Authorize(Roles = ApiReviewConstants.ApiApproverRole)]
+public partial class Publish
 {
-    [Authorize(Roles = ApiReviewConstants.ApiApproverRole)]
-    public partial class Publish
+    [Inject]
+    private RepositoryGroupService RepositoryGroupService { get; set; } = null!;
+
+    [Inject]
+    private NotesService NotesService { get; set; } = null!;
+
+    private CancellationTokenSource _cts = null!;
+    private DateTimeOffset _start;
+    private DateTimeOffset _end;
+    private string? _videoUrl;
+    private string? _videoId;
+
+    private string? SelectedRepositoryGroupName { get; set; }
+
+    private RepositoryGroup SelectedRepositoryGroup => RepositoryGroupService.RepositoryGroups.First(rg => rg.Name == SelectedRepositoryGroupName);
+
+    private DateTimeOffset Date
     {
-        [Inject]
-        private RepositoryGroupService RepositoryGroupService { get; set; }
-
-        [Inject]
-        private NotesService NotesService { get; set; }
-
-        private CancellationTokenSource _cts;
-        private DateTimeOffset _start;
-        private DateTimeOffset _end;
-        private string _videoUrl;
-        private string _videoId;
-
-        private string SelectedRepositoryGroupName { get; set; }
-
-        private RepositoryGroup SelectedRepositoryGroup => RepositoryGroupService.RepositoryGroups.First(rg => rg.Name == SelectedRepositoryGroupName);
-
-        private DateTimeOffset Date
+        get => _start;
+        set
         {
-            get => _start;
-            set
-            {
-                _start = value.Date.Add(_start.TimeOfDay);
-                _end = value.Date.Add(_end.TimeOfDay);
-                UpdateValidation();
-            }
+            _start = value.Date.Add(_start.TimeOfDay);
+            _end = value.Date.Add(_end.TimeOfDay);
+            UpdateValidation();
         }
+    }
 
-        private DateTimeOffset Start
+    private DateTimeOffset Start
+    {
+        get => _start;
+        set
         {
-            get => _start;
-            set
-            {
-                _start = _start.Date.Add(value.TimeOfDay);
-                UpdateValidation();
-            }
+            _start = _start.Date.Add(value.TimeOfDay);
+            UpdateValidation();
         }
+    }
 
-        private DateTimeOffset End
+    private DateTimeOffset End
+    {
+        get => _end;
+        set
         {
-            get => _end;
-            set
-            {
-                _end = _end.Date.Add(value.TimeOfDay);
-                UpdateValidation();
-            }
+            _end = _end.Date.Add(value.TimeOfDay);
+            UpdateValidation();
         }
+    }
 
-        private string VideoUrl
+    private string? VideoUrl
+    {
+        get => _videoUrl;
+        set
         {
-            get => _videoUrl;
-            set
+            _videoUrl = value;
+            if (string.IsNullOrEmpty(_videoUrl))
             {
-                _videoUrl = value;
-                if (string.IsNullOrEmpty(_videoUrl))
+                _videoId = null;
+            }
+            else
+            {
+                var match = Regex.Match(_videoUrl, @"https://www\.youtube\.com/watch\?v=(?<videoId>[^&]+)");
+                if (!match.Success)
                 {
-                    _videoId = null;
+                    VideoUrlValidationMessage = "The YouTube video URL isn't recognized";
                 }
                 else
                 {
-                    var match = Regex.Match(_videoUrl, @"https://www\.youtube\.com/watch\?v=(?<videoId>[^&]+)");
-                    if (!match.Success)
-                    {
-                        VideoUrlValidationMessage = "The YouTube video URL isn't recognized";
-                    }
-                    else
-                    {
-                        _videoId = match.Groups["videoId"].Value;
-                        VideoUrlValidationMessage = null;
-                    }
+                    _videoId = match.Groups["videoId"].Value;
+                    VideoUrlValidationMessage = null;
                 }
             }
         }
+    }
 
-        private string DateValidationMessage { get; set; }
-        private string StartValidationMessage { get; set; }
-        private string EndValidationMessage { get; set; }
-        private string VideoUrlValidationMessage { get; set; }
-        private bool HasValidationErrors => DateValidationMessage != null ||
-                                            StartValidationMessage != null ||
-                                            EndValidationMessage != null ||
-                                            VideoUrlValidationMessage != null;
+    private string? DateValidationMessage { get; set; }
+    private string? StartValidationMessage { get; set; }
+    private string? EndValidationMessage { get; set; }
+    private string? VideoUrlValidationMessage { get; set; }
+    private bool HasValidationErrors => DateValidationMessage is not null ||
+                                        StartValidationMessage is not null ||
+                                        EndValidationMessage is not null ||
+                                        VideoUrlValidationMessage is not null;
 
-        private bool CanSearch => !HasValidationErrors && !IsLoading;
+    private bool CanSearch => !HasValidationErrors && !IsLoading;
 
-        private bool IncludeVideo { get; set; }
+    private bool IncludeVideo { get; set; }
 
-        private IReadOnlyList<ApiReviewVideo> Videos { get; set; } = Array.Empty<ApiReviewVideo>();
-        private ApiReviewVideo SelectedVideo { get; set; }
+    private IReadOnlyList<ApiReviewVideo> Videos { get; set; } = Array.Empty<ApiReviewVideo>();
+    private ApiReviewVideo? SelectedVideo { get; set; }
 
-        private bool IsLoading { get; set; }
-        private ApiReviewSummary Summary { get; set; }
+    private bool IsLoading { get; set; }
+    private ApiReviewSummary? Summary { get; set; }
 
-        private ApiReviewPublicationResult PublicationResult { get; set; }
+    private ApiReviewPublicationResult? PublicationResult { get; set; }
 
-        protected override void OnInitialized()
+    protected override void OnInitialized()
+    {
+        SelectedRepositoryGroupName = RepositoryGroupService.Default.Name;
+        _start = DateTime.Now.Date;
+        _end = _start.AddHours(23).AddMinutes(59);
+        IncludeVideo = true;
+    }
+
+    private void UpdateValidation()
+    {
+        if (Start.Date > DateTimeOffset.Now.Date)
         {
-            SelectedRepositoryGroupName = RepositoryGroupService.Default.Name;
-            _start = DateTime.Now.Date;
-            _end = _start.AddHours(23).AddMinutes(59);
-            IncludeVideo = true;
+            DateValidationMessage = "Date cannot be in the future";
+            StartValidationMessage = null;
         }
-
-        private void UpdateValidation()
+        else
         {
-            if (Start.Date > DateTimeOffset.Now.Date)
+            DateValidationMessage = null;
+
+            if (Start > DateTimeOffset.Now)
             {
-                DateValidationMessage = "Date cannot be in the future";
+                StartValidationMessage = "Start cannot be in the future";
+            }
+            else
+            {
                 StartValidationMessage = null;
             }
-            else
-            {
-                DateValidationMessage = null;
-
-                if (Start > DateTimeOffset.Now)
-                {
-                    StartValidationMessage = "Start cannot be in the future";
-                }
-                else
-                {
-                    StartValidationMessage = null;
-                }
-            }
-
-            if (End <= Start)
-            {
-                EndValidationMessage = "End Time must be after Start Time";
-            }
-            else
-            {
-                EndValidationMessage = null;
-            }
         }
 
-        private async Task FindIssuesAsync()
+        if (End <= Start)
         {
-            IsLoading = true;
-            Videos = Array.Empty<ApiReviewVideo>();
-            SelectedVideo = null;
-            Summary = null;
-            PublicationResult = null;
-            StateHasChanged();
+            EndValidationMessage = "End Time must be after Start Time";
+        }
+        else
+        {
+            EndValidationMessage = null;
+        }
+    }
 
-            if (_cts != null)
-                _cts.Cancel();
+    private async Task FindIssuesAsync()
+    {
+        IsLoading = true;
+        Videos = Array.Empty<ApiReviewVideo>();
+        SelectedVideo = null;
+        Summary = null;
+        PublicationResult = null;
+        StateHasChanged();
 
-            _cts = new CancellationTokenSource();
+        if (_cts is not null)
+            _cts.Cancel();
 
-            var token = _cts.Token;
+        _cts = new CancellationTokenSource();
 
-            IReadOnlyList<ApiReviewVideo> videos = Array.Empty<ApiReviewVideo>();
+        var token = _cts.Token;
 
-            if (IncludeVideo)
+        IReadOnlyList<ApiReviewVideo> videos = Array.Empty<ApiReviewVideo>();
+
+        if (IncludeVideo)
+        {
+            if (string.IsNullOrEmpty(_videoId))
             {
-                if (string.IsNullOrEmpty(_videoId))
-                {
-                    videos = await NotesService.GetVideos(Start, End);
-                }
-                else
-                {
-                    var video = await NotesService.GetVideo(_videoId);
-                    if (video == null)
-                        videos = Array.Empty<ApiReviewVideo>();
-                    else
-                        videos = new[] { video };
-                }
-
-                if (token.IsCancellationRequested)
-                    return;
+                videos = await NotesService.GetVideos(Start, End);
             }
-
-            Videos = videos;
-            SelectedVideo = videos.FirstOrDefault();
-            StateHasChanged();
-
-            ApiReviewSummary summary;
-
-            if (SelectedVideo != null)
-                summary = await NotesService.IssuesForVideo(SelectedRepositoryGroup, SelectedVideo.Id);
             else
-                summary = await NotesService.IssuesForRange(SelectedRepositoryGroup, Start, End);
+            {
+                var video = await NotesService.GetVideo(_videoId);
+                if (video is null)
+                    videos = Array.Empty<ApiReviewVideo>();
+                else
+                    videos = new[] { video };
+            }
 
             if (token.IsCancellationRequested)
                 return;
-
-            Summary = summary;
-            IsLoading = false;
         }
 
-        private async Task SelectVideoAsync(ApiReviewVideo video)
-        {
-            if (video == SelectedVideo)
-                return;
+        Videos = videos;
+        SelectedVideo = videos.FirstOrDefault();
+        StateHasChanged();
 
-            SelectedVideo = video;
-            Summary = null;
-            PublicationResult = null;
-            IsLoading = true;
-            StateHasChanged();
+        ApiReviewSummary? summary;
 
-            if (_cts != null)
-                _cts.Cancel();
+        if (SelectedVideo is not null)
+            summary = await NotesService.IssuesForVideo(SelectedRepositoryGroup, SelectedVideo.Id);
+        else
+            summary = await NotesService.IssuesForRange(SelectedRepositoryGroup, Start, End);
 
-            _cts = new CancellationTokenSource();
+        if (token.IsCancellationRequested)
+            return;
 
-            var token = _cts.Token;
+        Summary = summary;
+        IsLoading = false;
+    }
 
-            var summary = await NotesService.IssuesForVideo(SelectedRepositoryGroup, video.Id);
-            if (token.IsCancellationRequested)
-                return;
+    private async Task SelectVideoAsync(ApiReviewVideo video)
+    {
+        if (video == SelectedVideo)
+            return;
 
-            Summary = summary;
-            IsLoading = false;
-        }
+        SelectedVideo = video;
+        Summary = null;
+        PublicationResult = null;
+        IsLoading = true;
+        StateHasChanged();
 
-        private async Task PublishNotesAsync()
-        {
-            IsLoading = true;
+        if (_cts is not null)
+            _cts.Cancel();
 
-            PublicationResult = await NotesService.PublishNotesAsync(Summary);
+        _cts = new CancellationTokenSource();
 
-            IsLoading = false;
-        }
+        var token = _cts.Token;
+
+        var summary = await NotesService.IssuesForVideo(SelectedRepositoryGroup, video.Id);
+        if (token.IsCancellationRequested)
+            return;
+
+        Summary = summary;
+        IsLoading = false;
+    }
+
+    private async Task PublishNotesAsync()
+    {
+        IsLoading = true;
+
+        PublicationResult = await NotesService.PublishNotesAsync(Summary);
+
+        IsLoading = false;
     }
 }

@@ -1,72 +1,60 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Net.Http;
+﻿using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 
-namespace ApiReviewDotNet.Services.Ospo
+namespace ApiReviewDotNet.Services.Ospo;
+
+public sealed class OspoClient : IDisposable
 {
-    public sealed class OspoClient : IDisposable
+    private readonly HttpClient _httpClient;
+
+    public OspoClient(string token)
     {
-        private readonly HttpClient _httpClient;
+        if (token is null)
+            throw new ArgumentNullException(nameof(token));
 
-        public OspoClient(string token)
+        _httpClient = new HttpClient
         {
-            if (token is null)
-                throw new ArgumentNullException(nameof(token));
+            BaseAddress = new Uri("https://repos.opensource.microsoft.com/api/")
+        };
+        _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        _httpClient.DefaultRequestHeaders.Add("api-version", "2019-10-01");
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("basic", Convert.ToBase64String(Encoding.ASCII.GetBytes($":{token}")));
+    }
 
-            _httpClient = new HttpClient
-            {
-                BaseAddress = new Uri("https://repos.opensource.microsoft.com/api/")
-            };
-            _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            _httpClient.DefaultRequestHeaders.Add("api-version", "2019-10-01");
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("basic", Convert.ToBase64String(Encoding.ASCII.GetBytes($":{token}")));
+    public void Dispose()
+    {
+        _httpClient.Dispose();
+    }
+
+    public async Task<OspoLinkSet> GetAllAsync()
+    {
+        var links = await GetAsJsonAsync<IReadOnlyList<OspoLink>>($"people/links");
+        return links is null ? OspoLinkSet.Empty : new OspoLinkSet(links);
+    }
+
+    private async Task<T?> GetAsJsonAsync<T>(string requestUri)
+    {
+        var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
+        var response = await _httpClient.SendAsync(request);
+
+        if (response.StatusCode == HttpStatusCode.NotFound)
+            return default;
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var message = await response.Content.ReadAsStringAsync();
+            throw new Exception(message) { HResult = (int)response.StatusCode };
         }
 
-        public void Dispose()
+        var responseStream = await response.Content.ReadAsStreamAsync();
+
+        var options = new JsonSerializerOptions
         {
-            _httpClient.Dispose();
-        }
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        };
 
-        public async Task<OspoLinkSet> GetAllAsync()
-        {
-            var links = await GetAsJsonAsync<IReadOnlyList<OspoLink>>($"people/links");
-
-            var linkSet = new OspoLinkSet
-            {
-                Links = links ?? Array.Empty<OspoLink>()
-            };
-
-            linkSet.Initialize();
-            return linkSet;
-        }
-
-        private async Task<T> GetAsJsonAsync<T>(string requestUri)
-        {
-            var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
-            var response = await _httpClient.SendAsync(request);
-
-            if (response.StatusCode == HttpStatusCode.NotFound)
-                return default;
-
-            if (!response.IsSuccessStatusCode)
-            {
-                var message = await response.Content.ReadAsStringAsync();
-                throw new Exception(message) { HResult = (int)response.StatusCode };
-            }
-
-            var responseStream = await response.Content.ReadAsStreamAsync();
-
-            var options = new JsonSerializerOptions
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            };
-
-            return await JsonSerializer.DeserializeAsync<T>(responseStream, options);
-        }
+        return await JsonSerializer.DeserializeAsync<T>(responseStream, options);
     }
 }

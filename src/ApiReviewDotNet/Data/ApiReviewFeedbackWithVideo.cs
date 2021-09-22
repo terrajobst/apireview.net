@@ -1,28 +1,34 @@
-﻿using System;
+﻿namespace ApiReviewDotNet.Data;
 
-namespace ApiReviewDotNet.Data
+public sealed class ApiReviewFeedbackWithVideo
 {
-    public sealed class ApiReviewFeedbackWithVideo
+    public ApiReviewFeedbackWithVideo(ApiReviewFeedback feedback,
+                                      ApiReviewVideo? video,
+                                      TimeSpan videoTimeCode)
     {
-        public ApiReviewFeedback Feedback { get; set; }
-        public ApiReviewVideo Video { get; set; }
-        public TimeSpan VideoTimeCode { get; set; }
+        Feedback = feedback;
+        Video = video;
+        VideoTimeCode = videoTimeCode;
+    }
 
-        public string VideoTimeCodeUrl
+    public ApiReviewFeedback Feedback { get; }
+    public ApiReviewVideo? Video { get; }
+    public TimeSpan VideoTimeCode { get; }
+
+    public string? VideoTimeCodeUrl
+    {
+        get
         {
-            get
-            {
-                if (Video == null)
-                    return null;
+            if (Video is null)
+                return null;
 
-                var timeCodeText = $"{VideoTimeCode.Hours}h{VideoTimeCode.Minutes}m{VideoTimeCode.Seconds}s";
-                return $"https://www.youtube.com/watch?v={Video.Id}&t={timeCodeText}";
-            }
+            var timeCodeText = $"{VideoTimeCode.Hours}h{VideoTimeCode.Minutes}m{VideoTimeCode.Seconds}s";
+            return $"https://www.youtube.com/watch?v={Video.Id}&t={timeCodeText}";
         }
+    }
 
-        public override string ToString()
-        {
-            return $"{Feedback.Issue.Id} - {Feedback.Issue.Title} @ {VideoTimeCode}";
-        }
+    public override string ToString()
+    {
+        return $"{Feedback.Issue.Id} - {Feedback.Issue.Title} @ {VideoTimeCode}";
     }
 }

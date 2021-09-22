@@ -12,8 +12,8 @@
     </div>
     <div class="col col-lg-auto">
         <label for="inputStartDate">Date</label>
-        <input type="date" class="form-control @(DateValidationMessage == null ? "" : "is-invalid")" id="inputStartDate" @bind="Date">
-        @if (DateValidationMessage != null)
+        <input type="date" class="form-control @(DateValidationMessage is null ? "" : "is-invalid")" id="inputStartDate" @bind="Date">
+        @if (DateValidationMessage is not null)
         {
             <div class="invalid-feedback">
                 @DateValidationMessage
@@ -22,8 +22,8 @@
     </div>
     <div class="mt-2 col col-lg-auto mt-lg-0">
         <label for="inputStartDateTime">Start Time</label>
-        <input type="time" placeholder="Start" class="form-control @(StartValidationMessage == null ? "" : "is-invalid")" id="inputStartTime" @bind="Start">
-        @if (StartValidationMessage != null)
+        <input type="time" placeholder="Start" class="form-control @(StartValidationMessage is null ? "" : "is-invalid")" id="inputStartTime" @bind="Start">
+        @if (StartValidationMessage is not null)
         {
             <div class="invalid-feedback">
                 @StartValidationMessage
@@ -32,8 +32,8 @@
     </div>
     <div class="mt-2 col col-lg-auto mt-lg-0">
         <label for="inputEndTime">End Time</label>
-        <input type="time" placeholder="End" class="form-control @(EndValidationMessage == null ? "" : "is-invalid")" id="inputEndTime" @bind="End">
-        @if (EndValidationMessage != null)
+        <input type="time" placeholder="End" class="form-control @(EndValidationMessage is null ? "" : "is-invalid")" id="inputEndTime" @bind="End">
+        @if (EndValidationMessage is not null)
         {
             <div class="invalid-feedback">
                 @EndValidationMessage
@@ -54,8 +54,8 @@
 <div class="form-group row">
     <div class="col">
         <label for="inputVideoUrl">Specific video (optional)</label>
-        <input type="text" placeholder="YouTube video URL" class="form-control @(VideoUrlValidationMessage == null ? "" : "is-invalid")" disabled="@(!IncludeVideo)"  id="inputVideoUrl" @bind="VideoUrl" @bind:event="oninput">
-        @if (VideoUrlValidationMessage != null)
+        <input type="text" placeholder="YouTube video URL" class="form-control @(VideoUrlValidationMessage is null ? "" : "is-invalid")" disabled="@(!IncludeVideo)"  id="inputVideoUrl" @bind="VideoUrl" @bind:event="oninput">
+        @if (VideoUrlValidationMessage is not null)
         {
             <div class="invalid-feedback">
                 @VideoUrlValidationMessage
@@ -87,11 +87,11 @@
     </div>
 }
 
-@if (Summary != null && Summary.Items.Count == 0)
+@if (Summary is not null && Summary.Items.Count == 0)
 {
     <div class="alert alert-secondary">No issues found.</div>
 }
-else if (Summary != null && Summary.Items.Any())
+else if (Summary is not null && Summary.Items.Any())
 {
     <div class="gh-issue-list">
         @foreach (var item in Summary.Items)
@@ -108,7 +108,7 @@ else if (Summary != null && Summary.Items.Any())
                 </span>
                 <div class="gh-details-cell">
                     <strong><a href="@item.Feedback.FeedbackUrl">@item.Feedback.Decision</a></strong>
-                    @if (item.VideoTimeCodeUrl != null)
+                    @if (item.VideoTimeCodeUrl is not null)
                     {
                         <text>|</text>
                         <strong><a href="@item.VideoTimeCodeUrl">Video</a></strong>
@@ -119,7 +119,7 @@ else if (Summary != null && Summary.Items.Any())
         }
     </div>
 
-    @if (PublicationResult == null)
+    @if (PublicationResult is null)
     {
         if (!IsLoading)
         {

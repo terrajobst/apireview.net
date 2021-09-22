@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using ApiReviewDotNet.Data;
 
-using ApiReviewDotNet.Data;
+namespace ApiReviewDotNet.Services.YouTube;
 
-namespace ApiReviewDotNet.Services.YouTube
+public interface IYouTubeManager
 {
-    public interface IYouTubeManager
-    {
-        Task<ApiReviewVideo> GetVideoAsync(string id);
-        Task<ApiReviewVideo> GetVideoAsync(DateTimeOffset start, DateTimeOffset end);
-        Task<IReadOnlyList<ApiReviewVideo>> GetVideosAsync(DateTimeOffset start, DateTimeOffset end);
-    }
+    Task<ApiReviewVideo?> GetVideoAsync(string id);
+    Task<ApiReviewVideo?> GetVideoAsync(DateTimeOffset start, DateTimeOffset end);
+    Task<IReadOnlyList<ApiReviewVideo>> GetVideosAsync(DateTimeOffset start, DateTimeOffset end);
 }

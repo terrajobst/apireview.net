@@ -1,13 +1,19 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace ApiReviewDotNet.Services.Ospo
-{
-    public sealed class OspoLink
-    {
-        [JsonPropertyName("github")]
-        public OspoGitHubInfo GitHubInfo { get; set; }
+namespace ApiReviewDotNet.Services.Ospo;
 
-        [JsonPropertyName("aad")]
-        public OspoMicrosoftInfo MicrosoftInfo { get; set; }
+public sealed class OspoLink
+{
+    public OspoLink(OspoGitHubInfo gitHubInfo,
+                    OspoMicrosoftInfo microsoftInfo)
+    {
+        GitHubInfo = gitHubInfo;
+        MicrosoftInfo = microsoftInfo;
     }
+
+    [JsonPropertyName("github")]
+    public OspoGitHubInfo GitHubInfo { get; }
+
+    [JsonPropertyName("aad")]
+    public OspoMicrosoftInfo MicrosoftInfo { get; }
 }

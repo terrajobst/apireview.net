@@ -1,11 +1,23 @@
-﻿namespace ApiReviewDotNet.Services.Ospo
+﻿namespace ApiReviewDotNet.Services.Ospo;
+
+public sealed class OspoMicrosoftInfo
 {
-    public sealed class OspoMicrosoftInfo
+    public OspoMicrosoftInfo(string alias,
+                             string preferredName,
+                             string userPrincipalName,
+                             string emailAddress,
+                             string id)
     {
-        public string Alias { get; set; }
-        public string PreferredName { get; set; }
-        public string UserPrincipalName { get; set; }
-        public string EmailAddress { get; set; }
-        public string Id { get; set; }
+        Alias = alias;
+        PreferredName = preferredName;
+        UserPrincipalName = userPrincipalName;
+        EmailAddress = emailAddress;
+        Id = id;
     }
+
+    public string Alias { get; }
+    public string PreferredName { get; }
+    public string UserPrincipalName { get; }
+    public string EmailAddress { get; }
+    public string Id { get; }
 }

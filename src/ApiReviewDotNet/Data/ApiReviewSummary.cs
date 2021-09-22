@@ -1,11 +1,19 @@
-﻿using System.Collections.Generic;
+﻿namespace ApiReviewDotNet.Data;
 
-namespace ApiReviewDotNet.Data
+public sealed class ApiReviewSummary
 {
-    public sealed class ApiReviewSummary
+    public ApiReviewSummary(string repositoryGroup,
+                            ApiReviewVideo? video,
+                            IReadOnlyList<ApiReviewFeedbackWithVideo> items)
     {
-        public string RepositoryGroup { get; set; }
-        public ApiReviewVideo Video { get; set; }
-        public IReadOnlyList<ApiReviewFeedbackWithVideo> Items { get; set; }
+        RepositoryGroup = repositoryGroup;
+        Video = video;
+        Items = items;
     }
+
+    public string RepositoryGroup { get; }
+
+    public ApiReviewVideo? Video { get; }
+
+    public IReadOnlyList<ApiReviewFeedbackWithVideo> Items { get; }
 }

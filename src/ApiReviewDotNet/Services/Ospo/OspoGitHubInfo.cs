@@ -1,11 +1,17 @@
-﻿using System.Collections.Generic;
+﻿namespace ApiReviewDotNet.Services.Ospo;
 
-namespace ApiReviewDotNet.Services.Ospo
+public sealed class OspoGitHubInfo
 {
-    public sealed class OspoGitHubInfo
+    public OspoGitHubInfo(int id,
+                          string login,
+                          IReadOnlyList<string> organizations)
     {
-        public int Id { get; set; }
-        public string Login { get; set; }
-        public List<string> Organizations { get; set; }
+        Id = id;
+        Login = login;
+        Organizations = organizations;
     }
+
+    public int Id { get; }
+    public string Login { get; }
+    public IReadOnlyList<string> Organizations { get; }
 }

@@ -12,17 +12,17 @@ jobs:
     - name: Get code
       uses: actions/checkout@v2
 
-    # Publishing
+    - name: Get .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '6.0.100-rc.2.21463.7'
     
     - name: dotnet publish
       run: |
         cd src/ApiReviewDotNet 
-        dotnet publish -c Release -o '../../artifacts/ApiReviewDotNet'
-        cd ../..
+        dotnet publish -c Release --self-contained -r linux-x64 /p:SourceRevisionId=${{ github.sha }}  -o '../../artifacts/ApiReviewDotNet'
 
-    # Deploy to Azure
-
-    - name: webapps-deploy
+    - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
       with:
         app-name: apireviews
