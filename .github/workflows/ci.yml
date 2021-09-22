@@ -12,10 +12,12 @@ jobs:
     - name: Get code
       uses: actions/checkout@v2
 
-    # Build
+    - name: Get .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '6.0.100-rc.2.21463.7'
 
     - name: dotnet build
       run: |
         cd src/ApiReviewDotNet
-        dotnet build -c Release -o '../../artifacts/ApiReviewDotNet'
-        cd ../..
+        dotnet build -c Release
