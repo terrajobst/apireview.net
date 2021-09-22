@@ -61,7 +61,7 @@
             }
         </div>
         <div class="col">
-            @if (_milestones != null)
+            @if (_milestones is not null)
             {
                 <div class="mr-2 float-right">
                     <div class="dropdown">
@@ -114,7 +114,7 @@
                     <div class="gh-details-cell">
                         @issue.DetailText
 
-                        @if (issue.Milestone != null)
+                        @if (issue.Milestone is not null)
                         {
                             <span class="ml-2 mr-1 oi oi-signpost text-muted" aria-hidden="true"></span>@issue.Milestone
                         }

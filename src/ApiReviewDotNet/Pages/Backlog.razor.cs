@@ -71,7 +71,7 @@ public sealed partial class Backlog : IDisposable
         {
             var name = g.ToString();
             var group = RepositoryGroupService.RepositoryGroups.FirstOrDefault(g => string.Equals(g.Name, name, StringComparison.OrdinalIgnoreCase));
-            if (group != null)
+            if (group is not null)
                 _selectedGroup = group;
         }
 
@@ -146,7 +146,7 @@ public sealed partial class Backlog : IDisposable
         if (!SelectedGroup.Repos.Any(r => string.Equals(r.FullName, issue.RepoFull, StringComparison.OrdinalIgnoreCase)))
             return false;
 
-        if (_milestones != null && _milestones.TryGetValue(issue.Milestone, out var isChecked) && !isChecked)
+        if (_milestones is not null && _milestones.TryGetValue(issue.Milestone, out var isChecked) && !isChecked)
             return false;
 
         if (string.IsNullOrEmpty(Filter))
@@ -178,7 +178,7 @@ public sealed partial class Backlog : IDisposable
         foreach (var issue in issues)
             result[issue.Milestone] = true;
 
-        if (existingMilestones != null)
+        if (existingMilestones is not null)
         {
             foreach (var (k, v) in existingMilestones)
             {

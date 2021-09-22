@@ -28,7 +28,7 @@ public sealed class SummaryManager
     public async Task<ApiReviewSummary?> GetSummaryAsync(RepositoryGroup repositoryGroup, string videoId)
     {
         var video = await _youTubeManager.GetVideoAsync(videoId);
-        if (video == null)
+        if (video is null)
             return null;
 
         var start = video.StartDateTime;
@@ -50,11 +50,11 @@ public sealed class SummaryManager
         else
         {
             var result = new List<ApiReviewFeedbackWithVideo>();
-            var reviewStart = video == null
+            var reviewStart = video is null
                                 ? items.OrderBy(i => i.FeedbackDateTime).Select(i => i.FeedbackDateTime).First()
                                 : video.StartDateTime;
 
-            var reviewEnd = video == null
+            var reviewEnd = video is null
                                 ? items.OrderBy(i => i.FeedbackDateTime).Select(i => i.FeedbackDateTime).Last()
                                 : video.EndDateTime + _extraTimeAfterStreamEnded;
 
@@ -62,7 +62,7 @@ public sealed class SummaryManager
             {
                 var current = items[i];
 
-                if (video != null)
+                if (video is not null)
                 {
                     var wasDuringReview = reviewStart <= current.FeedbackDateTime && current.FeedbackDateTime <= reviewEnd;
                     if (!wasDuringReview)
@@ -73,7 +73,7 @@ public sealed class SummaryManager
 
                 TimeSpan timeCode;
 
-                if (previous == null || video == null)
+                if (previous is null || video is null)
                 {
                     timeCode = TimeSpan.Zero;
                 }

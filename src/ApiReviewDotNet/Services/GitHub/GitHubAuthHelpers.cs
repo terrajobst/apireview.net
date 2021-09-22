@@ -33,7 +33,7 @@ public static class GitHubAuthHelpers
 
             var result = await connection.Run(query);
             var exactUser = result.FirstOrDefault(login => string.Equals(login, userName, StringComparison.OrdinalIgnoreCase));
-            return exactUser != null;
+            return exactUser is not null;
         }
         catch
         {

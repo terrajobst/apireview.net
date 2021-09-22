@@ -26,7 +26,7 @@ public sealed class OrgAndRepo
     public static IEnumerable<OrgAndRepo> ParseList(string text)
     {
         var elements = text.Split(',');
-        return elements.Select(Parse).Where(r => r != null).Select(r => r!);
+        return elements.Select(Parse).Where(r => r is not null).Select(r => r!);
     }
 
     public override string ToString()

@@ -19,7 +19,7 @@ public sealed class ApiReviewFeedbackWithVideo
     {
         get
         {
-            if (Video == null)
+            if (Video is null)
                 return null;
 
             var timeCodeText = $"{VideoTimeCode.Hours}h{VideoTimeCode.Minutes}m{VideoTimeCode.Seconds}s";

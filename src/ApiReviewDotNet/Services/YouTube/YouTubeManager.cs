@@ -49,7 +49,7 @@ public class YouTubeManager : IYouTubeManager
         searchRequest.PublishedBefore = end.DateTime;
         searchRequest.MaxResults = 25;
 
-        while (nextPageToken != null)
+        while (nextPageToken is not null)
         {
             searchRequest.PageToken = nextPageToken;
             var response = await searchRequest.ExecuteAsync();
@@ -65,9 +65,9 @@ public class YouTubeManager : IYouTubeManager
             nextPageToken = response.NextPageToken;
         }
 
-        var videos = result.Where(v => v.LiveStreamingDetails != null &&
-                                       v.LiveStreamingDetails.ActualStartTime != null &&
-                                       v.LiveStreamingDetails.ActualEndTime != null)
+        var videos = result.Where(v => v.LiveStreamingDetails is not null &&
+                                       v.LiveStreamingDetails.ActualStartTime is not null &&
+                                       v.LiveStreamingDetails.ActualEndTime is not null)
                            .Select(CreateVideo)
                            .OrderBy(v => v.StartDateTime);
         return videos.ToArray();

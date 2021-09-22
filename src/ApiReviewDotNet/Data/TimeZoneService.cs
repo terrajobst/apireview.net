@@ -15,7 +15,7 @@ public sealed class TimeZoneService
 
     public async ValueTask<DateTimeOffset> ToLocalAsync(DateTimeOffset dateTime)
     {
-        if (_userOffset == null)
+        if (_userOffset is null)
         {
             var offsetInMinutes = await _jsRuntime.InvokeAsync<int>("getTimezoneOffset");
             _userOffset = TimeSpan.FromMinutes(-offsetInMinutes);

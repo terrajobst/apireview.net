@@ -51,7 +51,7 @@ public sealed class AreaOwnerService
         while (true)
         {
             var line = stringReader.ReadLine();
-            if (line == null)
+            if (line is null)
                 yield break;
 
             yield return line;

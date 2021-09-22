@@ -54,7 +54,7 @@ public sealed class GitHubEvenProcessor : IGitHubEventProcessor
 
     private static bool IsRelevant(GitHubEventIssueOrPullRequest? issueOrPullRequest)
     {
-        if (issueOrPullRequest is null || issueOrPullRequest.Labels == null)
+        if (issueOrPullRequest is null || issueOrPullRequest.Labels is null)
             return false;
 
         return IsRelevant(issueOrPullRequest.Labels);
@@ -62,7 +62,7 @@ public sealed class GitHubEvenProcessor : IGitHubEventProcessor
 
     private static bool IsRelevant(IEnumerable<GitHubEventLabel>? labels)
     {
-        if (labels == null)
+        if (labels is null)
             return false;
 
         return labels.Any(IsRelevant);

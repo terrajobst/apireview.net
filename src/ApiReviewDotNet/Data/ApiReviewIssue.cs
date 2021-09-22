@@ -61,7 +61,7 @@ public sealed class ApiReviewIssue : IComparable<ApiReviewIssue>
 
     public IReadOnlyList<ApiReviewLabel> Labels { get; }
 
-    public bool IsBlocking => Labels != null && Labels.Any(l => string.Equals(l.Name, ApiReviewConstants.Blocking, StringComparison.OrdinalIgnoreCase));
+    public bool IsBlocking => Labels is not null && Labels.Any(l => string.Equals(l.Name, ApiReviewConstants.Blocking, StringComparison.OrdinalIgnoreCase));
 
     public IReadOnlyList<ApiReviewer> Reviewers { get; }
 

@@ -33,7 +33,7 @@ public sealed class GitHubManager : IGitHubManager
 
         static (string? VideoLink, string? Markdown) ParseFeedback(string? body)
         {
-            if (body == null)
+            if (body is null)
                 return (null, null);
 
             const string prefix = "[Video](";
@@ -79,7 +79,7 @@ public sealed class GitHubManager : IGitHubManager
                 var events = await github.Issue.Events.GetAllForIssue(owner, repo, issue.Number);
                 var reviewOutcome = ApiReviewOutcome.Get(events, start, end);
 
-                if (reviewOutcome != null)
+                if (reviewOutcome is not null)
                 {
                     var title = GitHubIssueHelpers.FixTitle(issue.Title);
                     var feedbackDateTime = reviewOutcome.DecisionTime;
@@ -171,7 +171,7 @@ public sealed class GitHubManager : IGitHubManager
 
         static void Add(List<ApiReviewer> target, OspoLinkSet linkSet, string userName)
         {
-            if (userName == null)
+            if (userName is null)
                 return;
 
             if (target.Any(r => string.Equals(r.GitHubUserName, userName, StringComparison.OrdinalIgnoreCase)))
@@ -258,7 +258,7 @@ public sealed class GitHubManager : IGitHubManager
                         break;
                 }
 
-            return readyEvent == null
+            return readyEvent is null
                     ? null
                     : new ApiReadyEvent(readyEvent.Actor.Login, readyEvent.CreatedAt);
         }
@@ -299,15 +299,15 @@ public sealed class GitHubManager : IGitHubManager
                         rejection = null;
                         break;
                     case "closed":
-                        if (readyEvent != null)
+                        if (readyEvent is not null)
                             rejection = new ApiReviewOutcome(ApiReviewDecision.Rejected, e.Actor.Login, e.CreatedAt);
                         break;
                 }
 
-            if (rejection != null)
+            if (rejection is not null)
                 current = rejection;
 
-            if (current != null)
+            if (current is not null)
             {
                 var inInterval = start <= current.DecisionTime && current.DecisionTime <= end;
                 if (!inInterval)

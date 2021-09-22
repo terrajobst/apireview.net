@@ -88,10 +88,10 @@ public partial class Publish
     private string? StartValidationMessage { get; set; }
     private string? EndValidationMessage { get; set; }
     private string? VideoUrlValidationMessage { get; set; }
-    private bool HasValidationErrors => DateValidationMessage != null ||
-                                        StartValidationMessage != null ||
-                                        EndValidationMessage != null ||
-                                        VideoUrlValidationMessage != null;
+    private bool HasValidationErrors => DateValidationMessage is not null ||
+                                        StartValidationMessage is not null ||
+                                        EndValidationMessage is not null ||
+                                        VideoUrlValidationMessage is not null;
 
     private bool CanSearch => !HasValidationErrors && !IsLoading;
 
@@ -153,7 +153,7 @@ public partial class Publish
         PublicationResult = null;
         StateHasChanged();
 
-        if (_cts != null)
+        if (_cts is not null)
             _cts.Cancel();
 
         _cts = new CancellationTokenSource();
@@ -171,7 +171,7 @@ public partial class Publish
             else
             {
                 var video = await NotesService.GetVideo(_videoId);
-                if (video == null)
+                if (video is null)
                     videos = Array.Empty<ApiReviewVideo>();
                 else
                     videos = new[] { video };
@@ -187,7 +187,7 @@ public partial class Publish
 
         ApiReviewSummary? summary;
 
-        if (SelectedVideo != null)
+        if (SelectedVideo is not null)
             summary = await NotesService.IssuesForVideo(SelectedRepositoryGroup, SelectedVideo.Id);
         else
             summary = await NotesService.IssuesForRange(SelectedRepositoryGroup, Start, End);
@@ -210,7 +210,7 @@ public partial class Publish
         IsLoading = true;
         StateHasChanged();
 
-        if (_cts != null)
+        if (_cts is not null)
             _cts.Cancel();
 
         _cts = new CancellationTokenSource();

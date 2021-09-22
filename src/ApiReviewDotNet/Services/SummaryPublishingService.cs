@@ -94,7 +94,7 @@ public sealed class SummaryPublishingService
 
     private async Task UpdateVideoDescriptionAsync(ApiReviewSummary summary)
     {
-        if (summary.Video == null)
+        if (summary.Video is null)
             return;
 
         using var descriptionBuilder = new StringWriter();
@@ -129,7 +129,7 @@ public sealed class SummaryPublishingService
         {
             var feedback = item.Feedback;
 
-            if (feedback.VideoUrl == null && feedback.FeedbackId != null && item.VideoTimeCodeUrl != null)
+            if (feedback.VideoUrl is null && feedback.FeedbackId is not null && item.VideoTimeCodeUrl is not null)
             {
                 var updatedMarkdown = $"[Video]({item.VideoTimeCodeUrl})\n\n{feedback.FeedbackMarkdown}";
                 var commentId = Convert.ToInt32(feedback.FeedbackId);
@@ -152,7 +152,7 @@ public sealed class SummaryPublishingService
         {
             var feedback = item.Feedback;
 
-            if (feedback.FeedbackId != null)
+            if (feedback.FeedbackId is not null)
             {
                 var status = feedback.Decision.ToString();
                 var updatedMarkdown = $"[Video]({status})\n\n{feedback.FeedbackMarkdown}";
@@ -179,7 +179,7 @@ public sealed class SummaryPublishingService
         var recursiveTreeResponse = await github.Git.Tree.GetRecursive(owner, repo, latestCommit.Tree.Sha);
         var file = recursiveTreeResponse.Tree.SingleOrDefault(t => t.Path == path);
 
-        if (file == null)
+        if (file is null)
         {
             var newTreeItem = new NewTreeItem
             {
@@ -218,13 +218,13 @@ public sealed class SummaryPublishingService
             noteWriter.WriteLine();
             noteWriter.Write($"**{feedback.Decision}** | [#{feedback.Issue.Repo}/{feedback.Issue.Id}]({feedback.FeedbackUrl})");
 
-            if (item.VideoTimeCodeUrl != null)
+            if (item.VideoTimeCodeUrl is not null)
                 noteWriter.Write($" | [Video]({item.VideoTimeCodeUrl})");
 
             noteWriter.WriteLine();
             noteWriter.WriteLine();
 
-            if (feedback.FeedbackMarkdown != null)
+            if (feedback.FeedbackMarkdown is not null)
             {
                 noteWriter.Write(feedback.FeedbackMarkdown);
                 noteWriter.WriteLine();
