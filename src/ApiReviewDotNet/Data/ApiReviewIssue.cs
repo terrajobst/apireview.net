@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-
-namespace ApiReviewDotNet.Data
+﻿namespace ApiReviewDotNet.Data
 {
     public sealed class ApiReviewIssue : IComparable<ApiReviewIssue>
     {

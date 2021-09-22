@@ -1,10 +1,4 @@
-﻿using System.Threading.Tasks;
-
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
-
-namespace ApiReviewDotNet.Services.Ospo
+﻿namespace ApiReviewDotNet.Services.Ospo
 {
     public sealed class OspoService
     {

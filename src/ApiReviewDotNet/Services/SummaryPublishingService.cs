@@ -1,18 +1,8 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-
-using ApiReviewDotNet.Data;
+﻿using ApiReviewDotNet.Data;
 using ApiReviewDotNet.Services.GitHub;
 using ApiReviewDotNet.Services.YouTube;
 
 using Markdig;
-
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 
 using Octokit;
 

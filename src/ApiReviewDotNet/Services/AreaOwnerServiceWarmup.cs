@@ -1,10 +1,4 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-
-using Microsoft.Extensions.Hosting;
-
-namespace ApiReviewDotNet.Services
+﻿namespace ApiReviewDotNet.Services
 {
     public sealed class AreaOwnerServiceWarmup : IHostedService, IDisposable
     {

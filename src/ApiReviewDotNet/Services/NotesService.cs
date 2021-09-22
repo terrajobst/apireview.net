@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-using ApiReviewDotNet.Data;
+﻿using ApiReviewDotNet.Data;
 using ApiReviewDotNet.Services.YouTube;
-
-using Microsoft.Extensions.Logging;
 
 namespace ApiReviewDotNet.Services
 {

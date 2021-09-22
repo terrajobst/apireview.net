@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ApiReviewDotNet.Data
+﻿namespace ApiReviewDotNet.Data
 {
     public sealed class ApiReviewFeedback
     {

@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace ApiReviewDotNet.Data
+﻿namespace ApiReviewDotNet.Data
 {
     public sealed class ApiReviewSummary
     {

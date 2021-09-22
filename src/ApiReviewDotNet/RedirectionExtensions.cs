@@ -1,8 +1,4 @@
-﻿using System;
-
-using Microsoft.ApplicationInsights.AspNetCore.Extensions;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.ApplicationInsights.AspNetCore.Extensions;
 using Microsoft.Net.Http.Headers;
 
 namespace ApiReviewDotNet

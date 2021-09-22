@@ -1,10 +1,4 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-
-using Microsoft.Extensions.Hosting;
-
-namespace ApiReviewDotNet.Services.Ospo
+﻿namespace ApiReviewDotNet.Services.Ospo
 {
     public sealed class OspoServiceWarmup : IHostedService, IDisposable
     {

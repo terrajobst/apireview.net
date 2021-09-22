@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-
-namespace ApiReviewDotNet.Services
+﻿namespace ApiReviewDotNet.Services
 {
     public sealed class OrgAndRepo
     {

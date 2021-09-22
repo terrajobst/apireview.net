@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-using Microsoft.Extensions.Configuration;
-
-namespace ApiReviewDotNet.Services
+﻿namespace ApiReviewDotNet.Services
 {
     public sealed class RepositoryGroupService
     {

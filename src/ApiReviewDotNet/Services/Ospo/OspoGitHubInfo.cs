@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace ApiReviewDotNet.Services.Ospo
+﻿namespace ApiReviewDotNet.Services.Ospo
 {
     public sealed class OspoGitHubInfo
     {
