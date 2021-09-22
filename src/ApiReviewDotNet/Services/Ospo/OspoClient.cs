@@ -31,17 +31,10 @@ namespace ApiReviewDotNet.Services.Ospo
         public async Task<OspoLinkSet> GetAllAsync()
         {
             var links = await GetAsJsonAsync<IReadOnlyList<OspoLink>>($"people/links");
-
-            var linkSet = new OspoLinkSet
-            {
-                Links = links ?? Array.Empty<OspoLink>()
-            };
-
-            linkSet.Initialize();
-            return linkSet;
+            return links is null ? OspoLinkSet.Empty : new OspoLinkSet(links);
         }
 
-        private async Task<T> GetAsJsonAsync<T>(string requestUri)
+        private async Task<T?> GetAsJsonAsync<T>(string requestUri)
         {
             var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
             var response = await _httpClient.SendAsync(request);

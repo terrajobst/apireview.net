@@ -12,18 +12,18 @@ namespace ApiReviewDotNet.Pages
     public partial class Publish
     {
         [Inject]
-        private RepositoryGroupService RepositoryGroupService { get; set; }
+        private RepositoryGroupService RepositoryGroupService { get; set; } = null!;
 
         [Inject]
-        private NotesService NotesService { get; set; }
+        private NotesService NotesService { get; set; } = null!;
 
-        private CancellationTokenSource _cts;
+        private CancellationTokenSource _cts = null!;
         private DateTimeOffset _start;
         private DateTimeOffset _end;
-        private string _videoUrl;
-        private string _videoId;
+        private string? _videoUrl;
+        private string? _videoId;
 
-        private string SelectedRepositoryGroupName { get; set; }
+        private string? SelectedRepositoryGroupName { get; set; }
 
         private RepositoryGroup SelectedRepositoryGroup => RepositoryGroupService.RepositoryGroups.First(rg => rg.Name == SelectedRepositoryGroupName);
 
@@ -58,7 +58,7 @@ namespace ApiReviewDotNet.Pages
             }
         }
 
-        private string VideoUrl
+        private string? VideoUrl
         {
             get => _videoUrl;
             set
@@ -84,10 +84,10 @@ namespace ApiReviewDotNet.Pages
             }
         }
 
-        private string DateValidationMessage { get; set; }
-        private string StartValidationMessage { get; set; }
-        private string EndValidationMessage { get; set; }
-        private string VideoUrlValidationMessage { get; set; }
+        private string? DateValidationMessage { get; set; }
+        private string? StartValidationMessage { get; set; }
+        private string? EndValidationMessage { get; set; }
+        private string? VideoUrlValidationMessage { get; set; }
         private bool HasValidationErrors => DateValidationMessage != null ||
                                             StartValidationMessage != null ||
                                             EndValidationMessage != null ||
@@ -98,12 +98,12 @@ namespace ApiReviewDotNet.Pages
         private bool IncludeVideo { get; set; }
 
         private IReadOnlyList<ApiReviewVideo> Videos { get; set; } = Array.Empty<ApiReviewVideo>();
-        private ApiReviewVideo SelectedVideo { get; set; }
+        private ApiReviewVideo? SelectedVideo { get; set; }
 
         private bool IsLoading { get; set; }
-        private ApiReviewSummary Summary { get; set; }
+        private ApiReviewSummary? Summary { get; set; }
 
-        private ApiReviewPublicationResult PublicationResult { get; set; }
+        private ApiReviewPublicationResult? PublicationResult { get; set; }
 
         protected override void OnInitialized()
         {
@@ -185,7 +185,7 @@ namespace ApiReviewDotNet.Pages
             SelectedVideo = videos.FirstOrDefault();
             StateHasChanged();
 
-            ApiReviewSummary summary;
+            ApiReviewSummary? summary;
 
             if (SelectedVideo != null)
                 summary = await NotesService.IssuesForVideo(SelectedRepositoryGroup, SelectedVideo.Id);

@@ -2,7 +2,7 @@
 {
     public sealed class AreaOwnerService
     {
-        private Dictionary<string, string[]> _ownerByArea = new Dictionary<string, string[]>();
+        private Dictionary<string, string[]> _ownerByArea = new();
 
         public IReadOnlyList<string> GetOwners(string area)
         {

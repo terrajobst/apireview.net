@@ -31,7 +31,7 @@ namespace ApiReviewDotNet.Services.GitHub
                 return isClosed || isReadyForReview || isApproved || needsWork;
             }
 
-            static (string VideoLink, string Markdown) ParseFeedback(string body)
+            static (string? VideoLink, string? Markdown) ParseFeedback(string? body)
             {
                 if (body == null)
                     return (null, null);
@@ -100,17 +100,16 @@ namespace ApiReviewDotNet.Services.GitHub
 
                         var apiReviewIssue = CreateIssue(owner, repo, issue, events, end);
 
-                        var feedback = new ApiReviewFeedback
-                        {
-                            Decision = decision,
-                            Issue = apiReviewIssue,
-                            FeedbackId = feedbackId,
-                            FeedbackAuthor = feedbackAuthor,
-                            FeedbackDateTime = feedbackDateTime,
-                            FeedbackUrl = feedbackUrl,
-                            FeedbackMarkdown = feedbackMarkdown,
-                            VideoUrl = videoUrl
-                        };
+                        var feedback = new ApiReviewFeedback(
+                            decision: decision,
+                            issue: apiReviewIssue,
+                            feedbackId: feedbackId,
+                            feedbackAuthor: feedbackAuthor,
+                            feedbackDateTime: feedbackDateTime,
+                            feedbackUrl: feedbackUrl,
+                            feedbackMarkdown: feedbackMarkdown,
+                            videoUrl: videoUrl
+                        );
                         results.Add(feedback);
                     }
                 }
@@ -152,16 +151,20 @@ namespace ApiReviewDotNet.Services.GitHub
             return result;
         }
 
-        private ApiReviewer[] GetReviewers(ApiReviewIssue apiReviewIssue)
+        private ApiReviewer[] GetReviewers(string author,
+                                           IReadOnlyList<string> assignees,
+                                           string? markedReadyForReviewBy,
+                                           IReadOnlyList<string> areaOwners)
         {
             var linkSet = _ospoService.LinkSet;
             var result = new List<ApiReviewer>();
 
-            Add(result, linkSet, apiReviewIssue.Author);
-            foreach (var assignee in apiReviewIssue.Assignees ?? Array.Empty<string>())
+            Add(result, linkSet, author);
+            foreach (var assignee in assignees ?? Array.Empty<string>())
                 Add(result, linkSet, assignee);
-            Add(result, linkSet, apiReviewIssue.MarkedReadyForReviewBy);
-            foreach (var areaOwner in apiReviewIssue.AreaOwners ?? Array.Empty<string>())
+            if (markedReadyForReviewBy is not null)
+                Add(result, linkSet, markedReadyForReviewBy);
+            foreach (var areaOwner in areaOwners ?? Array.Empty<string>())
                 Add(result, linkSet, areaOwner);
 
             return result.ToArray();
@@ -176,12 +179,11 @@ namespace ApiReviewDotNet.Services.GitHub
 
                 if (linkSet.LinkByLogin.TryGetValue(userName, out var link))
                 {
-                    var reviewer = new ApiReviewer
-                    {
-                        GitHubUserName = userName,
-                        Name = link.MicrosoftInfo.PreferredName,
-                        Email = link.MicrosoftInfo.EmailAddress
-                    };
+                    var reviewer = new ApiReviewer(
+                        gitHubUserName: userName,
+                        name: link.MicrosoftInfo.PreferredName,
+                        email: link.MicrosoftInfo.EmailAddress
+                    );
                     target.Add(reviewer);
                 }
             }
@@ -191,23 +193,30 @@ namespace ApiReviewDotNet.Services.GitHub
         {
             var readyEvent = ApiReadyEvent.Get(events, issue.CreatedAt, end);
 
-            var result = new ApiReviewIssue
-            {
-                Owner = owner,
-                Repo = repo,
-                Author = issue.User.Login,
-                Assignees = issue.Assignees.Select(a => a.Login).ToArray(),
-                MarkedReadyForReviewBy = readyEvent?.DecisionMaker,
-                AreaOwners = GetAreaOwners(issue.Labels.Select(l => l.Name)),
-                CreatedAt = issue.CreatedAt,
-                Labels = issue.Labels.Select(l => new ApiReviewLabel { Name = l.Name, Color = l.Color, Description = l.Description }).ToArray(),
-                Milestone = issue.Milestone?.Title ?? ApiReviewConstants.NoMilestone,
-                Title = GitHubIssueHelpers.FixTitle(issue.Title),
-                Url = issue.HtmlUrl,
-                Id = issue.Number
-            };
+            var title = GitHubIssueHelpers.FixTitle(issue.Title);
+            var author = issue.User.Login;
+            var assignees = issue.Assignees.Select(a => a.Login).ToArray();
+            var markedReadyForReviewBy = readyEvent?.DecisionMaker;
+            var areaOwners = GetAreaOwners(issue.Labels.Select(l => l.Name));
+            var milestone = issue.Milestone?.Title ?? ApiReviewConstants.NoMilestone;
+            var labels = issue.Labels.Select(l => new ApiReviewLabel(l.Name, l.Color, l.Description)).ToArray();
+            var reviewers = GetReviewers(author, assignees, markedReadyForReviewBy, areaOwners);
 
-            result.Reviewers = GetReviewers(result);
+            var result = new ApiReviewIssue(
+                owner,
+                repo,
+                issue.Number,
+                title,
+                author,
+                assignees,
+                markedReadyForReviewBy,
+                areaOwners,
+                issue.CreatedAt,
+                issue.HtmlUrl,
+                milestone,
+                labels,
+                reviewers
+            );
 
             return result;
         }
@@ -236,7 +245,7 @@ namespace ApiReviewDotNet.Services.GitHub
             public string DecisionMaker { get; }
             public DateTimeOffset CreatedAt { get; }
 
-            public static ApiReadyEvent Get(IEnumerable<EventInfo> events, DateTimeOffset start, DateTimeOffset end)
+            public static ApiReadyEvent? Get(IEnumerable<EventInfo> events, DateTimeOffset start, DateTimeOffset end)
             {
                 var readyEvent = default(EventInfo);
 
@@ -264,7 +273,7 @@ namespace ApiReviewDotNet.Services.GitHub
                 DecisionTime = decisionTime;
             }
 
-            public static ApiReviewOutcome Get(IEnumerable<EventInfo> events, DateTimeOffset start, DateTimeOffset end)
+            public static ApiReviewOutcome? Get(IEnumerable<EventInfo> events, DateTimeOffset start, DateTimeOffset end)
             {
                 var readyEvent = default(EventInfo);
                 var current = default(ApiReviewOutcome);

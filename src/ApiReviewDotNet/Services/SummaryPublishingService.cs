@@ -167,7 +167,7 @@ namespace ApiReviewDotNet.Services
             var (owner, repo) = group.NotesRepo;
             var branch = ApiReviewConstants.ApiReviewsBranch;
             var head = $"heads/{branch}";
-            var date = summary.Items.FirstOrDefault().Feedback.FeedbackDateTime.DateTime;
+            var date = summary.Items.First().Feedback.FeedbackDateTime.DateTime;
             var markdown = $"# API Review {date:d}\n\n{GetMarkdown(summary)}";
             var path = $"{date.Year}/{date.Month:00}-{date.Day:00}-{group.NotesSuffix}/README.md";
             var commitMessage = $"Add review notes for {date:d}";

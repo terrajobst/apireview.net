@@ -12,7 +12,7 @@
         public string RepoName { get; }
         public string FullName => $"{OrgName}/{RepoName}";
 
-        public static OrgAndRepo Parse(string text)
+        public static OrgAndRepo? Parse(string text)
         {
             var parts = text.Split('/');
             if (parts.Length != 2)
@@ -26,7 +26,7 @@
         public static IEnumerable<OrgAndRepo> ParseList(string text)
         {
             var elements = text.Split(',');
-            return elements.Select(Parse).Where(r => r != null);
+            return elements.Select(Parse).Where(r => r != null).Select(r => r!);
         }
 
         public override string ToString()

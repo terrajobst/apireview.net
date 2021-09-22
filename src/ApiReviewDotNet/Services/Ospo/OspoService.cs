@@ -20,6 +20,6 @@
             LinkSet = await client.GetAllAsync();
         }
 
-        public OspoLinkSet LinkSet { get; private set; } = new OspoLinkSet();
+        public OspoLinkSet LinkSet { get; private set; } = OspoLinkSet.Empty;
     }
 }

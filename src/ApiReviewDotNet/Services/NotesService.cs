@@ -26,7 +26,7 @@ namespace ApiReviewDotNet.Services
             return _youTubeManager.GetVideosAsync(start, end);
         }
 
-        public Task<ApiReviewVideo> GetVideo(string videoId)
+        public Task<ApiReviewVideo?> GetVideo(string videoId)
         {
             return _youTubeManager.GetVideoAsync(videoId);
         }
@@ -36,12 +36,12 @@ namespace ApiReviewDotNet.Services
             return _summaryManager.GetSummaryAsync(repositoryGroup, start, end);
         }
 
-        public Task<ApiReviewSummary> IssuesForVideo(RepositoryGroup repositoryGroup, string videoId)
+        public Task<ApiReviewSummary?> IssuesForVideo(RepositoryGroup repositoryGroup, string videoId)
         {
             return _summaryManager.GetSummaryAsync(repositoryGroup, videoId);
         }
 
-        public async Task<ApiReviewPublicationResult> PublishNotesAsync(ApiReviewSummary summary)
+        public async Task<ApiReviewPublicationResult?> PublishNotesAsync(ApiReviewSummary? summary)
         {
             if (summary?.Items?.Any() != true)
                 return null;

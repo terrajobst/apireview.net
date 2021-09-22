@@ -8,6 +8,8 @@ using ApiReviewDotNet.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+#nullable disable // We're going to remove this
+
 namespace ApiReviewDotNet.Controllers
 {
     [ApiController]
@@ -15,7 +17,7 @@ namespace ApiReviewDotNet.Controllers
     [AllowAnonymous]
     public sealed class GitHubWebHookController : Controller
     {
-        private static readonly HashSet<string> _relevantActions = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        private static readonly HashSet<string> _relevantActions = new(StringComparer.OrdinalIgnoreCase)
         {
             "opened",
             "edited",
@@ -31,7 +33,7 @@ namespace ApiReviewDotNet.Controllers
             "demilestoned"
         };
 
-        private static readonly HashSet<string> _relevantLabels = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        private static readonly HashSet<string> _relevantLabels = new(StringComparer.OrdinalIgnoreCase)
         {
             ApiReviewConstants.ApiReadyForReview,
             ApiReviewConstants.ApiApproved,

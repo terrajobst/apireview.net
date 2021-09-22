@@ -26,6 +26,6 @@ namespace ApiReviewDotNet.Services
 
         public IReadOnlyList<ApiReviewIssue> Issues { get; private set; } = Array.Empty<ApiReviewIssue>();
 
-        public event EventHandler Changed;
+        public event EventHandler? Changed;
     }
 }

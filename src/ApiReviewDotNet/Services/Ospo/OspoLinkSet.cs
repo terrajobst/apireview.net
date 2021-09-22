@@ -1,21 +1,17 @@
-﻿using System.Text.Json.Serialization;
-
-namespace ApiReviewDotNet.Services.Ospo
+﻿namespace ApiReviewDotNet.Services.Ospo
 {
     public sealed class OspoLinkSet
     {
-        public OspoLinkSet()
-        {
-        }
+        public static OspoLinkSet Empty { get; } = new OspoLinkSet(Array.Empty<OspoLink>());
 
-        public void Initialize()
+        public OspoLinkSet(IEnumerable<OspoLink> links)
         {
+            Links = links.ToArray();
             LinkByLogin = Links.ToDictionary(l => l.GitHubInfo.Login);
         }
 
-        public IReadOnlyList<OspoLink> Links { get; set; } = new List<OspoLink>();
+        public IReadOnlyList<OspoLink> Links { get; }
 
-        [JsonIgnore]
-        public IReadOnlyDictionary<string, OspoLink> LinkByLogin { get; set; } = new Dictionary<string, OspoLink>();
+        public IReadOnlyDictionary<string, OspoLink> LinkByLogin { get; }
     }
 }

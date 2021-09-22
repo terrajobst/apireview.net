@@ -16,10 +16,10 @@ namespace ApiReviewDotNet.Pages
         private DateTimeOffset? Today { get; set; }
         private DateTimeOffset? CurrentDate { get; set; }
 
-        private CalendarCell[] Cells { get; set; }
+        private CalendarCell[] Cells { get; set; } = Array.Empty<CalendarCell>();
 
         [Inject]
-        public TimeZoneService TimeZoneService { get; set; }
+        public TimeZoneService TimeZoneService { get; set; } = null!;
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -84,13 +84,12 @@ namespace ApiReviewDotNet.Pages
                 var e = occurence.Source as CalendarEvent;
                 if (e is not null)
                 {
-                    yield return new CalendarEntry
-                    {
-                        Title = e.Summary,
-                        Description = e.Description,
-                        Start = occurence.Period.StartTime.AsDateTimeOffset.ToOffset(start.Offset),
-                        End = occurence.Period.EndTime.AsDateTimeOffset.ToOffset(start.Offset),
-                    };
+                    yield return new CalendarEntry(
+                        title: e.Summary,
+                        description: e.Description,
+                        start: occurence.Period.StartTime.AsDateTimeOffset.ToOffset(start.Offset),
+                        end: occurence.Period.EndTime.AsDateTimeOffset.ToOffset(start.Offset)
+                    );
                 }
             }
         }
@@ -103,14 +102,20 @@ namespace ApiReviewDotNet.Pages
 
         private async Task PreviousMonthAsync()
         {
-            CurrentDate = CurrentDate.Value.AddMonths(-1);
-            await UpdateCellsAsync();
+            if (CurrentDate is not null)
+            {
+                CurrentDate = CurrentDate.Value.AddMonths(-1);
+                await UpdateCellsAsync();
+            }
         }
 
         private async Task NextMonthAsync()
         {
-            CurrentDate = CurrentDate.Value.AddMonths(1);
-            await UpdateCellsAsync();
+            if (CurrentDate is not null)
+            {
+                CurrentDate = CurrentDate.Value.AddMonths(1);
+                await UpdateCellsAsync();
+            }
         }
 
         private sealed class CalendarCell
@@ -127,10 +132,21 @@ namespace ApiReviewDotNet.Pages
 
         private sealed class CalendarEntry
         {
-            public string Title { get; set; }
-            public string Description { get; set; }
-            public DateTimeOffset Start { get; set; }
-            public DateTimeOffset End { get; set; }
+            public CalendarEntry(string title,
+                                 string description,
+                                 DateTimeOffset start,
+                                 DateTimeOffset end)
+            {
+                Title = title;
+                Description = description;
+                Start = start;
+                End = end;
+            }
+
+            public string Title { get; }
+            public string Description { get; }
+            public DateTimeOffset Start { get; }
+            public DateTimeOffset End { get; }
         }
     }
 }

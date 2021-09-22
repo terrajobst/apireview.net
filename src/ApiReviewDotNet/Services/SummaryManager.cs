@@ -4,7 +4,7 @@ using ApiReviewDotNet.Services.YouTube;
 
 namespace ApiReviewDotNet.Services
 {
-    public class SummaryManager
+    public sealed class SummaryManager
     {
         // We sometimes post the comments from the last issue slightly after the stream
         // has ended. To account for that, we'll give us 15 minutes extra.
@@ -25,7 +25,7 @@ namespace ApiReviewDotNet.Services
             return CreateSummary(repositoryGroup, null, items);
         }
 
-        public async Task<ApiReviewSummary> GetSummaryAsync(RepositoryGroup repositoryGroup, string videoId)
+        public async Task<ApiReviewSummary?> GetSummaryAsync(RepositoryGroup repositoryGroup, string videoId)
         {
             var video = await _youTubeManager.GetVideoAsync(videoId);
             if (video == null)
@@ -37,16 +37,15 @@ namespace ApiReviewDotNet.Services
             return CreateSummary(repositoryGroup, video, items);
         }
 
-        private static ApiReviewSummary CreateSummary(RepositoryGroup repositoryGroup, ApiReviewVideo video, IReadOnlyList<ApiReviewFeedback> items)
+        private static ApiReviewSummary CreateSummary(RepositoryGroup repositoryGroup, ApiReviewVideo? video, IReadOnlyList<ApiReviewFeedback> items)
         {
             if (items.Count == 0)
             {
-                return new ApiReviewSummary
-                {
-                    RepositoryGroup = repositoryGroup.Name,
-                    Video = video,
-                    Items = Array.Empty<ApiReviewFeedbackWithVideo>()
-                };
+                return new ApiReviewSummary(
+                    repositoryGroup: repositoryGroup.Name,
+                    video: video,
+                    items: Array.Empty<ApiReviewFeedbackWithVideo>()
+                );
             }
             else
             {
@@ -86,23 +85,20 @@ namespace ApiReviewDotNet.Services
                             timeCode = result[i - 1].VideoTimeCode;
                     }
 
-
-                    var feedbackWithVideo = new ApiReviewFeedbackWithVideo
-                    {
-                        Feedback = current,
-                        Video = video,
-                        VideoTimeCode = timeCode
-                    };
+                    var feedbackWithVideo = new ApiReviewFeedbackWithVideo(                   
+                        feedback: current,
+                        video: video,
+                        videoTimeCode: timeCode
+                    );
 
                     result.Add(feedbackWithVideo);
                 }
 
-                return new ApiReviewSummary
-                {
-                    RepositoryGroup = repositoryGroup.Name,
-                    Video = video,
-                    Items = result
-                };
+                return new ApiReviewSummary(
+                    repositoryGroup: repositoryGroup.Name,
+                    video: video,
+                    items: result
+                );
             }
         }
     }

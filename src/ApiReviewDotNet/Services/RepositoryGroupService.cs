@@ -7,19 +7,19 @@
             RepositoryGroups = RepositoryGroup.Get(configuration.GetSection("RepositoryGroups"));
             Repositories = RepositoryGroups.SelectMany(rg => rg.Repos.Select(r => r.FullName))
                                            .Distinct(StringComparer.OrdinalIgnoreCase)
-                                           .Select(OrgAndRepo.Parse)
+                                           .Select(r => OrgAndRepo.Parse(r)!)
                                            .ToArray();
             ApproverTeamSlugs = RepositoryGroups.Select(rg => rg.ApproverTeamSlug)
                                                 .Distinct()
                                                 .ToArray();
         }
 
-        public RepositoryGroup Get(string name)
+        public RepositoryGroup? Get(string name)
         {
             return RepositoryGroups.FirstOrDefault(rg => string.Equals(rg.Name, name, StringComparison.OrdinalIgnoreCase));
         }
 
-        public RepositoryGroup Default => RepositoryGroups.First(r => r.IsDefault);
+        public RepositoryGroup Default => RepositoryGroups.Single(r => r.IsDefault);
         public IReadOnlyList<RepositoryGroup> RepositoryGroups { get; }
         public IReadOnlyList<OrgAndRepo> Repositories { get; }
         public IReadOnlyList<string> ApproverTeamSlugs { get; }

@@ -2,10 +2,16 @@
 {
     public sealed class ApiReviewPublicationResult
     {
-        public static ApiReviewPublicationResult Failed() => new ApiReviewPublicationResult { Success = false, Url = null };
-        public static ApiReviewPublicationResult Suceess(string url) => new ApiReviewPublicationResult { Success = true, Url = url };
+        public static ApiReviewPublicationResult Failed() => new(success: false, url: null);
+        public static ApiReviewPublicationResult Suceess(string url) => new(success: true, url);
 
-        public bool Success { get; set; }
-        public string Url { get; set; }
+        private ApiReviewPublicationResult(bool success, string? url)
+        {
+            Success = success;
+            Url = url;
+        }
+
+        public bool Success { get; }
+        public string? Url { get; }
     }
 }

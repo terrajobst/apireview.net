@@ -65,12 +65,15 @@ builder.Services.AddAuthentication(options =>
         var accessToken = context.AccessToken;
         var orgName = ApiReviewConstants.ApiApproverOrgName;
         var teamSlugs = groupService.ApproverTeamSlugs;
-        var userName = context.Identity.Name;
-        var isMember = await GitHubAuthHelpers.IsMemberOfAnyTeamAsync(accessToken, orgName, teamSlugs, userName);
-        if (isMember)
-            context.Identity.AddClaim(new Claim(context.Identity.RoleClaimType, ApiReviewConstants.ApiApproverRole));
+        if (accessToken is not null && context.Identity?.Name is not null)
+        {
+            var userName = context.Identity.Name;
+            var isMember = await GitHubAuthHelpers.IsMemberOfAnyTeamAsync(accessToken, orgName, teamSlugs, userName);
+            if (isMember)
+                context.Identity.AddClaim(new Claim(context.Identity.RoleClaimType, ApiReviewConstants.ApiApproverRole));
 
-        context.Identity.AddClaim(new Claim(ApiReviewConstants.TokenClaim, accessToken));
+            context.Identity.AddClaim(new Claim(ApiReviewConstants.TokenClaim, accessToken));
+        }
     };
 });
 

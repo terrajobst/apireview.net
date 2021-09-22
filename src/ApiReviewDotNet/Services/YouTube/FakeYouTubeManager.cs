@@ -4,7 +4,7 @@ namespace ApiReviewDotNet.Services.YouTube
 {
     public class FakeYouTubeManager : IYouTubeManager
     {
-        private IReadOnlyList<ApiReviewVideo> GetVideos()
+        private static IReadOnlyList<ApiReviewVideo> GetVideos()
         {
             return new[]
             {
@@ -32,14 +32,14 @@ namespace ApiReviewDotNet.Services.YouTube
             };
         }
 
-        public Task<ApiReviewVideo> GetVideoAsync(string id)
+        public Task<ApiReviewVideo?> GetVideoAsync(string id)
         {
             var videos = GetVideos();
             var result = videos.FirstOrDefault(v => v.Id == id);
             return Task.FromResult(result);
         }
 
-        public async Task<ApiReviewVideo> GetVideoAsync(DateTimeOffset start, DateTimeOffset end)
+        public async Task<ApiReviewVideo?> GetVideoAsync(DateTimeOffset start, DateTimeOffset end)
         {
             var videos = await GetVideosAsync(start, end);
             var result = videos.FirstOrDefault();

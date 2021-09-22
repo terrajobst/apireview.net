@@ -2,11 +2,20 @@
 {
     public sealed class ApiReviewFeedbackWithVideo
     {
-        public ApiReviewFeedback Feedback { get; set; }
-        public ApiReviewVideo Video { get; set; }
-        public TimeSpan VideoTimeCode { get; set; }
+        public ApiReviewFeedbackWithVideo(ApiReviewFeedback feedback,
+                                          ApiReviewVideo? video,
+                                          TimeSpan videoTimeCode)
+        {
+            Feedback = feedback;
+            Video = video;
+            VideoTimeCode = videoTimeCode;
+        }
 
-        public string VideoTimeCodeUrl
+        public ApiReviewFeedback Feedback { get; }
+        public ApiReviewVideo? Video { get; }
+        public TimeSpan VideoTimeCode { get; }
+
+        public string? VideoTimeCodeUrl
         {
             get
             {

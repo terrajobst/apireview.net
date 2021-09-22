@@ -2,15 +2,36 @@
 {
     public sealed class RepositoryGroup
     {
-        public string Name { get; set; }
-        public string DisplayName { get; set; }
-        public bool IsDefault { get; set; }
-        public OrgAndRepo[] Repos { get; set; }
-        public string ApproverTeamSlug { get; set; }
-        public string MailingList { get; set; }
-        public string MailingReplyTo { get; set; }
-        public OrgAndRepo NotesRepo { get; set; }
-        public string NotesSuffix { get; set; }
+        public RepositoryGroup(string name,
+                               string displayName,
+                               bool isDefault,
+                               IReadOnlyList<OrgAndRepo> repos,
+                               string approverTeamSlug,
+                               string mailingList,
+                               string mailingReplyTo,
+                               OrgAndRepo notesRepo,
+                               string notesSuffix)
+        {
+            Name = name;
+            DisplayName = displayName;
+            IsDefault = isDefault;
+            Repos = repos;
+            ApproverTeamSlug = approverTeamSlug;
+            MailingList = mailingList;
+            MailingReplyTo = mailingReplyTo;
+            NotesRepo = notesRepo;
+            NotesSuffix = notesSuffix;
+        }
+
+        public string Name { get; }
+        public string DisplayName { get; }
+        public bool IsDefault { get; }
+        public IReadOnlyList<OrgAndRepo> Repos { get; }
+        public string ApproverTeamSlug { get; }
+        public string MailingList { get; }
+        public string MailingReplyTo { get; }
+        public OrgAndRepo NotesRepo { get; }
+        public string NotesSuffix { get; }
 
         public static IReadOnlyList<RepositoryGroup> Get(IConfiguration configuration)
         {
@@ -18,22 +39,20 @@
 
             foreach (var groupConfiguration in configuration.GetChildren())
             {
-                var item = new RepositoryGroup
-                {
-                    Name = groupConfiguration.Key,
-                    DisplayName = groupConfiguration["DisplayName"],
-                    IsDefault = groupConfiguration.GetValue("IsDefault", false),
-                    Repos = groupConfiguration.GetSection("Repos")
-                                              .GetChildren()
-                                              .Select(r => OrgAndRepo.Parse(r.Value))
-                                              .ToArray(),
-                    ApproverTeamSlug = groupConfiguration["ApproverTeamSlug"],
-                    MailingList = groupConfiguration["MailingList"],
-                    MailingReplyTo = groupConfiguration["MailingReplyTo"],
-                    NotesRepo = OrgAndRepo.Parse(groupConfiguration["NotesRepo"]),
-                    NotesSuffix = groupConfiguration["NotesSuffix"]
-                };
-
+                var item = new RepositoryGroup(
+                    name: groupConfiguration.Key,
+                    displayName: groupConfiguration["DisplayName"],
+                    isDefault: groupConfiguration.GetValue("IsDefault", false),
+                    repos: groupConfiguration.GetSection("Repos")
+                                             .GetChildren()
+                                             .Select(r => OrgAndRepo.Parse(r.Value)!)
+                                             .ToArray(),
+                    approverTeamSlug: groupConfiguration["ApproverTeamSlug"],
+                    mailingList: groupConfiguration["MailingList"],
+                    mailingReplyTo: groupConfiguration["MailingReplyTo"],
+                    notesRepo: OrgAndRepo.Parse(groupConfiguration["NotesRepo"])!,
+                    notesSuffix: groupConfiguration["NotesSuffix"]
+                );
                 result.Add(item);
             }
 

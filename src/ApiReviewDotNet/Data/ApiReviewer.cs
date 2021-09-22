@@ -2,8 +2,17 @@
 {
     public sealed class ApiReviewer
     {
-        public string GitHubUserName { get; set; }
-        public string Name { get; set; }
-        public string Email { get; set; }
+        public ApiReviewer(string gitHubUserName,
+                           string name,
+                           string email)
+        {
+            GitHubUserName = gitHubUserName;
+            Name = name;
+            Email = email;
+        }
+
+        public string GitHubUserName { get; }
+        public string Name { get; }
+        public string Email { get; }
     }
 }

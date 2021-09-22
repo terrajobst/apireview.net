@@ -3,7 +3,7 @@
     public sealed class OspoServiceWarmup : IHostedService, IDisposable
     {
         private readonly OspoService _ospoService;
-        private Timer _timer;
+        private Timer? _timer;
 
         public OspoServiceWarmup(OspoService ospoService)
         {
@@ -17,7 +17,7 @@
             _timer = new Timer(Refresh, null, interval, interval);
         }
 
-        private async void Refresh(object state)
+        private async void Refresh(object? state)
         {
             await _ospoService.ReloadAsync();
         }

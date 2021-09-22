@@ -6,9 +6,18 @@ namespace ApiReviewDotNet.Data
 {
     public sealed class ApiReviewLabel
     {
-        public string Name { get; set; }
-        public string Color { get; set; }
-        public string Description { get; set; }
+        public ApiReviewLabel(string name,
+                              string color,
+                              string description)
+        {
+            Name = name;
+            Color = color;
+            Description = description;
+        }
+
+        public string Name { get; }
+        public string Color { get; }
+        public string Description { get; }
 
         public string GetStyle()
         {
@@ -32,9 +41,9 @@ namespace ApiReviewDotNet.Data
         private static Color ParseColor(string color)
         {
             if (!string.IsNullOrEmpty(color) && color.Length == 6 &&
-                int.TryParse(color.Substring(0, 2), NumberStyles.HexNumber, null, out var r) &&
-                int.TryParse(color.Substring(2, 2), NumberStyles.HexNumber, null, out var g) &&
-                int.TryParse(color.Substring(4, 2), NumberStyles.HexNumber, null, out var b))
+                int.TryParse(color.AsSpan(0, 2), NumberStyles.HexNumber, null, out var r) &&
+                int.TryParse(color.AsSpan(2, 2), NumberStyles.HexNumber, null, out var g) &&
+                int.TryParse(color.AsSpan(4, 2), NumberStyles.HexNumber, null, out var b))
             {
                 return System.Drawing.Color.FromArgb(r, g, b);
             }

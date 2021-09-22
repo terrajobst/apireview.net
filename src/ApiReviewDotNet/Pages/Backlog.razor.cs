@@ -12,21 +12,21 @@ namespace ApiReviewDotNet.Pages
     public sealed partial class Backlog : IDisposable
     {
         [Inject]
-        private IJSRuntime JSRuntime { get; set; }
+        private IJSRuntime JSRuntime { get; set; } = null!;
 
         [Inject]
-        public NavigationManager NavigationManager { get; set; }
+        public NavigationManager NavigationManager { get; set; } = null!;
 
         [Inject]
-        private IssueService IssueService { get; set; }
+        private IssueService IssueService { get; set; } = null!;
 
         [Inject]
-        private RepositoryGroupService RepositoryGroupService { get; set; }
+        private RepositoryGroupService RepositoryGroupService { get; set; } = null!;
 
-        private RepositoryGroup _selectedGroup;
-        private string _filter;
-        private SortedDictionary<string, bool> _milestones;
-        private readonly HashSet<ApiReviewIssue> _checkedIssues = new HashSet<ApiReviewIssue>();
+        private RepositoryGroup _selectedGroup = null!;
+        private string _filter = null!;
+        private SortedDictionary<string, bool> _milestones = null!;
+        private readonly HashSet<ApiReviewIssue> _checkedIssues = new();
 
         private RepositoryGroup SelectedGroup
         {
@@ -132,7 +132,7 @@ namespace ApiReviewDotNet.Pages
             _checkedIssues.Clear();
         }
 
-        private async void IssuesChanged(object sender, EventArgs e)
+        private async void IssuesChanged(object? sender, EventArgs e)
         {
             await InvokeAsync(() =>
             {

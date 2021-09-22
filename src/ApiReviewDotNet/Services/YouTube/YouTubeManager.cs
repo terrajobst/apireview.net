@@ -15,7 +15,7 @@ namespace ApiReviewDotNet.Services.YouTube
             _youTubeServiceFactory = youTubeServiceFactory;
         }
 
-        public async Task<ApiReviewVideo> GetVideoAsync(string id)
+        public async Task<ApiReviewVideo?> GetVideoAsync(string id)
         {
             var service = _youTubeServiceFactory.Create();
 
@@ -28,7 +28,7 @@ namespace ApiReviewDotNet.Services.YouTube
             return CreateVideo(videoResponse.Items[0]);
         }
 
-        public async Task<ApiReviewVideo> GetVideoAsync(DateTimeOffset start, DateTimeOffset end)
+        public async Task<ApiReviewVideo?> GetVideoAsync(DateTimeOffset start, DateTimeOffset end)
         {
             var videos = await GetVideosAsync(start, end);
             return videos.FirstOrDefault();
@@ -76,10 +76,10 @@ namespace ApiReviewDotNet.Services.YouTube
         private static ApiReviewVideo CreateVideo(Video v)
         {
             return new ApiReviewVideo(v.Id,
-                                      v.LiveStreamingDetails.ActualStartTime.Value,
-                                      v.LiveStreamingDetails.ActualEndTime.Value,
+                                      v.LiveStreamingDetails.ActualStartTime!.Value,
+                                      v.LiveStreamingDetails.ActualEndTime!.Value,
                                       v.Snippet.Title,
-                                      v.Snippet.Thumbnails?.Medium?.Url);
+                                      v.Snippet.Thumbnails.Medium.Url);
         }
     }
 }
