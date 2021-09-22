@@ -1,10 +1,9 @@
 ﻿using ApiReviewDotNet.Data;
 
-namespace ApiReviewDotNet.Services.GitHub
+namespace ApiReviewDotNet.Services.GitHub;
+
+public interface IGitHubManager
 {
-    public interface IGitHubManager
-    {
-        Task<IReadOnlyList<ApiReviewFeedback>> GetFeedbackAsync(IReadOnlyCollection<OrgAndRepo> repos, DateTimeOffset start, DateTimeOffset end);
-        Task<IReadOnlyList<ApiReviewIssue>> GetIssuesAsync();
-    }
+    Task<IReadOnlyList<ApiReviewFeedback>> GetFeedbackAsync(IReadOnlyCollection<OrgAndRepo> repos, DateTimeOffset start, DateTimeOffset end);
+    Task<IReadOnlyList<ApiReviewIssue>> GetIssuesAsync();
 }

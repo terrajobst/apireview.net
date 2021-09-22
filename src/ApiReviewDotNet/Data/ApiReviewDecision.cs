@@ -1,9 +1,8 @@
-﻿namespace ApiReviewDotNet.Data
+﻿namespace ApiReviewDotNet.Data;
+
+public enum ApiReviewDecision
 {
-    public enum ApiReviewDecision
-    {
-        Approved,
-        NeedsWork,
-        Rejected
-    }
+    Approved,
+    NeedsWork,
+    Rejected
 }

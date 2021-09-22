@@ -1,31 +1,30 @@
 ﻿using Microsoft.ApplicationInsights.AspNetCore.Extensions;
 using Microsoft.Net.Http.Headers;
 
-namespace ApiReviewDotNet
+namespace ApiReviewDotNet;
+
+public static class RedirectionExtensions
 {
-    public static class RedirectionExtensions
+    public static IApplicationBuilder UseHostRedirection(this IApplicationBuilder app, string oldHost, string newHost)
     {
-        public static IApplicationBuilder UseHostRedirection(this IApplicationBuilder app, string oldHost, string newHost)
+        return app.Use(async (context, next) =>
         {
-            return app.Use(async (context, next) =>
+            var url = context.Request.GetUri();
+            if (url.Host.Equals(oldHost, StringComparison.OrdinalIgnoreCase))
             {
-                var url = context.Request.GetUri();
-                if (url.Host.Equals(oldHost, StringComparison.OrdinalIgnoreCase))
+                var response = context.Response;
+                response.StatusCode = StatusCodes.Status301MovedPermanently;
+
+                var newUrl = new UriBuilder(url)
                 {
-                    var response = context.Response;
-                    response.StatusCode = StatusCodes.Status301MovedPermanently;
+                    Host = newHost
+                }.ToString();
 
-                    var newUrl = new UriBuilder(url)
-                    {
-                        Host = newHost
-                    }.ToString();
+                response.Headers[HeaderNames.Location] = newUrl;
+                return;
+            }
 
-                    response.Headers[HeaderNames.Location] = newUrl;
-                    return;
-                }
-
-                await next();
-            });
-        }
+            await next();
+        });
     }
 }

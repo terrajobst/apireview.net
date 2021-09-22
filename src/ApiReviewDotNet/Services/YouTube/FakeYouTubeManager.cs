@@ -1,13 +1,13 @@
 ﻿using ApiReviewDotNet.Data;
 
-namespace ApiReviewDotNet.Services.YouTube
+namespace ApiReviewDotNet.Services.YouTube;
+
+public class FakeYouTubeManager : IYouTubeManager
 {
-    public class FakeYouTubeManager : IYouTubeManager
+    private static IReadOnlyList<ApiReviewVideo> GetVideos()
     {
-        private static IReadOnlyList<ApiReviewVideo> GetVideos()
+        return new[]
         {
-            return new[]
-            {
                 new ApiReviewVideo(
                     "q7ODj3RJnME",
                     DateTime.Parse("2020-06-25T16:53:18Z"),
@@ -30,29 +30,28 @@ namespace ApiReviewDotNet.Services.YouTube
                     "https://i.ytimg.com/vi/R5G4scTRRNQ/mqdefault.jpg"
                 )
             };
-        }
+    }
 
-        public Task<ApiReviewVideo?> GetVideoAsync(string id)
-        {
-            var videos = GetVideos();
-            var result = videos.FirstOrDefault(v => v.Id == id);
-            return Task.FromResult(result);
-        }
+    public Task<ApiReviewVideo?> GetVideoAsync(string id)
+    {
+        var videos = GetVideos();
+        var result = videos.FirstOrDefault(v => v.Id == id);
+        return Task.FromResult(result);
+    }
 
-        public async Task<ApiReviewVideo?> GetVideoAsync(DateTimeOffset start, DateTimeOffset end)
-        {
-            var videos = await GetVideosAsync(start, end);
-            var result = videos.FirstOrDefault();
-            return result;
-        }
+    public async Task<ApiReviewVideo?> GetVideoAsync(DateTimeOffset start, DateTimeOffset end)
+    {
+        var videos = await GetVideosAsync(start, end);
+        var result = videos.FirstOrDefault();
+        return result;
+    }
 
-        public Task<IReadOnlyList<ApiReviewVideo>> GetVideosAsync(DateTimeOffset start, DateTimeOffset end)
-        {
-            var videos = GetVideos();
-            var result = videos.Where(v => start <= v.StartDateTime && v.EndDateTime <= end)
-                               .ToArray();
+    public Task<IReadOnlyList<ApiReviewVideo>> GetVideosAsync(DateTimeOffset start, DateTimeOffset end)
+    {
+        var videos = GetVideos();
+        var result = videos.Where(v => start <= v.StartDateTime && v.EndDateTime <= end)
+                           .ToArray();
 
-            return Task.FromResult<IReadOnlyList<ApiReviewVideo>>(result);
-        }
+        return Task.FromResult<IReadOnlyList<ApiReviewVideo>>(result);
     }
 }

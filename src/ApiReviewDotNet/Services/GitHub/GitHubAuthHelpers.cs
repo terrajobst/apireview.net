@@ -2,43 +2,42 @@
 
 using Octokit.GraphQL;
 
-namespace ApiReviewDotNet.Services.GitHub
-{
-    public static class GitHubAuthHelpers
-    {
-        public static async Task<bool> IsMemberOfAnyTeamAsync(string accessToken, string orgName, IEnumerable<string> teamSlugs, string userName)
-        {
-            foreach (var teamSlug in teamSlugs)
-            {
-                if (await IsMemberOfTeamAsync(accessToken, orgName, teamSlug, userName))
-                    return true;
-            }
+namespace ApiReviewDotNet.Services.GitHub;
 
-            return false;
+public static class GitHubAuthHelpers
+{
+    public static async Task<bool> IsMemberOfAnyTeamAsync(string accessToken, string orgName, IEnumerable<string> teamSlugs, string userName)
+    {
+        foreach (var teamSlug in teamSlugs)
+        {
+            if (await IsMemberOfTeamAsync(accessToken, orgName, teamSlug, userName))
+                return true;
         }
 
-        public static async Task<bool> IsMemberOfTeamAsync(string accessToken, string orgName, string teamSlug, string userName)
+        return false;
+    }
+
+    public static async Task<bool> IsMemberOfTeamAsync(string accessToken, string orgName, string teamSlug, string userName)
+    {
+        try
         {
-            try
-            {
-                var productInformation = new ProductHeaderValue(ApiReviewConstants.ProductName);
-                var connection = new Connection(productInformation, accessToken);
+            var productInformation = new ProductHeaderValue(ApiReviewConstants.ProductName);
+            var connection = new Connection(productInformation, accessToken);
 
-                var query = new Query()
-                    .Organization(orgName)
-                    .Team(teamSlug)
-                    .Members(null, null, null, null, null, null, userName, null)
-                    .AllPages()
-                    .Select(u => u.Login);
+            var query = new Query()
+                .Organization(orgName)
+                .Team(teamSlug)
+                .Members(null, null, null, null, null, null, userName, null)
+                .AllPages()
+                .Select(u => u.Login);
 
-                var result = await connection.Run(query);
-                var exactUser = result.FirstOrDefault(login => string.Equals(login, userName, StringComparison.OrdinalIgnoreCase));
-                return exactUser != null;
-            }
-            catch
-            {
-                return false;
-            }
+            var result = await connection.Run(query);
+            var exactUser = result.FirstOrDefault(login => string.Equals(login, userName, StringComparison.OrdinalIgnoreCase));
+            return exactUser != null;
+        }
+        catch
+        {
+            return false;
         }
     }
 }
