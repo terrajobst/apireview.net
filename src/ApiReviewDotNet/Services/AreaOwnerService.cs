@@ -2,7 +2,14 @@
 
 public sealed class AreaOwnerService
 {
+    private readonly ILogger<AreaOwnerService> _logger;
+
     private Dictionary<string, string[]> _ownerByArea = new();
+
+    public AreaOwnerService(ILogger<AreaOwnerService> logger)
+    {
+        _logger = logger;
+    }
 
     public IReadOnlyList<string> GetOwners(string area)
     {
@@ -14,7 +21,15 @@ public sealed class AreaOwnerService
 
     public async Task ReloadAsync()
     {
-        _ownerByArea = await GetOwnersAsync();
+        try
+        {
+            _ownerByArea = await GetOwnersAsync();
+            _logger.LogInformation("Loaded {count} area owners", _ownerByArea.Count);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error loading area owners");
+        }
     }
 
     private static async Task<Dictionary<string, string[]>> GetOwnersAsync()

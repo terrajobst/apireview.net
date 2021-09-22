@@ -162,14 +162,13 @@ public sealed class GitHubManager : IGitHubManager
         Add(result, linkSet, author);
         foreach (var assignee in assignees ?? Array.Empty<string>())
             Add(result, linkSet, assignee);
-        if (markedReadyForReviewBy is not null)
-            Add(result, linkSet, markedReadyForReviewBy);
+        Add(result, linkSet, markedReadyForReviewBy);
         foreach (var areaOwner in areaOwners ?? Array.Empty<string>())
             Add(result, linkSet, areaOwner);
 
         return result.ToArray();
 
-        static void Add(List<ApiReviewer> target, OspoLinkSet linkSet, string userName)
+        static void Add(List<ApiReviewer> target, OspoLinkSet linkSet, string? userName)
         {
             if (userName is null)
                 return;
