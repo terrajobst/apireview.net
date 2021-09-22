@@ -3,7 +3,7 @@
 @code
 {
     [CascadingParameter]
-    private Task<AuthenticationState> AuthenticationStateTask { get; set; }
+    private Task<AuthenticationState> AuthenticationStateTask { get; set; } = null!;
 
     protected override async Task OnInitializedAsync()
     {
