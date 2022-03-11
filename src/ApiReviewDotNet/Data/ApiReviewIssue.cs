@@ -7,28 +7,28 @@ public sealed class ApiReviewIssue : IComparable<ApiReviewIssue>
                           int id,
                           string title,
                           string author,
-                          IReadOnlyList<string> assignees,
+                          IReadOnlyList<string>? assignees,
                           string? markedReadyForReviewBy,
-                          IReadOnlyList<string> areaOwners,
+                          IReadOnlyList<string>? areaOwners,
                           DateTimeOffset createdAt,
                           string url,
-                          string milestone,
-                          IReadOnlyList<ApiReviewLabel> labels,
-                          IReadOnlyList<ApiReviewer> reviewers)
+                          string? milestone,
+                          IReadOnlyList<ApiReviewLabel>? labels,
+                          IReadOnlyList<ApiReviewer>? reviewers)
     {
         Owner = owner;
         Repo = repo;
         Id = id;
         Title = title;
         Author = author;
-        Assignees = assignees;
+        Assignees = assignees ?? Array.Empty<string>();
         MarkedReadyForReviewBy = markedReadyForReviewBy;
-        AreaOwners = areaOwners;
+        AreaOwners = areaOwners ?? Array.Empty<string>();
         CreatedAt = createdAt;
         Url = url;
         Milestone = milestone;
-        Labels = labels;
-        Reviewers = reviewers;
+        Labels = labels ?? Array.Empty<ApiReviewLabel>();
+        Reviewers = reviewers ?? Array.Empty<ApiReviewer>();
     }
 
     public string Owner { get; }
@@ -57,7 +57,7 @@ public sealed class ApiReviewIssue : IComparable<ApiReviewIssue>
 
     public string Url { get; }
 
-    public string Milestone { get; }
+    public string? Milestone { get; }
 
     public IReadOnlyList<ApiReviewLabel> Labels { get; }
 
@@ -81,7 +81,7 @@ public sealed class ApiReviewIssue : IComparable<ApiReviewIssue>
         return CreatedAt.CompareTo(other.CreatedAt);
     }
 
-    private static int CompareMilestone(string x, string y)
+    private static int CompareMilestone(string? x, string? y)
     {
         // The desired sort order is:
         //
@@ -91,18 +91,13 @@ public sealed class ApiReviewIssue : IComparable<ApiReviewIssue>
         //
         // Why does no milestone go last? Because we don't to punish folks for triaging milestones.
 
-        static bool IsNone(string m)
-        {
-            return string.IsNullOrEmpty(m) || m == ApiReviewConstants.NoMilestone;
-        }
-
-        if (IsNone(x) && IsNone(y))
+        if (string.IsNullOrEmpty(x) && string.IsNullOrEmpty(y))
             return 0;
 
-        if (IsNone(x))
+        if (string.IsNullOrEmpty(x))
             return 1;
 
-        if (IsNone(y))
+        if (string.IsNullOrEmpty(y))
             return -1;
 
         var xIsVersion = Version.TryParse(x, out var xVersion);

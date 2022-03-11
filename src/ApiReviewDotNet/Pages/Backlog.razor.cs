@@ -146,7 +146,7 @@ public sealed partial class Backlog : IDisposable
         if (!SelectedGroup.Repos.Any(r => string.Equals(r.FullName, issue.RepoFull, StringComparison.OrdinalIgnoreCase)))
             return false;
 
-        if (_milestones is not null && _milestones.TryGetValue(issue.Milestone, out var isChecked) && !isChecked)
+        if (_milestones is not null && _milestones.TryGetValue(issue.Milestone ?? ApiReviewConstants.NoMilestone, out var isChecked) && !isChecked)
             return false;
 
         if (string.IsNullOrEmpty(Filter))
@@ -176,7 +176,7 @@ public sealed partial class Backlog : IDisposable
         var result = new SortedDictionary<string, bool>();
 
         foreach (var issue in issues)
-            result[issue.Milestone] = true;
+            result[issue.Milestone ?? ApiReviewConstants.NoMilestone] = true;
 
         if (existingMilestones is not null)
         {
