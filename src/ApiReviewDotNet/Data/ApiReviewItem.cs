@@ -1,15 +1,14 @@
 ﻿namespace ApiReviewDotNet.Data;
 
-public sealed class ApiReviewFeedback
+public sealed class ApiReviewItem
 {
-    public ApiReviewFeedback(ApiReviewDecision decision,
-                             ApiReviewIssue issue,
-                             DateTimeOffset feedbackDateTime,
-                             string? feedbackId,
-                             string? feedbackAuthor,
-                             string feedbackUrl,
-                             string? feedbackMarkdown,
-                             string? videoUrl)
+    public ApiReviewItem(ApiReviewDecision decision,
+                         ApiReviewIssue issue,
+                         DateTimeOffset feedbackDateTime,
+                         string? feedbackId,
+                         string? feedbackAuthor,
+                         string feedbackUrl,
+                         string? feedbackMarkdown)
     {
         Decision = decision;
         Issue = issue;
@@ -18,7 +17,6 @@ public sealed class ApiReviewFeedback
         FeedbackAuthor = feedbackAuthor;
         FeedbackUrl = feedbackUrl;
         FeedbackMarkdown = feedbackMarkdown;
-        VideoUrl = videoUrl;
     }
 
     public ApiReviewDecision Decision { get; }
@@ -28,5 +26,5 @@ public sealed class ApiReviewFeedback
     public string? FeedbackAuthor { get; }
     public string FeedbackUrl { get; }
     public string? FeedbackMarkdown { get; }
-    public string? VideoUrl { get; }
+    public TimeSpan TimeCode { get; set; }
 }

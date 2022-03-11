@@ -37,19 +37,18 @@ public sealed class SummaryManager
         return CreateSummary(repositoryGroup, video, items);
     }
 
-    private static ApiReviewSummary CreateSummary(RepositoryGroup repositoryGroup, ApiReviewVideo? video, IReadOnlyList<ApiReviewFeedback> items)
+    private static ApiReviewSummary CreateSummary(RepositoryGroup repositoryGroup, ApiReviewVideo? video, IReadOnlyList<ApiReviewItem> items)
     {
         if (items.Count == 0)
         {
             return new ApiReviewSummary(
                 repositoryGroup: repositoryGroup.Name,
                 video: video,
-                items: Array.Empty<ApiReviewFeedbackWithVideo>()
+                items: Array.Empty<ApiReviewItem>()
             );
         }
         else
         {
-            var result = new List<ApiReviewFeedbackWithVideo>();
             var reviewStart = video is null
                                 ? items.OrderBy(i => i.FeedbackDateTime).Select(i => i.FeedbackDateTime).First()
                                 : video.StartDateTime;
@@ -82,22 +81,16 @@ public sealed class SummaryManager
                     timeCode = (previous.FeedbackDateTime - video.StartDateTime).Add(TimeSpan.FromSeconds(10));
                     var videoDuration = video.EndDateTime - video.StartDateTime;
                     if (timeCode >= videoDuration)
-                        timeCode = result[i - 1].VideoTimeCode;
+                        timeCode = items[i - 1].TimeCode;
                 }
 
-                var feedbackWithVideo = new ApiReviewFeedbackWithVideo(
-                    feedback: current,
-                    video: video,
-                    videoTimeCode: timeCode
-                );
-
-                result.Add(feedbackWithVideo);
+                current.TimeCode = timeCode;
             }
 
             return new ApiReviewSummary(
                 repositoryGroup: repositoryGroup.Name,
                 video: video,
-                items: result
+                items: items
             );
         }
     }

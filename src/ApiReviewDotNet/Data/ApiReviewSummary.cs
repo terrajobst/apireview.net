@@ -4,7 +4,7 @@ public sealed class ApiReviewSummary
 {
     public ApiReviewSummary(string repositoryGroup,
                             ApiReviewVideo? video,
-                            IReadOnlyList<ApiReviewFeedbackWithVideo> items)
+                            IReadOnlyList<ApiReviewItem> items)
     {
         RepositoryGroup = repositoryGroup;
         Video = video;
@@ -15,5 +15,14 @@ public sealed class ApiReviewSummary
 
     public ApiReviewVideo? Video { get; }
 
-    public IReadOnlyList<ApiReviewFeedbackWithVideo> Items { get; }
+    public IReadOnlyList<ApiReviewItem> Items { get; }
+
+    public string? GetVideoUrl(TimeSpan timeCode)
+    {
+        if (Video == null)
+            return null;
+
+        var timeCodeText = $"{timeCode.Hours}h{timeCode.Minutes}m{timeCode.Seconds}s";
+        return $"https://www.youtube.com/watch?v={Video.Id}&t={timeCodeText}";
+    }
 }

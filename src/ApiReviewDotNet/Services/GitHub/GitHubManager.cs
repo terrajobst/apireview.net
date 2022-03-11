@@ -20,7 +20,7 @@ public sealed class GitHubManager : IGitHubManager
         _ospoService = ospoService;
     }
 
-    public async Task<IReadOnlyList<ApiReviewFeedback>> GetFeedbackAsync(IReadOnlyCollection<OrgAndRepo> repos, DateTimeOffset start, DateTimeOffset end)
+    public async Task<IReadOnlyList<ApiReviewItem>> GetFeedbackAsync(IReadOnlyCollection<OrgAndRepo> repos, DateTimeOffset start, DateTimeOffset end)
     {
         static bool MightBeAnApiIssue(Issue issue)
         {
@@ -58,7 +58,7 @@ public sealed class GitHubManager : IGitHubManager
         //       role, so using the app quota seems fine.
 
         var github = await _clientFactory.CreateForAppAsync();
-        var results = new List<ApiReviewFeedback>();
+        var results = new List<ApiReviewItem>();
 
         foreach (var (owner, repo) in repos)
         {
@@ -96,19 +96,18 @@ public sealed class GitHubManager : IGitHubManager
                     var feedbackId = comment?.Id.ToString();
                     var feedbackAuthor = reviewOutcome.DecisionMaker;
                     var feedbackUrl = comment?.HtmlUrl ?? issue.HtmlUrl;
-                    var (videoUrl, feedbackMarkdown) = ParseFeedback(comment?.Body);
+                    var (_, feedbackMarkdown) = ParseFeedback(comment?.Body);
 
                     var apiReviewIssue = CreateIssue(owner, repo, issue, events, end);
 
-                    var feedback = new ApiReviewFeedback(
+                    var feedback = new ApiReviewItem(
                         decision: decision,
                         issue: apiReviewIssue,
                         feedbackId: feedbackId,
                         feedbackAuthor: feedbackAuthor,
                         feedbackDateTime: feedbackDateTime,
                         feedbackUrl: feedbackUrl,
-                        feedbackMarkdown: feedbackMarkdown,
-                        videoUrl: videoUrl
+                        feedbackMarkdown: feedbackMarkdown
                     );
                     results.Add(feedback);
                 }

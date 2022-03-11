@@ -70,7 +70,7 @@ public sealed class SummaryPublishingService
             return;
 
         var key = _configuration["SendGridKey"];
-        var date = summary.Items.First().Feedback.FeedbackDateTime.Date;
+        var date = summary.Items.First().FeedbackDateTime.Date;
         var subject = $"API Review Notes {date:d}";
         var markdown = GetMarkdown(summary);
         var body = Markdown.ToHtml(markdown);
@@ -100,8 +100,8 @@ public sealed class SummaryPublishingService
         using var descriptionBuilder = new StringWriter();
         foreach (var item in summary.Items)
         {
-            var tc = item.VideoTimeCode;
-            descriptionBuilder.WriteLine($"{tc.Hours:00}:{tc.Minutes:00}:{tc.Seconds:00} - {item.Feedback.Decision}: {item.Feedback.Issue.Title} {item.Feedback.FeedbackUrl}");
+            var tc = item.TimeCode;
+            descriptionBuilder.WriteLine($"{tc.Hours:00}:{tc.Minutes:00}:{tc.Seconds:00} - {item.Decision}: {item.Issue.Title} {item.FeedbackUrl}");
         }
 
         var description = descriptionBuilder.ToString()
@@ -127,13 +127,13 @@ public sealed class SummaryPublishingService
 
         foreach (var item in summary.Items)
         {
-            var feedback = item.Feedback;
+            var videoUrl = summary.GetVideoUrl(item.TimeCode);
 
-            if (feedback.VideoUrl is null && feedback.FeedbackId is not null && item.VideoTimeCodeUrl is not null)
+            if (item.FeedbackId is not null && videoUrl is not null)
             {
-                var updatedMarkdown = $"[Video]({item.VideoTimeCodeUrl})\n\n{feedback.FeedbackMarkdown}";
-                var commentId = Convert.ToInt32(feedback.FeedbackId);
-                await github.Issue.Comment.Update(feedback.Issue.Owner, feedback.Issue.Repo, commentId, updatedMarkdown);
+                var updatedMarkdown = $"[Video]({videoUrl})\n\n{item.FeedbackMarkdown}";
+                var commentId = Convert.ToInt32(item.FeedbackId);
+                await github.Issue.Comment.Update(item.Issue.Owner, item.Issue.Repo, commentId, updatedMarkdown);
             }
         }
     }
@@ -142,22 +142,20 @@ public sealed class SummaryPublishingService
     {
         var (owner, repo) = _repositoryGroupService.Repositories.First();
 
-        if (!summary.Items.All(i => i.Feedback.Issue.Owner == owner &&
-                                    i.Feedback.Issue.Repo == repo))
+        if (!summary.Items.All(i => i.Issue.Owner == owner &&
+                                    i.Issue.Repo == repo))
             return;
 
         var github = await _clientFactory.CreateForAppAsync();
 
         foreach (var item in summary.Items)
         {
-            var feedback = item.Feedback;
-
-            if (feedback.FeedbackId is not null)
+            if (item.FeedbackId is not null)
             {
-                var status = feedback.Decision.ToString();
-                var updatedMarkdown = $"[Video]({status})\n\n{feedback.FeedbackMarkdown}";
-                var commentId = Convert.ToInt32(feedback.FeedbackId);
-                await github.Issue.Comment.Update(feedback.Issue.Owner, feedback.Issue.Repo, commentId, updatedMarkdown);
+                var status = item.Decision.ToString();
+                var updatedMarkdown = $"[Video]({status})\n\n{item.FeedbackMarkdown}";
+                var commentId = Convert.ToInt32(item.FeedbackId);
+                await github.Issue.Comment.Update(item.Issue.Owner, item.Issue.Repo, commentId, updatedMarkdown);
             }
         }
     }
@@ -167,7 +165,7 @@ public sealed class SummaryPublishingService
         var (owner, repo) = group.NotesRepo;
         var branch = ApiReviewConstants.ApiReviewsBranch;
         var head = $"heads/{branch}";
-        var date = summary.Items.First().Feedback.FeedbackDateTime.DateTime;
+        var date = summary.Items.First().FeedbackDateTime.DateTime;
         var markdown = $"# API Review {date:d}\n\n{GetMarkdown(summary)}";
         var path = $"{date.Year}/{date.Month:00}-{date.Day:00}-{group.NotesSuffix}/README.md";
         var commitMessage = $"Add review notes for {date:d}";
@@ -212,21 +210,20 @@ public sealed class SummaryPublishingService
 
         foreach (var item in summary.Items)
         {
-            var feedback = item.Feedback;
-
-            noteWriter.WriteLine($"## {feedback.Issue.Title}");
+            noteWriter.WriteLine($"## {item.Issue.Title}");
             noteWriter.WriteLine();
-            noteWriter.Write($"**{feedback.Decision}** | [#{feedback.Issue.Repo}/{feedback.Issue.Id}]({feedback.FeedbackUrl})");
+            noteWriter.Write($"**{item.Decision}** | [#{item.Issue.Repo}/{item.Issue.Id}]({item.FeedbackUrl})");
 
-            if (item.VideoTimeCodeUrl is not null)
-                noteWriter.Write($" | [Video]({item.VideoTimeCodeUrl})");
+            var videoUrl = summary.GetVideoUrl(item.TimeCode);
+            if (videoUrl is not null)
+                noteWriter.Write($" | [Video]({videoUrl})");
 
             noteWriter.WriteLine();
             noteWriter.WriteLine();
 
-            if (feedback.FeedbackMarkdown is not null)
+            if (item.FeedbackMarkdown is not null)
             {
-                noteWriter.Write(feedback.FeedbackMarkdown);
+                noteWriter.Write(item.FeedbackMarkdown);
                 noteWriter.WriteLine();
             }
         }
