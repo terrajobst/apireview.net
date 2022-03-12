@@ -21,7 +21,7 @@
             @{
                 var isChecked = _checkedIssues.Count == Issues.Count;
             }
-            <input class="ml-2 mr-3" type="checkbox" value="@isChecked" @onchange="e => CheckAllIssues((bool)e.Value)" />
+            <input class="ml-2 mr-3" type="checkbox" value="@isChecked" @onchange="e => CheckAllIssues((bool)e.Value!)" />
         </div>
 
         <div class="col align-self-center">
@@ -99,7 +99,7 @@
         <div class="gh-issue-cell @background text-break">
             <div class="d-flex flex-row align-items-center">
                 <div class="align-self-center">
-                    <input class="ml-2 mr-3" type="checkbox" checked="@_checkedIssues.Contains(issue)" @onchange="e => CheckIssue(issue, (bool)e.Value)" />
+                    <input class="ml-2 mr-3" type="checkbox" checked="@_checkedIssues.Contains(issue)" @onchange="e => CheckIssue(issue, (bool)e.Value!)" />
                 </div>
                 <div>
                     <a class="gh-issue-title" href="@issue.Url">@issue.Title</a>

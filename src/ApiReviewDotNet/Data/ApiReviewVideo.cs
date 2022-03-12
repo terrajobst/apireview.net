@@ -2,7 +2,7 @@
 
 public sealed class ApiReviewVideo
 {
-    public ApiReviewVideo(string id, DateTimeOffset startDateTime, DateTimeOffset endDateTime, string title, string thumbnailUrl)
+    public ApiReviewVideo(string id, DateTimeOffset startDateTime, DateTimeOffset endDateTime, string title, string? thumbnailUrl)
     {
         Id = id;
         StartDateTime = startDateTime;
@@ -17,5 +17,5 @@ public sealed class ApiReviewVideo
     public DateTimeOffset EndDateTime { get; }
     public TimeSpan Duration => EndDateTime - StartDateTime;
     public string Title { get; }
-    public string ThumbnailUrl { get; }
+    public string? ThumbnailUrl { get; }
 }
