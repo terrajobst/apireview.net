@@ -21,6 +21,9 @@ public sealed partial class Schedule
     [Inject]
     public TimeZoneService TimeZoneService { get; set; } = null!;
 
+    [Inject]
+    public IHttpClientFactory HttpClientFactory { get; set; } = null!;
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -43,10 +46,16 @@ public sealed partial class Schedule
         StateHasChanged();
     }
 
-    private static async Task<CalendarCollection> LoadCalendarAsync(string url)
+    private async Task<CalendarCollection> LoadCalendarAsync(string url)
     {
-        var httpClient = new HttpClient();
-        var content = await httpClient.GetStringAsync(url);
+        using var httpClient = HttpClientFactory.CreateClient();
+        
+        using var request = new HttpRequestMessage(HttpMethod.Get, url);
+        request.Headers.Add("User-Agent", "apireview.net");
+        
+        using var response = await httpClient.SendAsync(request);
+        var content = await response.Content.ReadAsStringAsync();
+        
         return CalendarCollection.Load(content);
     }
 
