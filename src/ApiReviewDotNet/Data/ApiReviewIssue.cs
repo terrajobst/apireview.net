@@ -9,6 +9,9 @@ public sealed class ApiReviewIssue : IComparable<ApiReviewIssue>
                           string author,
                           IReadOnlyList<string>? assignees,
                           string? markedReadyForReviewBy,
+                          DateTimeOffset? markedReadyAt,
+                          string? markedBlockingReviewBy,
+                          DateTimeOffset? markedBlockingAt,
                           IReadOnlyList<string>? areaOwners,
                           DateTimeOffset createdAt,
                           string url,
@@ -23,12 +26,14 @@ public sealed class ApiReviewIssue : IComparable<ApiReviewIssue>
         Author = author;
         Assignees = assignees ?? Array.Empty<string>();
         MarkedReadyForReviewBy = markedReadyForReviewBy;
+        MarkedReadyAt = markedReadyAt;
         AreaOwners = areaOwners ?? Array.Empty<string>();
         CreatedAt = createdAt;
         Url = url;
         Milestone = milestone;
         Labels = labels ?? Array.Empty<ApiReviewLabel>();
         Reviewers = reviewers ?? Array.Empty<ApiReviewer>();
+        DetailText = CreateDetailText();
     }
 
     public string Owner { get; }
@@ -49,11 +54,17 @@ public sealed class ApiReviewIssue : IComparable<ApiReviewIssue>
 
     public string? MarkedReadyForReviewBy { get; }
 
+    public DateTimeOffset? MarkedReadyAt { get; }
+
+    public string? MarkedBlockingBy { get; }
+
+    public DateTimeOffset? MarkedBlockingAt { get; }
+
     public IReadOnlyList<string> AreaOwners { get; }
 
     public DateTimeOffset CreatedAt { get; }
 
-    public string DetailText => $"{IdFull} {CreatedAt.FormatRelative()} by {Author}";
+    public string DetailText { get; }
 
     public string Url { get; }
 
@@ -64,6 +75,23 @@ public sealed class ApiReviewIssue : IComparable<ApiReviewIssue>
     public bool IsBlocking => Labels is not null && Labels.Any(l => string.Equals(l.Name, ApiReviewConstants.Blocking, StringComparison.OrdinalIgnoreCase));
 
     public IReadOnlyList<ApiReviewer> Reviewers { get; }
+
+    private string CreateDetailText()
+    {
+        if (MarkedBlockingAt is not null &&
+            MarkedBlockingBy is not null)
+        {
+            return $"{IdFull} marked blocking {MarkedBlockingAt.Value.FormatRelative()} by {MarkedBlockingBy}";
+        }
+
+        if (MarkedReadyAt is not null &&
+            MarkedReadyForReviewBy is not null)
+        {
+            return $"{IdFull} marked blocking {MarkedReadyAt.Value.FormatRelative()} by {MarkedReadyForReviewBy}";
+        }
+
+        return $"{IdFull} {CreatedAt.FormatRelative()} by {Author}";
+    }
 
     public int CompareTo(ApiReviewIssue? other)
     {
@@ -78,7 +106,29 @@ public sealed class ApiReviewIssue : IComparable<ApiReviewIssue>
         if (result != 0)
             return result;
 
+        result = CompareDates(MarkedBlockingAt, other.MarkedBlockingAt);
+        if (result != 0)
+            return result;
+        
+        result = CompareDates(MarkedReadyAt, other.MarkedReadyAt);
+        if (result != 0)
+            return result;
+        
         return CreatedAt.CompareTo(other.CreatedAt);
+    }
+
+    private static int CompareDates(DateTimeOffset? x, DateTimeOffset? y)
+    {
+        if (x is null && y is null)
+            return 0;
+
+        if (x is null)
+            return 1;
+
+        if (y is null)
+            return -1;
+
+        return x.Value.CompareTo(y.Value);
     }
 
     private static int CompareMilestone(string? x, string? y)

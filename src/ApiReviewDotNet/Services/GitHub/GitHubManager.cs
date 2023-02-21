@@ -187,14 +187,18 @@ public sealed class GitHubManager : IGitHubManager
         }
     }
 
-    private ApiReviewIssue CreateIssue(string owner, string repo, Issue issue, IEnumerable<EventInfo> events, DateTimeOffset end)
+    private ApiReviewIssue CreateIssue(string owner, string repo, Issue issue, IReadOnlyList<EventInfo> events, DateTimeOffset end)
     {
-        var readyEvent = ApiReadyEvent.Get(events, issue.CreatedAt, end);
+        var readyEvent = ApiReadyEvent.Get(events, end);
+        var blockingEvent = ApiBlockingEvent.Get(events, end);
 
         var title = GitHubIssueHelpers.FixTitle(issue.Title);
         var author = issue.User.Login;
         var assignees = issue.Assignees.Select(a => a.Login).ToArray();
         var markedReadyForReviewBy = readyEvent?.DecisionMaker;
+        var markedReadyAt = readyEvent?.CreatedAt;
+        var markedBlockingBy = blockingEvent?.DecisionMaker;
+        var markedBlockingAt = blockingEvent?.CreatedAt;
         var areaOwners = GetAreaOwners(issue.Labels.Select(l => l.Name));
         var milestone = issue.Milestone?.Title ?? ApiReviewConstants.NoMilestone;
         var labels = issue.Labels.Select(l => new ApiReviewLabel(l.Name, l.Color, l.Description)).ToArray();
@@ -208,6 +212,9 @@ public sealed class GitHubManager : IGitHubManager
             author,
             assignees,
             markedReadyForReviewBy,
+            markedReadyAt,
+            markedBlockingBy,
+            markedBlockingAt,
             areaOwners,
             issue.CreatedAt,
             issue.HtmlUrl,
@@ -243,7 +250,7 @@ public sealed class GitHubManager : IGitHubManager
         public string DecisionMaker { get; }
         public DateTimeOffset CreatedAt { get; }
 
-        public static ApiReadyEvent? Get(IEnumerable<EventInfo> events, DateTimeOffset start, DateTimeOffset end)
+        public static ApiReadyEvent? Get(IEnumerable<EventInfo> events, DateTimeOffset end)
         {
             var readyEvent = default(EventInfo);
 
@@ -259,6 +266,37 @@ public sealed class GitHubManager : IGitHubManager
             return readyEvent is null
                     ? null
                     : new ApiReadyEvent(readyEvent.Actor.Login, readyEvent.CreatedAt);
+        }
+    }
+
+    private sealed class ApiBlockingEvent
+    {
+        private ApiBlockingEvent(string decisionMaker, DateTimeOffset createdAt)
+        {
+            DecisionMaker = decisionMaker;
+            CreatedAt = createdAt;
+        }
+
+        public string DecisionMaker { get; }
+
+        public DateTimeOffset CreatedAt { get; }
+
+        public static ApiBlockingEvent? Get(IEnumerable<EventInfo> events, DateTimeOffset end)
+        {
+            var blockingEvent = default(EventInfo);
+
+            foreach (var e in events.Where(e => e.CreatedAt <= end)
+                                    .OrderByDescending(e => e.CreatedAt))
+                switch (e.Event.StringValue)
+                {
+                    case "labeled" when string.Equals(e.Label.Name, ApiReviewConstants.Blocking, StringComparison.OrdinalIgnoreCase):
+                        blockingEvent = e;
+                        break;
+                }
+
+            return blockingEvent is null
+                ? null
+                : new ApiBlockingEvent(blockingEvent.Actor.Login, blockingEvent.CreatedAt);
         }
     }
 
