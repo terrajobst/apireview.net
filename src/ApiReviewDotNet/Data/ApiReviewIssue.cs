@@ -10,7 +10,7 @@ public sealed class ApiReviewIssue : IComparable<ApiReviewIssue>
                           IReadOnlyList<string>? assignees,
                           string? markedReadyForReviewBy,
                           DateTimeOffset? markedReadyAt,
-                          string? markedBlockingReviewBy,
+                          string? markedBlockingBy,
                           DateTimeOffset? markedBlockingAt,
                           IReadOnlyList<string>? areaOwners,
                           DateTimeOffset createdAt,
@@ -27,6 +27,8 @@ public sealed class ApiReviewIssue : IComparable<ApiReviewIssue>
         Assignees = assignees ?? Array.Empty<string>();
         MarkedReadyForReviewBy = markedReadyForReviewBy;
         MarkedReadyAt = markedReadyAt;
+        MarkedBlockingBy = markedBlockingBy;
+        MarkedBlockingAt = markedBlockingAt;
         AreaOwners = areaOwners ?? Array.Empty<string>();
         CreatedAt = createdAt;
         Url = url;
