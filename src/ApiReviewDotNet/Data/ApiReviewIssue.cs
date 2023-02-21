@@ -87,7 +87,7 @@ public sealed class ApiReviewIssue : IComparable<ApiReviewIssue>
         if (MarkedReadyAt is not null &&
             MarkedReadyForReviewBy is not null)
         {
-            return $"{IdFull} marked blocking {MarkedReadyAt.Value.FormatRelative()} by {MarkedReadyForReviewBy}";
+            return $"{IdFull} marked for review {MarkedReadyAt.Value.FormatRelative()} by {MarkedReadyForReviewBy}";
         }
 
         return $"{IdFull} {CreatedAt.FormatRelative()} by {Author}";
