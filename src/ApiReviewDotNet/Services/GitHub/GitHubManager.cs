@@ -252,20 +252,17 @@ public sealed class GitHubManager : IGitHubManager
 
         public static ApiReadyEvent? Get(IEnumerable<EventInfo> events, DateTimeOffset end)
         {
-            var readyEvent = default(EventInfo);
-
             foreach (var e in events.Where(e => e.CreatedAt <= end)
                                     .OrderByDescending(e => e.CreatedAt))
+            {
                 switch (e.Event.StringValue)
                 {
                     case "labeled" when string.Equals(e.Label.Name, ApiReviewConstants.ApiReadyForReview, StringComparison.OrdinalIgnoreCase):
-                        readyEvent = e;
-                        break;
+                        return new ApiReadyEvent(e.Actor.Login, e.CreatedAt);
                 }
+            }
 
-            return readyEvent is null
-                    ? null
-                    : new ApiReadyEvent(readyEvent.Actor.Login, readyEvent.CreatedAt);
+            return null;
         }
     }
 
@@ -283,20 +280,19 @@ public sealed class GitHubManager : IGitHubManager
 
         public static ApiBlockingEvent? Get(IEnumerable<EventInfo> events, DateTimeOffset end)
         {
-            var blockingEvent = default(EventInfo);
-
             foreach (var e in events.Where(e => e.CreatedAt <= end)
                                     .OrderByDescending(e => e.CreatedAt))
+            {
                 switch (e.Event.StringValue)
                 {
                     case "labeled" when string.Equals(e.Label.Name, ApiReviewConstants.Blocking, StringComparison.OrdinalIgnoreCase):
-                        blockingEvent = e;
-                        break;
+                        return new ApiBlockingEvent(e.Actor.Login, e.CreatedAt);
+                    case "unlabeled" when string.Equals(e.Label.Name, ApiReviewConstants.Blocking, StringComparison.OrdinalIgnoreCase):
+                        return null;
                 }
+            }
 
-            return blockingEvent is null
-                ? null
-                : new ApiBlockingEvent(blockingEvent.Actor.Login, blockingEvent.CreatedAt);
+            return null;
         }
     }
 
