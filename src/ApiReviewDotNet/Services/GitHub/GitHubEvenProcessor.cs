@@ -40,8 +40,7 @@ public sealed class GitHubEvenProcessor : IGitHubEventProcessor
 
     public async void Process(GitHubEventMessage message)
     {
-        var messageText = message.FormatMessage();
-        _logger.LogInformation("Received {message}", messageText);
+        _logger.LogInformation("Received {message}", message);
 
         if (IsRelevant(message))
         {
