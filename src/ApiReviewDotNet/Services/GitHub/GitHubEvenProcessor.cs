@@ -29,17 +29,25 @@ public sealed class GitHubEvenProcessor : IGitHubEventProcessor
         ApiReviewConstants.ApiNeedsWork
     };
 
+    private readonly ILogger<GitHubEvenProcessor> _logger;
     private readonly IssueService _issueService;
 
-    public GitHubEvenProcessor(IssueService issueService)
+    public GitHubEvenProcessor(ILogger<GitHubEvenProcessor> logger, IssueService issueService)
     {
+        _logger = logger;
         _issueService = issueService;
     }
 
     public async void Process(GitHubEventMessage message)
     {
+        var messageText = message.FormatMessage();
+        _logger.LogInformation("Received {message}", messageText);
+
         if (IsRelevant(message))
+        {
+            _logger.LogInformation("Message relevant, reloading issues");
             await _issueService.ReloadAsync();
+        }
     }
 
     private static bool IsRelevant(GitHubEventMessage message)
