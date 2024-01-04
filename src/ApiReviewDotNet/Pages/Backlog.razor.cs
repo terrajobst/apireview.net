@@ -76,7 +76,7 @@ public sealed partial class Backlog : IDisposable
         }
 
         if (queryParameters.TryGetValue("q", out var q))
-            _filter = q;
+            _filter = q!;
 
         if (queryParameters.TryGetValue("m", out var selectedMilestones))
         {
@@ -85,8 +85,8 @@ public sealed partial class Backlog : IDisposable
 
             foreach (var m in selectedMilestones)
             {
-                if (_milestones.ContainsKey(m))
-                    _milestones[m] = true;
+                if (_milestones.ContainsKey(m!))
+                    _milestones[m!] = true;
             }
         }
 

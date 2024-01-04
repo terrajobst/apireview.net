@@ -64,8 +64,8 @@ builder.Services.AddAuthentication(options =>
 })
 .AddGitHub(options =>
 {
-    options.ClientId = builder.Configuration["GitHubClientId"];
-    options.ClientSecret = builder.Configuration["GitHubClientSecret"];
+    options.ClientId = builder.Configuration["GitHubClientId"]!;
+    options.ClientSecret = builder.Configuration["GitHubClientSecret"]!;
     options.ClaimActions.MapJsonKey(ApiReviewConstants.GitHubAvatarUrl, ApiReviewConstants.GitHubAvatarUrl);
     options.Events.OnCreatingTicket = async context =>
     {

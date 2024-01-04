@@ -41,17 +41,17 @@ public sealed class RepositoryGroup
         {
             var item = new RepositoryGroup(
                 name: groupConfiguration.Key,
-                displayName: groupConfiguration["DisplayName"],
+                displayName: groupConfiguration["DisplayName"]!,
                 isDefault: groupConfiguration.GetValue("IsDefault", false),
                 repos: groupConfiguration.GetSection("Repos")
                                          .GetChildren()
-                                         .Select(r => OrgAndRepo.Parse(r.Value)!)
+                                         .Select(r => OrgAndRepo.Parse(r.Value!)!)
                                          .ToArray(),
-                approverTeamSlug: groupConfiguration["ApproverTeamSlug"],
-                mailingList: groupConfiguration["MailingList"],
-                mailingReplyTo: groupConfiguration["MailingReplyTo"],
-                notesRepo: OrgAndRepo.Parse(groupConfiguration["NotesRepo"])!,
-                notesSuffix: groupConfiguration["NotesSuffix"]
+                approverTeamSlug: groupConfiguration["ApproverTeamSlug"]!,
+                mailingList: groupConfiguration["MailingList"]!,
+                mailingReplyTo: groupConfiguration["MailingReplyTo"]!,
+                notesRepo: OrgAndRepo.Parse(groupConfiguration["NotesRepo"]!)!,
+                notesSuffix: groupConfiguration["NotesSuffix"]!
             );
             result.Add(item);
         }

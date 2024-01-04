@@ -20,7 +20,7 @@ public sealed class GitHubClientFactory
         // See: https://octokitnet.readthedocs.io/en/latest/github-apps/ for details.
 
         var appId = Convert.ToInt32(_configuration["GitHubAppId"]);
-        var privateKey = _configuration["GitHubAppPrivateKey"];
+        var privateKey = _configuration["GitHubAppPrivateKey"]!;
 
         var privateKeySource = new PlainStringPrivateKeySource(privateKey);
         var generator = new GitHubJwtFactory(
