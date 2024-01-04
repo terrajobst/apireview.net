@@ -7,6 +7,7 @@ using ApiReviewDotNet.Services.GitHub;
 using ApiReviewDotNet.Services.Ospo;
 using ApiReviewDotNet.Services.YouTube;
 
+using Azure.Identity;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
@@ -41,6 +42,10 @@ else
 {
     builder.Services.AddSingleton<IYouTubeManager, YouTubeManager>();
     builder.Services.AddSingleton<IGitHubManager, GitHubManager>();
+
+    builder.Configuration.AddAzureKeyVault(
+        new Uri($"https://{builder.Configuration["KeyVaultName"]}.vault.azure.net/"),
+        new DefaultAzureCredential());
 }
 
 builder.Services.AddSingleton<SummaryManager>();
