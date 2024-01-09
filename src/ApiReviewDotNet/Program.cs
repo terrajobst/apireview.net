@@ -3,6 +3,7 @@
 using ApiReviewDotNet;
 using ApiReviewDotNet.Data;
 using ApiReviewDotNet.Services;
+using ApiReviewDotNet.Services.Calendar;
 using ApiReviewDotNet.Services.GitHub;
 using ApiReviewDotNet.Services.Ospo;
 using ApiReviewDotNet.Services.YouTube;
@@ -32,6 +33,7 @@ builder.Services.AddSingleton<AreaOwnerService>();
 builder.Services.AddSingleton<OspoService>();
 builder.Services.AddSingleton<RepositoryGroupService>();
 builder.Services.AddSingleton<IGitHubEventProcessor, GitHubEvenProcessor>();
+builder.Services.AddSingleton<CalendarService>();
 
 if (builder.Environment.IsDevelopment())
 {
