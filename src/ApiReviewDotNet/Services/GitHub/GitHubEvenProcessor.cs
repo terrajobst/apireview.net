@@ -1,10 +1,12 @@
 ﻿using ApiReviewDotNet.Data;
-
-using Terrajobst.GitHubEvents;
+using Octokit.Webhooks;
+using Octokit.Webhooks.Events;
+using Octokit.Webhooks.Models;
+using Octokit.Webhooks.Models.PullRequestEvent;
 
 namespace ApiReviewDotNet.Services.GitHub;
 
-public sealed class GitHubEvenProcessor : IGitHubEventProcessor
+public sealed class GitHubEvenProcessor : WebhookEventProcessor
 {
     private static readonly HashSet<string> _relevantActions = new(StringComparer.OrdinalIgnoreCase)
     {
@@ -38,48 +40,47 @@ public sealed class GitHubEvenProcessor : IGitHubEventProcessor
         _issueService = issueService;
     }
 
-    public async void Process(GitHubEventMessage message)
+    public override async Task ProcessWebhookAsync(WebhookHeaders headers, WebhookEvent webhookEvent)
     {
-        _logger.LogInformation("Received {message}", message);
+        _logger.LogInformation("Received {message}", webhookEvent);
 
-        if (IsRelevant(message))
+        if (IsRelevant(webhookEvent))
         {
             _logger.LogInformation("Message relevant, reloading issues");
             await _issueService.ReloadAsync();
         }
     }
-
-    private static bool IsRelevant(GitHubEventMessage message)
+    
+    private static bool IsRelevant(WebhookEvent message)
     {
-        if (message.Body.Action is null || !_relevantActions.Contains(message.Body.Action))
+        if (message.Action is null || !_relevantActions.Contains(message.Action))
             return false;
 
-        return IsRelevant(message.Body.Label) ||
-               IsRelevant(message.Body.Issue) ||
-               IsRelevant(message.Body.PullRequest);
+        return message is LabelEvent labelEvent && IsRelevant(labelEvent.Label) ||
+               message is IssuesEvent issuesEvent && IsRelevant(issuesEvent.Issue) ||
+               message is PullRequestEvent pullRequestEvent && IsRelevant(pullRequestEvent.PullRequest);
     }
 
-    private static bool IsRelevant(GitHubEventIssueOrPullRequest? issueOrPullRequest)
+    private static bool IsRelevant(Issue? issue)
     {
-        if (issueOrPullRequest is null || issueOrPullRequest.Labels is null)
-            return false;
-
-        return IsRelevant(issueOrPullRequest.Labels);
+        return issue is not null && IsRelevant(issue.Labels);
     }
 
-    private static bool IsRelevant(IEnumerable<GitHubEventLabel>? labels)
+    private static bool IsRelevant(PullRequest? issue)
     {
-        if (labels is null)
-            return false;
-
-        return labels.Any(IsRelevant);
+        return issue is not null &&
+               IsRelevant(issue.Labels);
     }
 
-    private static bool IsRelevant(GitHubEventLabel? payload)
+    private static bool IsRelevant(IEnumerable<Label>? labels)
     {
-        if (payload is null || payload.Name is null)
-            return false;
+        return labels is not null &&
+               labels.Any(IsRelevant);
+    }
 
-        return _relevantLabels.Contains(payload.Name);
+    private static bool IsRelevant(Label? payload)
+    {
+        return payload is not null &&
+               _relevantLabels.Contains(payload.Name);
     }
 }

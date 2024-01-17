@@ -11,9 +11,8 @@ using ApiReviewDotNet.Services.YouTube;
 using Azure.Identity;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-
-using Terrajobst.GitHubEvents;
-using Terrajobst.GitHubEvents.AspNetCore;
+using Octokit.Webhooks;
+using Octokit.Webhooks.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,7 +30,7 @@ builder.Services.AddSingleton<YouTubeServiceFactory>();
 builder.Services.AddSingleton<AreaOwnerService>();
 builder.Services.AddSingleton<OspoService>();
 builder.Services.AddSingleton<RepositoryGroupService>();
-builder.Services.AddSingleton<IGitHubEventProcessor, GitHubEvenProcessor>();
+builder.Services.AddSingleton<WebhookEventProcessor, GitHubEvenProcessor>();
 builder.Services.AddSingleton<CalendarService>();
 
 if (builder.Environment.IsDevelopment())
@@ -115,7 +114,7 @@ app.UseAuthorization();
 
 app.MapBlazorHub();
 app.MapDefaultControllerRoute();
-app.MapGitHubWebHook();
+app.MapGitHubWebhooks();
 app.MapFallbackToPage("/_Host");
 
 app.Run();
