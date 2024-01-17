@@ -32,21 +32,12 @@ builder.Services.AddSingleton<OspoService>();
 builder.Services.AddSingleton<RepositoryGroupService>();
 builder.Services.AddSingleton<WebhookEventProcessor, GitHubEvenProcessor>();
 builder.Services.AddSingleton<CalendarService>();
+builder.Services.AddSingleton<YouTubeManager>();
+builder.Services.AddSingleton<GitHubManager>();
 
-if (builder.Environment.IsDevelopment())
-{
-    builder.Services.AddSingleton<IYouTubeManager, FakeYouTubeManager>();
-    builder.Services.AddSingleton<IGitHubManager, FakeGitHubManager>();
-}
-else
-{
-    builder.Services.AddSingleton<IYouTubeManager, YouTubeManager>();
-    builder.Services.AddSingleton<IGitHubManager, GitHubManager>();
-
-    builder.Configuration.AddAzureKeyVault(
-        new Uri($"https://{builder.Configuration["KeyVaultName"]}.vault.azure.net/"),
-        new DefaultAzureCredential());
-}
+builder.Configuration.AddAzureKeyVault(
+    new Uri($"https://{builder.Configuration["KeyVaultName"]}.vault.azure.net/"),
+    new DefaultAzureCredential());
 
 builder.Services.AddSingleton<SummaryManager>();
 builder.Services.AddSingleton<SummaryPublishingService>();

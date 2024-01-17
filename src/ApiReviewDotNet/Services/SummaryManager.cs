@@ -10,10 +10,10 @@ public sealed class SummaryManager
     // has ended. To account for that, we'll give us 15 minutes extra.
     private static readonly TimeSpan _extraTimeAfterStreamEnded = TimeSpan.FromMinutes(15);
 
-    private readonly IYouTubeManager _youTubeManager;
-    private readonly IGitHubManager _gitHubManager;
+    private readonly YouTubeManager _youTubeManager;
+    private readonly GitHubManager _gitHubManager;
 
-    public SummaryManager(IYouTubeManager youTubeManager, IGitHubManager gitHubManager)
+    public SummaryManager(YouTubeManager youTubeManager, GitHubManager gitHubManager)
     {
         _youTubeManager = youTubeManager;
         _gitHubManager = gitHubManager;

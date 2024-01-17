@@ -6,12 +6,12 @@ namespace ApiReviewDotNet.Services;
 public sealed class NotesService
 {
     private readonly ILogger<NotesService> _logger;
-    private readonly IYouTubeManager _youTubeManager;
+    private readonly YouTubeManager _youTubeManager;
     private readonly SummaryManager _summaryManager;
     private readonly SummaryPublishingService _summaryPublishingService;
 
     public NotesService(ILogger<NotesService> logger,
-                        IYouTubeManager youTubeManager,
+                        YouTubeManager youTubeManager,
                         SummaryManager summaryManager,
                         SummaryPublishingService summaryPublishingService)
     {

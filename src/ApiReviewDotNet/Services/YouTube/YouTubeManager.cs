@@ -6,7 +6,7 @@ using static Google.Apis.YouTube.v3.SearchResource.ListRequest;
 
 namespace ApiReviewDotNet.Services.YouTube;
 
-public class YouTubeManager : IYouTubeManager
+public class YouTubeManager
 {
     private readonly YouTubeServiceFactory _youTubeServiceFactory;
 

@@ -5,9 +5,9 @@ namespace ApiReviewDotNet.Services;
 
 public sealed class IssueService
 {
-    private readonly IGitHubManager _gitHubManager;
+    private readonly GitHubManager _gitHubManager;
 
-    public IssueService(IGitHubManager gitHubManager)
+    public IssueService(GitHubManager gitHubManager)
     {
         _gitHubManager = gitHubManager;
         Load();

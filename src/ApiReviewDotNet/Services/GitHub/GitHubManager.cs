@@ -5,7 +5,7 @@ using Octokit;
 
 namespace ApiReviewDotNet.Services.GitHub;
 
-public sealed class GitHubManager : IGitHubManager
+public sealed class GitHubManager
 {
     private readonly RepositoryGroupService _repositoryGroupService;
     private readonly GitHubClientFactory _clientFactory;
