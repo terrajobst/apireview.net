@@ -197,7 +197,7 @@ public sealed class SummaryPublishingService
             var newCommitResponse = await github.Git.Commit.Create(owner, repo, newCommit);
 
             var newReference = new ReferenceUpdate(newCommitResponse.Sha);
-            var newReferenceResponse = await github.Git.Reference.Update(owner, repo, head, newReference);
+            await github.Git.Reference.Update(owner, repo, head, newReference);
         }
 
         var url = $"https://github.com/{owner}/{repo}/blob/{branch}/{path}";
