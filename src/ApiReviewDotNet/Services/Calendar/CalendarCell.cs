@@ -1,4 +1,4 @@
-namespace ApiReviewDotNet.Services.Calendar;
+﻿namespace ApiReviewDotNet.Services.Calendar;
 
 public sealed class CalendarCell
 {

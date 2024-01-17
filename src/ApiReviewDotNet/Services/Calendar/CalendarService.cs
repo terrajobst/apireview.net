@@ -1,4 +1,4 @@
-using Ical.Net;
+﻿using Ical.Net;
 using Ical.Net.CalendarComponents;
 using Ical.Net.DataTypes;
 
@@ -7,7 +7,7 @@ namespace ApiReviewDotNet.Services.Calendar;
 public sealed class CalendarService
 {
     public string Url => "https://outlook.office365.com/owa/calendar/3b9be8f4136f47bfb3bd10638b946523@microsoft.com/dedb09caf32a4c23be118e9f97ad25717678617836187798260/calendar.ics";
-    
+
     private readonly IHttpClientFactory _httpClientFactory;
 
     public CalendarService(IHttpClientFactory httpClientFactory)
@@ -24,13 +24,13 @@ public sealed class CalendarService
     private async Task<CalendarCollection> LoadCalendarAsync(string url)
     {
         using var httpClient = _httpClientFactory.CreateClient();
-        
+
         using var request = new HttpRequestMessage(HttpMethod.Get, url);
         request.Headers.Add("User-Agent", "apireview.net");
-        
+
         using var response = await httpClient.SendAsync(request);
         var content = await response.Content.ReadAsStringAsync();
-        
+
         return CalendarCollection.Load(content);
     }
 

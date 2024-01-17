@@ -29,7 +29,7 @@ public sealed class GitHubClientFactory
             {
                 AppIntegrationId = appId,
                 ExpirationSeconds = 8 * 60 // 600 is apparently too high
-                });
+            });
         var token = generator.CreateEncodedJwtToken();
 
         var client = CreateForToken(token, AuthenticationType.Bearer);

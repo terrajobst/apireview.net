@@ -50,7 +50,7 @@ public sealed class GitHubEvenProcessor : WebhookEventProcessor
             await _issueService.ReloadAsync();
         }
     }
-    
+
     private static bool IsRelevant(WebhookEvent message)
     {
         if (message.Action is null || !_relevantActions.Contains(message.Action))

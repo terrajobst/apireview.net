@@ -111,11 +111,11 @@ public sealed class ApiReviewIssue : IComparable<ApiReviewIssue>
         result = CompareDates(MarkedBlockingAt, other.MarkedBlockingAt);
         if (result != 0)
             return result;
-        
+
         result = CompareDates(MarkedReadyAt, other.MarkedReadyAt);
         if (result != 0)
             return result;
-        
+
         return CreatedAt.CompareTo(other.CreatedAt);
     }
 
