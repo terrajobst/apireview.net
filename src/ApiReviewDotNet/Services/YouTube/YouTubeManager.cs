@@ -45,8 +45,8 @@ public class YouTubeManager
         searchRequest.ChannelId = ApiReviewConstants.NetFoundationChannelId;
         searchRequest.Type = "video";
         searchRequest.EventType = EventTypeEnum.Completed;
-        searchRequest.PublishedAfter = start.DateTime;
-        searchRequest.PublishedBefore = end.DateTime;
+        searchRequest.PublishedAfterDateTimeOffset = start;
+        searchRequest.PublishedBeforeDateTimeOffset = end;
         searchRequest.MaxResults = 25;
 
         while (nextPageToken is not null)
@@ -66,8 +66,8 @@ public class YouTubeManager
         }
 
         var videos = result.Where(v => v.LiveStreamingDetails is not null &&
-                                       v.LiveStreamingDetails.ActualStartTime is not null &&
-                                       v.LiveStreamingDetails.ActualEndTime is not null)
+                                       v.LiveStreamingDetails.ActualStartTimeDateTimeOffset is not null &&
+                                       v.LiveStreamingDetails.ActualEndTimeDateTimeOffset is not null)
                            .Select(CreateVideo)
                            .OrderBy(v => v.StartDateTime);
         return videos.ToArray();
@@ -76,8 +76,8 @@ public class YouTubeManager
     private static ApiReviewVideo CreateVideo(Video v)
     {
         return new ApiReviewVideo(v.Id,
-                                  v.LiveStreamingDetails.ActualStartTime!.Value,
-                                  v.LiveStreamingDetails.ActualEndTime!.Value,
+                                  v.LiveStreamingDetails.ActualStartTimeDateTimeOffset!.Value,
+                                  v.LiveStreamingDetails.ActualEndTimeDateTimeOffset!.Value,
                                   v.Snippet.Title,
                                   v.Snippet.Thumbnails.Medium.Url);
     }
