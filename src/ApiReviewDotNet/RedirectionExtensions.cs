@@ -1,4 +1,4 @@
-﻿using Microsoft.ApplicationInsights.AspNetCore.Extensions;
+﻿using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Net.Http.Headers;
 
 namespace ApiReviewDotNet;
@@ -9,7 +9,7 @@ public static class RedirectionExtensions
     {
         return app.Use(async (context, next) =>
         {
-            var url = context.Request.GetUri();
+            var url = new Uri(context.Request.GetEncodedUrl());
             if (url.Host.Equals(oldHost, StringComparison.OrdinalIgnoreCase))
             {
                 var response = context.Response;
