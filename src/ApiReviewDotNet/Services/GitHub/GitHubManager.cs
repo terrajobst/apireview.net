@@ -187,7 +187,7 @@ public sealed class GitHubManager
         }
     }
 
-    private ApiReviewIssue CreateIssue(string owner, string repo, Issue issue, IReadOnlyList<EventInfo> events, DateTimeOffset end)
+    private ApiReviewIssue CreateIssue(string owner, string repo, Issue issue, IReadOnlyList<IssueEvent> events, DateTimeOffset end)
     {
         var readyEvent = ApiReadyEvent.Get(events, end);
         var blockingEvent = ApiBlockingEvent.Get(events, end);
@@ -250,7 +250,7 @@ public sealed class GitHubManager
         public string DecisionMaker { get; }
         public DateTimeOffset CreatedAt { get; }
 
-        public static ApiReadyEvent? Get(IEnumerable<EventInfo> events, DateTimeOffset end)
+        public static ApiReadyEvent? Get(IEnumerable<IssueEvent> events, DateTimeOffset end)
         {
             foreach (var e in events.Where(e => e.CreatedAt <= end)
                                     .OrderByDescending(e => e.CreatedAt))
@@ -278,7 +278,7 @@ public sealed class GitHubManager
 
         public DateTimeOffset CreatedAt { get; }
 
-        public static ApiBlockingEvent? Get(IEnumerable<EventInfo> events, DateTimeOffset end)
+        public static ApiBlockingEvent? Get(IEnumerable<IssueEvent> events, DateTimeOffset end)
         {
             foreach (var e in events.Where(e => e.CreatedAt <= end)
                                     .OrderByDescending(e => e.CreatedAt))
@@ -305,9 +305,9 @@ public sealed class GitHubManager
             DecisionTime = decisionTime;
         }
 
-        public static ApiReviewOutcome? Get(IEnumerable<EventInfo> events, DateTimeOffset start, DateTimeOffset end)
+        public static ApiReviewOutcome? Get(IEnumerable<IssueEvent> events, DateTimeOffset start, DateTimeOffset end)
         {
-            var readyEvent = default(EventInfo);
+            var readyEvent = default(IssueEvent);
             var current = default(ApiReviewOutcome);
             var rejection = default(ApiReviewOutcome);
 
