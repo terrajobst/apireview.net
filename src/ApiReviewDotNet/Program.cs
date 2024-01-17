@@ -21,7 +21,6 @@ builder.Services.AddRazorPages().AddJsonOptions(o =>
 {
     o.JsonSerializerOptions.Converters.Add(new TimeSpanJsonConverter());
 });
-builder.Services.AddApplicationInsightsTelemetry(builder.Configuration["APPINSIGHTS_INSTRUMENTATIONKEY"]);
 builder.Services.AddServerSideBlazor();
 builder.Services.AddControllers();
 builder.Services.AddHostedService<AreaOwnerServiceWarmup>();
