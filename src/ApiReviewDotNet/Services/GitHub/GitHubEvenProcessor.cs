@@ -42,7 +42,7 @@ public sealed class GitHubEvenProcessor : WebhookEventProcessor
 
     public override async Task ProcessWebhookAsync(WebhookHeaders headers, WebhookEvent webhookEvent)
     {
-        _logger.LogInformation("Received {message}", webhookEvent);
+        _logger.LogInformation("Received event {action} ({type})", webhookEvent.Action, webhookEvent.GetType().Name);
 
         if (IsRelevant(webhookEvent))
         {
