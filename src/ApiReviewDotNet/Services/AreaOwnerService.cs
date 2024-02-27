@@ -2,6 +2,7 @@
 
 public sealed class AreaOwnerService
 {
+    private static readonly TimeSpan _refreshInterval = TimeSpan.FromHours(1);
     private readonly ILogger<AreaOwnerService> _logger;
 
     private Dictionary<string, string[]> _ownerByArea = new();
@@ -9,6 +10,16 @@ public sealed class AreaOwnerService
     public AreaOwnerService(ILogger<AreaOwnerService> logger)
     {
         _logger = logger;
+    }
+
+    public async Task StartAsync()
+    {
+        await ReloadAsync();
+
+        _ = Task.Run(async () => {
+            await Task.Delay(_refreshInterval);
+            await ReloadAsync();
+        });
     }
 
     public IReadOnlyList<string> GetOwners(string area)
@@ -25,6 +36,7 @@ public sealed class AreaOwnerService
         {
             _ownerByArea = await GetOwnersAsync();
             _logger.LogInformation("Loaded {count} area owners", _ownerByArea.Count);
+            Changed?.Invoke(this, EventArgs.Empty);
         }
         catch (Exception ex)
         {
@@ -72,4 +84,6 @@ public sealed class AreaOwnerService
             yield return line;
         }
     }
+
+    public event EventHandler? Changed;
 }

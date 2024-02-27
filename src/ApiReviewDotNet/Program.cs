@@ -22,8 +22,6 @@ builder.Services.AddRazorPages().AddJsonOptions(o =>
 });
 builder.Services.AddServerSideBlazor();
 builder.Services.AddControllers();
-builder.Services.AddHostedService<AreaOwnerServiceWarmup>();
-builder.Services.AddHostedService<OspoServiceWarmup>();
 builder.Services.AddSingleton<IssueService>();
 builder.Services.AddSingleton<GitHubClientFactory>();
 builder.Services.AddSingleton<YouTubeServiceFactory>();
@@ -81,6 +79,9 @@ builder.Services.AddHttpClient();
 var app = builder.Build();
 
 // Warm up services
+var ospoService = app.Services.GetRequiredService<OspoService>();
+var areaOwnerService = app.Services.GetRequiredService<AreaOwnerService>();
+Task.WaitAll(ospoService.StartAsync(), areaOwnerService.StartAsync());
 app.Services.GetRequiredService<IssueService>();
 
 if (app.Environment.IsDevelopment())

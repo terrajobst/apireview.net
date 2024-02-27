@@ -2,6 +2,7 @@
 
 public sealed class OspoService
 {
+    private static readonly TimeSpan _refreshInterval = TimeSpan.FromHours(1);
     private readonly ILogger<OspoService> _logger;
     private readonly IConfiguration _configuration;
     private readonly IWebHostEnvironment _environment;
@@ -15,6 +16,16 @@ public sealed class OspoService
         _environment = environment;
     }
 
+    public async Task StartAsync()
+    {
+        await ReloadAsync();
+
+        _ = Task.Run(async () => {
+            await Task.Delay(_refreshInterval);
+            await ReloadAsync();
+        });
+    }
+
     public async Task ReloadAsync()
     {
         if (_environment.IsDevelopment())
@@ -25,6 +36,7 @@ public sealed class OspoService
             var client = new OspoClient(_configuration["OspoToken"]!);
             LinkSet = await client.GetAllAsync();
             _logger.LogInformation("Loaded {count} OSPO links", LinkSet.Links.Count);
+            Changed?.Invoke(this, EventArgs.Empty);
         }
         catch (Exception ex)
         {
@@ -33,4 +45,6 @@ public sealed class OspoService
     }
 
     public OspoLinkSet LinkSet { get; private set; } = OspoLinkSet.Empty;
+
+    public event EventHandler? Changed;
 }
