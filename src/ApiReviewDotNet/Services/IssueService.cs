@@ -1,47 +1,15 @@
 ﻿using ApiReviewDotNet.Data;
 using ApiReviewDotNet.Services.GitHub;
-using ApiReviewDotNet.Services.Ospo;
 
 namespace ApiReviewDotNet.Services;
 
-public sealed class IssueService : IDisposable
+public sealed class IssueService
 {
     private readonly GitHubManager _gitHubManager;
-    private readonly AreaOwnerService _areaOwnerService;
-    private readonly OspoService _ospoService;
 
-    public IssueService(GitHubManager gitHubManager,
-                        AreaOwnerService areaOwnerService,
-                        OspoService ospoService)
+    public IssueService(GitHubManager gitHubManager)
     {
         _gitHubManager = gitHubManager;
-        _areaOwnerService = areaOwnerService;
-        _ospoService = ospoService;
-        Load();
-
-        _ospoService.Changed += OspoServiceChanged;
-        _areaOwnerService.Changed += AreaOwnerServiceChanged;
-    }
-
-    public void Dispose()
-    {
-        _ospoService.Changed -= OspoServiceChanged;
-        _areaOwnerService.Changed -= AreaOwnerServiceChanged;
-    }
-
-    private void OspoServiceChanged(object? sender, EventArgs e)
-    {
-        Load();
-    }
-
-    private void AreaOwnerServiceChanged(object? sender, EventArgs e)
-    {
-        Load();
-    }
-
-    private async void Load()
-    {
-        await ReloadAsync();
     }
 
     public async Task ReloadAsync()

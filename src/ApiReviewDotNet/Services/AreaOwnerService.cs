@@ -1,25 +1,18 @@
-﻿namespace ApiReviewDotNet.Services;
+﻿using ApiReviewDotNet.Services.GitHub;
+
+namespace ApiReviewDotNet.Services;
 
 public sealed class AreaOwnerService
 {
-    private static readonly TimeSpan _refreshInterval = TimeSpan.FromHours(1);
     private readonly ILogger<AreaOwnerService> _logger;
-
+    private readonly GitHubTeamService _teamService;
     private Dictionary<string, string[]> _ownerByArea = new();
 
-    public AreaOwnerService(ILogger<AreaOwnerService> logger)
+    public AreaOwnerService(ILogger<AreaOwnerService> logger,
+                            GitHubTeamService teamService)
     {
         _logger = logger;
-    }
-
-    public async Task StartAsync()
-    {
-        await ReloadAsync();
-
-        _ = Task.Run(async () => {
-            await Task.Delay(_refreshInterval);
-            await ReloadAsync();
-        });
+        _teamService = teamService;
     }
 
     public IReadOnlyList<string> GetOwners(string area)
@@ -34,9 +27,8 @@ public sealed class AreaOwnerService
     {
         try
         {
-            _ownerByArea = await GetOwnersAsync();
+            _ownerByArea = await GetOwnersAsync(_teamService);
             _logger.LogInformation("Loaded {count} area owners", _ownerByArea.Count);
-            Changed?.Invoke(this, EventArgs.Empty);
         }
         catch (Exception ex)
         {
@@ -44,7 +36,7 @@ public sealed class AreaOwnerService
         }
     }
 
-    private static async Task<Dictionary<string, string[]>> GetOwnersAsync()
+    private static async Task<Dictionary<string, string[]>> GetOwnersAsync(GitHubTeamService teamService)
     {
         var url = "https://raw.githubusercontent.com/dotnet/runtime/main/docs/area-owners.md";
         var client = new HttpClient();
@@ -66,7 +58,18 @@ public sealed class AreaOwnerService
             if (!area.StartsWith("area-", StringComparison.OrdinalIgnoreCase))
                 continue;
 
-            result[area] = owners;
+            var expandedOwners = new SortedSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var owner in owners)
+            {
+                var members = teamService.GetMembers(owner);
+                if (members is not null)
+                    expandedOwners.UnionWith(members);
+                else
+                    expandedOwners.Add(owner);
+            }
+
+            result[area] = expandedOwners.ToArray();
         }
 
         return result;
@@ -84,6 +87,4 @@ public sealed class AreaOwnerService
             yield return line;
         }
     }
-
-    public event EventHandler? Changed;
 }

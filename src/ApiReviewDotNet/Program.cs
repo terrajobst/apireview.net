@@ -32,6 +32,8 @@ builder.Services.AddSingleton<WebhookEventProcessor, GitHubEventProcessor>();
 builder.Services.AddSingleton<CalendarService>();
 builder.Services.AddSingleton<YouTubeManager>();
 builder.Services.AddSingleton<GitHubManager>();
+builder.Services.AddSingleton<GitHubTeamService>();
+builder.Services.AddSingleton<RefreshService>();
 
 builder.Configuration.AddAzureKeyVault(
     new Uri($"https://{builder.Configuration["KeyVaultName"]}.vault.azure.net/"),
@@ -79,10 +81,8 @@ builder.Services.AddHttpClient();
 var app = builder.Build();
 
 // Warm up services
-var ospoService = app.Services.GetRequiredService<OspoService>();
-var areaOwnerService = app.Services.GetRequiredService<AreaOwnerService>();
-Task.WaitAll(ospoService.StartAsync(), areaOwnerService.StartAsync());
-app.Services.GetRequiredService<IssueService>();
+var refreshService = app.Services.GetRequiredService<RefreshService>();
+await refreshService.StartAsync();
 
 if (app.Environment.IsDevelopment())
 {
