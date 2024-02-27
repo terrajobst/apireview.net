@@ -153,15 +153,27 @@ public sealed class GitHubManager
     private ApiReviewer[] GetReviewers(string author,
                                        IReadOnlyList<string> assignees,
                                        string? markedReadyForReviewBy,
+                                       string? markedBlockingBy,
                                        IReadOnlyList<string> areaOwners)
     {
         var linkSet = _ospoService.LinkSet;
         var result = new List<ApiReviewer>();
 
+        // We want to assign reviewers based on relevance,
+        //
+        // 1. Whoever marked it blocking
+        // 2. Whoever marked it as ready-for-review
+        // 3. Whoever is the author
+        // 4. Assignees
+        // 5. Area owners
+
+        Add(result, linkSet, markedBlockingBy);
+        Add(result, linkSet, markedReadyForReviewBy);
         Add(result, linkSet, author);
+
         foreach (var assignee in assignees ?? Array.Empty<string>())
             Add(result, linkSet, assignee);
-        Add(result, linkSet, markedReadyForReviewBy);
+
         foreach (var areaOwner in areaOwners ?? Array.Empty<string>())
             Add(result, linkSet, areaOwner);
 
@@ -202,7 +214,7 @@ public sealed class GitHubManager
         var areaOwners = GetAreaOwners(issue.Labels.Select(l => l.Name));
         var milestone = issue.Milestone?.Title ?? ApiReviewConstants.NoMilestone;
         var labels = issue.Labels.Select(l => new ApiReviewLabel(l.Name, l.Color, l.Description)).ToArray();
-        var reviewers = GetReviewers(author, assignees, markedReadyForReviewBy, areaOwners);
+        var reviewers = GetReviewers(author, assignees, markedReadyForReviewBy, markedBlockingBy, areaOwners);
 
         var result = new ApiReviewIssue(
             owner,
