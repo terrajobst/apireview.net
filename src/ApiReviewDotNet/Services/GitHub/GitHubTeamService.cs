@@ -4,7 +4,6 @@ namespace ApiReviewDotNet.Services.GitHub;
 
 public sealed class GitHubTeamService
 {
-    private static readonly TimeSpan _refreshInterval = TimeSpan.FromHours(1);
     private readonly ILogger<GitHubTeamService> _logger;
     private readonly GitHubClientFactory _clientFactory;
     private readonly string[] _orgs;
@@ -17,16 +16,6 @@ public sealed class GitHubTeamService
         _logger = logger;
         _clientFactory = clientFactory;
         _orgs = repositoryGroupService.Repositories.Select(r => r.OrgName).Distinct().ToArray();
-    }
-
-    public async Task StartAsync()
-    {
-        await ReloadAsync();
-
-        _ = Task.Run(async () => {
-            await Task.Delay(_refreshInterval);
-            await ReloadAsync();
-        });
     }
 
     public async Task ReloadAsync()
