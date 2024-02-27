@@ -7,7 +7,7 @@ public sealed class GitHubTeamService
     private readonly ILogger<GitHubTeamService> _logger;
     private readonly GitHubClientFactory _clientFactory;
     private readonly string[] _orgs;
-    private Dictionary<string, IReadOnlyList<string>> _membersByTeam = new();
+    private Dictionary<string, IReadOnlyList<string>> _membersBySlug = new();
 
     public GitHubTeamService(ILogger<GitHubTeamService> logger,
                              GitHubClientFactory clientFactory,
@@ -23,8 +23,8 @@ public sealed class GitHubTeamService
         try
         {
             var github = await _clientFactory.CreateForAppAsync();
-            _membersByTeam = await LoadTeams(github);
-            _logger.LogInformation("Loaded {count} teams", _membersByTeam.Count);
+            _membersBySlug = await LoadTeams(github);
+            _logger.LogInformation("Loaded {count} teams", _membersBySlug.Count);
         }
         catch (Exception ex)
         {
@@ -34,7 +34,7 @@ public sealed class GitHubTeamService
 
     private async Task<Dictionary<string, IReadOnlyList<string>>> LoadTeams(GitHubClient github)
     {
-        var membersByTeam = new Dictionary<string, IReadOnlyList<string>>();
+        var membersBySlug = new Dictionary<string, IReadOnlyList<string>>();
 
         foreach (var org in _orgs)
         {
@@ -42,22 +42,19 @@ public sealed class GitHubTeamService
 
             foreach (var team in teams)
             {
+                var slug = $"{org}/{team.Slug}";
                 var members = await github.Organization.Team.GetAllMembers(team.Id);
                 var memberNames = members.Select(u => u.Login).ToArray();
-
-                if (membersByTeam.TryGetValue(team.Name, out var existingMembers))
-                    memberNames = memberNames.Concat(existingMembers).Distinct().Order().ToArray();
-
-                membersByTeam[team.Name] = memberNames;
+                membersBySlug.Add(slug, memberNames);
             }
         }
 
-        return membersByTeam;
+        return membersBySlug;
     }
 
-    public IReadOnlyList<string>? GetMembers(string teamName)
+    public IReadOnlyList<string>? GetMembers(string slug)
     {
-        _membersByTeam.TryGetValue(teamName, out var result);
+        _membersBySlug.TryGetValue(slug, out var result);
         return result;
     }
 }
