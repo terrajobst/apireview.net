@@ -6,7 +6,7 @@ using Octokit.Webhooks.Models.PullRequestEvent;
 
 namespace ApiReviewDotNet.Services.GitHub;
 
-public sealed class GitHubEvenProcessor : WebhookEventProcessor
+public sealed class GitHubEventProcessor : WebhookEventProcessor
 {
     private static readonly HashSet<string> _relevantActions = new(StringComparer.OrdinalIgnoreCase)
     {
@@ -31,10 +31,10 @@ public sealed class GitHubEvenProcessor : WebhookEventProcessor
         ApiReviewConstants.ApiNeedsWork
     };
 
-    private readonly ILogger<GitHubEvenProcessor> _logger;
+    private readonly ILogger<GitHubEventProcessor> _logger;
     private readonly IssueService _issueService;
 
-    public GitHubEvenProcessor(ILogger<GitHubEvenProcessor> logger, IssueService issueService)
+    public GitHubEventProcessor(ILogger<GitHubEventProcessor> logger, IssueService issueService)
     {
         _logger = logger;
         _issueService = issueService;

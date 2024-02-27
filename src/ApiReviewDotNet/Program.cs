@@ -28,7 +28,7 @@ builder.Services.AddSingleton<YouTubeServiceFactory>();
 builder.Services.AddSingleton<AreaOwnerService>();
 builder.Services.AddSingleton<OspoService>();
 builder.Services.AddSingleton<RepositoryGroupService>();
-builder.Services.AddSingleton<WebhookEventProcessor, GitHubEvenProcessor>();
+builder.Services.AddSingleton<WebhookEventProcessor, GitHubEventProcessor>();
 builder.Services.AddSingleton<CalendarService>();
 builder.Services.AddSingleton<YouTubeManager>();
 builder.Services.AddSingleton<GitHubManager>();
