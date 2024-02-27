@@ -7,13 +7,15 @@ namespace ApiReviewDotNet.Services.GitHub;
 
 public sealed class GitHubManager
 {
+    private readonly ILogger<GitHubManager> _logger;
     private readonly RepositoryGroupService _repositoryGroupService;
     private readonly GitHubClientFactory _clientFactory;
     private readonly AreaOwnerService _areaOwnerService;
     private readonly OspoService _ospoService;
 
-    public GitHubManager(RepositoryGroupService repositoryGroupService, GitHubClientFactory clientFactory, AreaOwnerService areaOwnerService, OspoService ospoService)
+    public GitHubManager(ILogger<GitHubManager> logger, RepositoryGroupService repositoryGroupService, GitHubClientFactory clientFactory, AreaOwnerService areaOwnerService, OspoService ospoService)
     {
+        _logger = logger;
         _repositoryGroupService = repositoryGroupService;
         _clientFactory = clientFactory;
         _areaOwnerService = areaOwnerService;
@@ -178,24 +180,28 @@ public sealed class GitHubManager
             Add(result, linkSet, areaOwner);
 
         return result.ToArray();
+    }
 
-        static void Add(List<ApiReviewer> target, OspoLinkSet linkSet, string? userName)
+    private void Add(List<ApiReviewer> target, OspoLinkSet linkSet, string? userName)
+    {
+        if (userName is null)
+            return;
+
+        if (target.Any(r => string.Equals(r.GitHubUserName, userName, StringComparison.OrdinalIgnoreCase)))
+            return;
+
+        if (!linkSet.LinkByLogin.TryGetValue(userName, out var link))
         {
-            if (userName is null)
-                return;
-
-            if (target.Any(r => string.Equals(r.GitHubUserName, userName, StringComparison.OrdinalIgnoreCase)))
-                return;
-
-            if (linkSet.LinkByLogin.TryGetValue(userName, out var link))
-            {
-                var reviewer = new ApiReviewer(
-                    gitHubUserName: userName,
-                    name: link.MicrosoftInfo.PreferredName,
-                    email: link.MicrosoftInfo.EmailAddress
-                );
-                target.Add(reviewer);
-            }
+            _logger.LogWarning("Ignored non-OSPO linked user '{userName}'", userName);
+        }
+        else
+        {
+            var reviewer = new ApiReviewer(
+                gitHubUserName: userName,
+                name: link.MicrosoftInfo.PreferredName,
+                email: link.MicrosoftInfo.EmailAddress
+            );
+            target.Add(reviewer);
         }
     }
 
