@@ -83,7 +83,6 @@ public sealed class GitHubManager
 
                 if (reviewOutcome is not null)
                 {
-                    var title = GitHubIssueHelpers.FixTitle(issue.Title);
                     var feedbackDateTime = reviewOutcome.DecisionTime;
 
                     var decision = reviewOutcome.Decision;
@@ -270,8 +269,13 @@ public sealed class GitHubManager
 
         public static ApiReadyEvent? Get(IEnumerable<IssueEvent> events, DateTimeOffset end)
         {
+            // NOTE: We want to know when an API was first marked as ready-for-review, as opposed to last.
+            //
+            // The reason being that when an API is reviewed and marked as need-work, flipping it back to
+            // ready-for-review should come back earlier, rather than later to aid review flow.
+
             foreach (var e in events.Where(e => e.CreatedAt <= end)
-                                    .OrderByDescending(e => e.CreatedAt))
+                                    .OrderBy(e => e.CreatedAt))
             {
                 switch (e.Event.StringValue)
                 {
@@ -298,6 +302,9 @@ public sealed class GitHubManager
 
         public static ApiBlockingEvent? Get(IEnumerable<IssueEvent> events, DateTimeOffset end)
         {
+            // NOTE: Since we use this expedite review, we generally want to know when an issue was last labelled as
+            //       blocking without maintaining its position within the blocking queue.
+
             foreach (var e in events.Where(e => e.CreatedAt <= end)
                                     .OrderByDescending(e => e.CreatedAt))
             {

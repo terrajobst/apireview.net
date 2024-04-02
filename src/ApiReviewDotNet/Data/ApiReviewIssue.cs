@@ -83,13 +83,13 @@ public sealed class ApiReviewIssue : IComparable<ApiReviewIssue>
         if (MarkedBlockingAt is not null &&
             MarkedBlockingBy is not null)
         {
-            return $"{IdFull} marked blocking {MarkedBlockingAt.Value.FormatRelative()} by {MarkedBlockingBy}";
+            return $"{IdFull} last marked blocking {MarkedBlockingAt.Value.FormatRelative()} by {MarkedBlockingBy}";
         }
 
         if (MarkedReadyAt is not null &&
             MarkedReadyForReviewBy is not null)
         {
-            return $"{IdFull} marked for review {MarkedReadyAt.Value.FormatRelative()} by {MarkedReadyForReviewBy}";
+            return $"{IdFull} first marked for review {MarkedReadyAt.Value.FormatRelative()} by {MarkedReadyForReviewBy}";
         }
 
         return $"{IdFull} {CreatedAt.FormatRelative()} by {Author}";
