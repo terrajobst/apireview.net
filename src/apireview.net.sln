@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30024.149
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.34906.271
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiReviewDotNet", "ApiReviewDotNet\ApiReviewDotNet.csproj", "{E043138F-E698-48AB-838E-D9BE2B31BF9F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "apireview.net", "apireview.net\apireview.net.csproj", "{E043138F-E698-48AB-838E-D9BE2B31BF9F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

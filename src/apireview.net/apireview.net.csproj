@@ -5,6 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <UserSecretsId>ApiReviewDotNet</UserSecretsId>
+    <RootNamespace>ApiReviewDotNet</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
