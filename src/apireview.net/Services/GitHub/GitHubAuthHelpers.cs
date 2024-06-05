@@ -1,6 +1,5 @@
 ﻿using ApiReviewDotNet.Data;
-
-using Octokit.GraphQL;
+using Octokit;
 
 namespace ApiReviewDotNet.Services.GitHub;
 
@@ -8,36 +7,33 @@ public static class GitHubAuthHelpers
 {
     public static async Task<bool> IsMemberOfAnyTeamAsync(string accessToken, string orgName, IEnumerable<string> teamSlugs, string userName)
     {
-        foreach (var teamSlug in teamSlugs)
-        {
-            if (await IsMemberOfTeamAsync(accessToken, orgName, teamSlug, userName))
-                return true;
-        }
-
-        return false;
-    }
-
-    public static async Task<bool> IsMemberOfTeamAsync(string accessToken, string orgName, string teamSlug, string userName)
-    {
         try
         {
             var productInformation = new ProductHeaderValue(ApiReviewConstants.ProductName);
-            var connection = new Connection(productInformation, accessToken);
+            var client = new GitHubClient(productInformation)
+            {
+                Credentials = new Credentials(accessToken)
+            };
 
-            var query = new Query()
-                .Organization(orgName)
-                .Team(teamSlug)
-                .Members(null, null, null, null, null, null, userName, null)
-                .AllPages()
-                .Select(u => u.Login);
+            var teams = await client.Organization.Team.GetAll(orgName);
+            var teamBySlug = teams.ToDictionary(t => t.Slug, StringComparer.OrdinalIgnoreCase);
 
-            var result = await connection.Run(query);
-            var exactUser = result.FirstOrDefault(login => string.Equals(login, userName, StringComparison.OrdinalIgnoreCase));
-            return exactUser is not null;
+
+            foreach (var teamSlug in teamSlugs)
+            {
+                if (!teamBySlug.TryGetValue(teamSlug, out var team))
+                    continue;
+
+                var membership = await client.Organization.Team.GetMembershipDetails(team.Id, userName);
+                if (membership is not null && membership.State == MembershipState.Active)
+                    return true;
+            }
         }
         catch
         {
-            return false;
+            // Ignore
         }
+
+        return false;
     }
 }
