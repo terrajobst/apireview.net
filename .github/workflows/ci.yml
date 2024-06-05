@@ -19,5 +19,5 @@ jobs:
 
     - name: dotnet build
       run: |
-        cd src/ApiReviewDotNet
+        cd src/apireview.net
         dotnet build -c Release

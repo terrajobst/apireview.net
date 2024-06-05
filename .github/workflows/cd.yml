@@ -19,7 +19,7 @@ jobs:
     
     - name: dotnet publish
       run: |
-        cd src/ApiReviewDotNet 
+        cd src/apireview.net 
         dotnet publish -c Release --self-contained -r linux-x64 /p:SourceRevisionId=${{ github.sha }}  -o '../../artifacts/ApiReviewDotNet'
 
     - name: Deploy to Azure Web App
