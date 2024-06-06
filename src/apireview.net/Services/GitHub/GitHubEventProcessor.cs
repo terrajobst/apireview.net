@@ -1,4 +1,5 @@
-﻿using ApiReviewDotNet.Data;
+﻿/*
+using ApiReviewDotNet.Data;
 using Octokit.Webhooks;
 using Octokit.Webhooks.Events;
 using Octokit.Webhooks.Models;
@@ -84,3 +85,4 @@ public sealed class GitHubEventProcessor : WebhookEventProcessor
                _relevantLabels.Contains(payload.Name);
     }
 }
+*/

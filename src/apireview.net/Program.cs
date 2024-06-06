@@ -11,8 +11,8 @@ using ApiReviewDotNet.Services.YouTube;
 using Azure.Identity;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Octokit.Webhooks;
-using Octokit.Webhooks.AspNetCore;
+// using Octokit.Webhooks;
+// using Octokit.Webhooks.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,7 +28,7 @@ builder.Services.AddSingleton<YouTubeServiceFactory>();
 builder.Services.AddSingleton<AreaOwnerService>();
 builder.Services.AddSingleton<OspoService>();
 builder.Services.AddSingleton<RepositoryGroupService>();
-builder.Services.AddSingleton<WebhookEventProcessor, GitHubEventProcessor>();
+// builder.Services.AddSingleton<WebhookEventProcessor, GitHubEventProcessor>();
 builder.Services.AddSingleton<CalendarService>();
 builder.Services.AddSingleton<YouTubeManager>();
 builder.Services.AddSingleton<GitHubManager>();
