@@ -31,6 +31,7 @@ builder.Services.AddSingleton<RepositoryGroupService>();
 builder.Services.AddSingleton<WebhookEventProcessor, GitHubEventProcessor>();
 builder.Services.AddSingleton<CalendarService>();
 builder.Services.AddSingleton<YouTubeManager>();
+builder.Services.AddSingleton<GitHubMembershipService>();
 builder.Services.AddSingleton<GitHubManager>();
 builder.Services.AddSingleton<GitHubTeamService>();
 builder.Services.AddSingleton<RefreshService>();
@@ -61,6 +62,7 @@ builder.Services.AddAuthentication(options =>
     options.Events.OnCreatingTicket = async context =>
     {
         var groupService = context.HttpContext.RequestServices.GetRequiredService<RepositoryGroupService>();
+        var membershipService = context.HttpContext.RequestServices.GetRequiredService<GitHubMembershipService>();
 
         var accessToken = context.AccessToken;
         var orgName = ApiReviewConstants.ApiApproverOrgName;
@@ -68,7 +70,7 @@ builder.Services.AddAuthentication(options =>
         if (accessToken is not null && context.Identity?.Name is not null)
         {
             var userName = context.Identity.Name;
-            var isMember = await GitHubAuthHelpers.IsMemberOfAnyTeamAsync(accessToken, orgName, teamSlugs, userName);
+            var isMember = await membershipService.IsMemberOfAnyTeamAsync(accessToken, orgName, teamSlugs, userName);
             if (isMember)
                 context.Identity.AddClaim(new Claim(context.Identity.RoleClaimType, ApiReviewConstants.ApiApproverRole));
 
