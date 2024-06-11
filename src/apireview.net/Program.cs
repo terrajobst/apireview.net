@@ -106,8 +106,7 @@ app.UseAuthorization();
 
 app.MapBlazorHub();
 app.MapDefaultControllerRoute();
-// Disable GitHub web hooks until they fixed the ABI incompatibility
-// app.MapGitHubWebhooks();
+app.MapGitHubWebhooks();
 app.MapFallbackToPage("/_Host");
 
 app.Run();
