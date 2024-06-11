@@ -132,7 +132,7 @@ public sealed class SummaryPublishingService
             if (item.FeedbackId is not null && videoUrl is not null)
             {
                 var updatedMarkdown = $"[Video]({videoUrl})\n\n{item.FeedbackMarkdown}";
-                var commentId = Convert.ToInt32(item.FeedbackId);
+                var commentId = Convert.ToInt64(item.FeedbackId);
                 await github.Issue.Comment.Update(item.Issue.Owner, item.Issue.Repo, commentId, updatedMarkdown);
             }
         }
@@ -154,7 +154,7 @@ public sealed class SummaryPublishingService
             {
                 var status = item.Decision.ToString();
                 var updatedMarkdown = $"[Video]({status})\n\n{item.FeedbackMarkdown}";
-                var commentId = Convert.ToInt32(item.FeedbackId);
+                var commentId = Convert.ToInt64(item.FeedbackId);
                 await github.Issue.Comment.Update(item.Issue.Owner, item.Issue.Repo, commentId, updatedMarkdown);
             }
         }
