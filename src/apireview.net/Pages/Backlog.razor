@@ -102,13 +102,13 @@
                     <input class="ml-2 mr-3" type="checkbox" checked="@_checkedIssues.Contains(issue)" @onchange="e => CheckIssue(issue, (bool)e.Value!)" />
                 </div>
                 <div>
-                    <a class="gh-issue-title" href="@issue.Url">@issue.Title</a>
+                    <a class="gh-issue-title" href="@issue.Url">@issue.Title.HighlightCode()</a>
                     <span>
                         @foreach (var label in issue.Labels)
                         {
                             <span class="gh-label"
                                   style="@label.GetStyle()"
-                                  title="@label.Description">@label.Name</span>
+                                  title="@label.Description">@label.Name.ExpandEmojis()</span>
                         }
                     </span>
                     <div class="gh-details-cell">
