@@ -58,6 +58,17 @@ public sealed partial class Backlog : IDisposable
     public IEnumerable<ApiReviewIssue> VisibleIssues => Issues.Where(IsVisible);
     public IEnumerable<ApiReviewIssue> SelectedIssues => VisibleIssues.Where(_checkedIssues.Contains);
 
+    public int GetRank(ApiReviewIssue issue)
+    {
+        for (var i = 0; i < Issues.Count; i++)
+        {
+            if (ReferenceEquals(Issues[i], issue))
+                return i + 1;
+        }
+
+        return -1;
+    }
+    
     protected override void OnInitialized()
     {
         _selectedGroup = RepositoryGroupService.Default;

@@ -118,6 +118,14 @@
                         {
                             <span class="ml-2 mr-1 oi oi-signpost text-muted" aria-hidden="true"></span>@issue.Milestone
                         }
+
+                        @{
+                            var rank = GetRank(issue);
+                            if (rank >= 0)
+                            {
+                                <span class="ml-2 mr-1 oi oi-elevator text-muted" aria-hidden="true" title="Backlog Rank"></span>@rank
+                            }
+                        }
                     </div>
                 </div>
             </div>
