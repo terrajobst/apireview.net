@@ -40,7 +40,7 @@ public sealed class RefreshService
     {
         try
         {
-            await _ospoService.ReloadAsync();
+            //await _ospoService.ReloadAsync();
             await _teamService.ReloadAsync();
             await _areaOwnerService.ReloadAsync();
             await _issueService.ReloadAsync();

@@ -96,7 +96,7 @@ else
     app.UseHsts();
 }
 
-app.UseHostRedirection("apireviews.azurewebsites.net", "apireview.net");
+app.UseHostRedirection("apireview.azurewebsites.net", "apireview.net");
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
