@@ -36,9 +36,9 @@ builder.Services.AddSingleton<GitHubManager>();
 builder.Services.AddSingleton<GitHubTeamService>();
 builder.Services.AddSingleton<RefreshService>();
 
-builder.Configuration.AddAzureKeyVault(
-    new Uri($"https://{builder.Configuration["KeyVaultName"]}.vault.azure.net/"),
-    new DefaultAzureCredential());
+//builder.Configuration.AddAzureKeyVault(
+//    new Uri($"https://{builder.Configuration["KeyVaultName"]}.vault.azure.net/"),
+//    new DefaultAzureCredential());
 
 builder.Services.AddSingleton<SummaryManager>();
 builder.Services.AddSingleton<SummaryPublishingService>();
