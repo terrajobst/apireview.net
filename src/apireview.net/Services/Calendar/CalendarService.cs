@@ -6,7 +6,7 @@ namespace ApiReviewDotNet.Services.Calendar;
 
 public sealed class CalendarService
 {
-    public string Url => "https://outlook.office365.com/owa/calendar/3b9be8f4136f47bfb3bd10638b946523@microsoft.com/dedb09caf32a4c23be118e9f97ad25717678617836187798260/calendar.ics";
+    public string Url => "https://outlook.office365.com/owa/calendar/af2b46caf68d451787ff1b121ed50a40@microsoft.com/0a462958ba9e4b0785d278b96308193212993146288461861038/calendar.ics";
 
     private readonly IHttpClientFactory _httpClientFactory;
 
